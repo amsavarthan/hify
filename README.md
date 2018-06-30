@@ -27,9 +27,6 @@ Just a social app. This app is still in **beta** and lacks some features.
 
 ## In development features (TO-DO)
 
-* Profile
-  - More settings **(yet to)**
-  - Security options **(yet to)**
 * Real-time Chat
   - Chat with your friends either in private or group **(yet to)**
 * Messages
@@ -46,6 +43,7 @@ Just a social app. This app is still in **beta** and lacks some features.
 This whole project is maintained only by **Amsavarthan Lv (me)**.
 
 If you like to contribute, please let me know
+Email : amsavarthan.a@gmail.com
 
 ## Credits
 
