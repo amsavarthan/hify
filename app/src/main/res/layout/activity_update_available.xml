@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="40dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp"
+    android:orientation="vertical"
+    android:background="@color/colorAccentt"
+    tools:context=".ui.activities.account.UpdateAvailable">
+
+    <LinearLayout
+        android:layout_above="@+id/button"
+        android:layout_alignParentTop="false"
+        android:id="@+id/top"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:textColor="#FFF"
+            android:gravity="start"
+            android:textSize="42sp"
+            android:text="New Update Available"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="#FFF"
+            android:gravity="start"
+            android:textSize="21sp"
+            android:text="Improvements:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_marginTop="5dp"
+            android:textColor="#FFF"
+            android:gravity="start"
+            android:textSize="18sp"
+            android:text="New Update Available"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <Button
+        android:text="Download"
+        android:background="@drawable/button_white_backgtound"
+        android:id="@+id/button"
+        android:onClick="onDownloadClick"
+        android:layout_above="@+id/alert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textSize="18sp"
+        android:textColor="#FFF"
+        android:text="Important: Logout from your Hify account, uninstall existing app and then install the downloaded apk."
+        android:id="@+id/alert"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

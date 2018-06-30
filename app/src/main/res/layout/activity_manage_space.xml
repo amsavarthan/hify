@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="30dp"
+    android:background="@color/colorAccentt"
+    tools:context=".ui.activities.ManageSpace">
+
+    <TextView
+        android:layout_alignParentTop="true"
+        android:textSize="52sp"
+        android:paddingStart="20dp"
+        android:text="Manage Space"
+        android:textColor="#FFF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/cache"
+        android:onClick="onClearCache"
+        android:layout_above="@+id/logout"
+        android:layout_margin="10dp"
+        android:text="Clear cache"
+        android:background="@drawable/button_white_backgtound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/logout"
+        android:text="Logout"
+        android:onClick="onLogoutClick"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_white_backgtound"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

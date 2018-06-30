@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="20dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimaryy">
+
+   <LinearLayout
+       android:paddingBottom="20dp"
+       android:orientation="vertical"
+       android:gravity="center"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+       <ImageView
+           android:src="@mipmap/logo"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content" />
+
+       <TextView
+           android:layout_marginTop="10dp"
+           android:textSize="32sp"
+           android:textColor="#212121"
+           android:text="@string/app_name"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content" />
+
+       <TextView
+           android:layout_marginTop="5dp"
+           android:textSize="16sp"
+           android:text="beta4"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content" />
+
+       <android.support.v7.widget.CardView
+           app:cardBackgroundColor="@color/cardview_dark_background"
+           android:layout_margin="10dp"
+           app:cardUseCompatPadding="true"
+           app:cardCornerRadius="4dp"
+           app:cardPreventCornerOverlap="true"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+           <LinearLayout
+               android:paddingBottom="10dp"
+               android:orientation="vertical"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+
+               <TextView
+                   android:padding="10dp"
+                   android:textSize="18sp"
+                   android:textColor="#FFF"
+                   android:text="Author"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content" />
+
+               <View
+                   android:background="#818181"
+                   android:layout_width="match_parent"
+                   android:layout_height="1dp"/>
+
+               <LinearLayout
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/ic_person_outline_black_24dp"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp"/>
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="@string/author_name"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/website"
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/ic_public_white_24dp"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp"/>
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="Visit my website for more apps"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/email"
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/ic_email_white_24dp"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp" />
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="Send me an email"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/instagram"
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/instagram"
+                       android:tint="#FFF"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp" />
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="Follow me on Instagram"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/google"
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/google_plus"
+                       android:tint="#FFF"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp" />
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="Add me to your circles"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+               <LinearLayout
+                   android:id="@+id/manage"
+                   android:clickable="true"
+                   android:focusable="true"
+                   android:foreground="?selectableItemBackground"
+                   android:padding="10dp"
+                   android:layout_marginTop="5dp"
+                   android:orientation="horizontal"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <ImageView
+                       android:src="@drawable/ic_storage_white_24dp"
+                       android:tint="#FFF"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp" />
+
+                   <TextView
+                       android:textColor="#FFF"
+                       android:textSize="18sp"
+                       android:layout_marginStart="10dp"
+                       android:text="Manage space"
+                       android:gravity="center_vertical"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent" />
+
+               </LinearLayout>
+
+
+           </LinearLayout>
+
+       </android.support.v7.widget.CardView>
+
+       <LinearLayout
+           android:id="@+id/github"
+           android:padding="10dp"
+           android:layout_marginTop="10dp"
+           android:gravity="center_horizontal"
+           android:orientation="horizontal"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+
+           <ImageView
+               android:src="@drawable/ic_github"
+               android:layout_width="40dp"
+               android:layout_height="40dp" />
+
+           <TextView
+               android:gravity="center_vertical"
+               android:text=" Open Source Project"
+               android:textSize="20sp"
+               android:layout_width="wrap_content"
+               android:layout_height="match_parent" />
+
+       </LinearLayout>
+
+
+
+   </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryy"
+    android:orientation="vertical"
+    tools:context=".ui.activities.friends.SendActivity">
+
+    <LinearLayout
+        android:padding="10dp"
+        android:id="@+id/top"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:onClick="PreviewProfileImage"
+            android:src="@drawable/default_user_art_g_2"
+            app:civ_border_color="@color/colorPrimaryy"
+            app:civ_border_width="1dp" />
+
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/user_name"
+            fontPath="fonts/bold.ttf"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            tools:ignore="MissingPrefix" />
+
+    </LinearLayout>
+
+    <EditText
+        android:layout_above="@+id/tabs"
+        android:id="@+id/message"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/input_backgtound_grey"
+        android:hint="Enter Message"
+        android:inputType="textCapSentences|textMultiLine"
+        android:paddingStart="20dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"/>
+
+    <HorizontalScrollView
+        android:id="@+id/tabs"
+        android:layout_alignParentBottom="true"
+        android:scrollbars="none"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/options"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_background"
+                android:text=" Send message "
+                android:padding="10dp"
+                />
+
+            <TextView
+                android:id="@+id/attachment"
+                android:layout_marginStart="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_background"
+                android:text=" Add an Attachment "
+                android:onClick="SelectImage"
+                android:padding="10dp"
+                />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_background"
+                android:onClick="shareLocation"
+                android:text=" Share location "
+                android:padding="10dp"
+                />
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/removeImage"
+                android:layout_marginStart="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_background"
+                android:text=" Remove attachment "
+                android:onClick="RemoveImage"
+                android:padding="10dp"
+                />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card"
+        android:layout_below="@id/top"
+        android:layout_above="@id/message"
+        app:cardUseCompatPadding="true"
+        app:cardCornerRadius="4dp"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/imageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <me.grantland.widget.AutofitTextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:maxLines="4"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                fontPath="fonts/bold.ttf"
+                android:text="Add an attachment to see its preview here"
+                android:textColor="#212121"
+                android:textSize="42sp"
+                app:minTextSize="18dp"
+                app:sizeToFit="true" />
+
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:onClick="PreviewImage"
+                android:scaleType="centerCrop" />
+
+        </FrameLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF"
+    android:orientation="vertical"
+    tools:context="com.amsavarthan.hify.ui.activities.post.PostText">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_alignParentTop="true"
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#FFF"
+            app:title="New Text Post" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
+        android:layout_below="@+id/top"
+        android:layout_above="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/input_light_white"
+                android:hint="Your text here"
+                android:inputType="textCapSentences"
+                android:paddingStart="20dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#495aff" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#03a9f4" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#e91e63" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#7579ff" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#ffea00" />
+
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#4d69ff" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#d500f9" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#12c700" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Preview"
+                android:textColor="#212121"
+                android:textSize="20sp" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="8dp"
+                app:cardMaxElevation="5dp"
+                app:cardUseCompatPadding="true">
+
+                <FrameLayout
+                    android:id="@+id/image_holder"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:background="@drawable/gradient_2">
+
+                    <me.grantland.widget.AutofitTextView
+                        android:id="@+id/text_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:gravity="center"
+                        android:maxLines="4"
+                        android:textColor="#FFF"
+                        android:textSize="70sp"
+                        app:minTextSize="16dp"
+                        app:sizeToFit="true" />
+
+                </FrameLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.google.android.gms.ads.AdView
+        android:layout_alignParentBottom="true"
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="@string/banner_ad_2">
+    </com.google.android.gms.ads.AdView>
+
+</RelativeLayout>
