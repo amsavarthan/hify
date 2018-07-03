@@ -148,7 +148,7 @@ public class ProfileFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
@@ -221,7 +221,7 @@ public class ProfileFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
             mRecyclerView.setItemAnimator(new SlideInLeftAnimator());

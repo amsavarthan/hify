@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
+import android.support.multidex.MultiDex;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -191,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         getSharedPreferences("fcm_activity",MODE_PRIVATE).edit().putBoolean("active",false).apply();
 
     }
-
 
     @Override
     protected void onStart() {

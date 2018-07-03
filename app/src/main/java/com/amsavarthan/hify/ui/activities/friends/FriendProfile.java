@@ -147,7 +147,7 @@ public class FriendProfile extends AppCompatActivity {
             }
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 

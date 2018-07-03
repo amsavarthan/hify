@@ -82,12 +82,45 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.amsavarthan.hify.ui.views.HifyImageView
-                android:id="@+id/post_image"
-                android:adjustViewBounds="true"
+            <FrameLayout
+                android:id="@+id/pager_layout"
+                android:visibility="visible"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:layout_height="wrap_content">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/pager"
+                    android:background="@color/colorPrimaryy"
+                    android:layout_gravity="top"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    />
+
+                <RelativeLayout
+                    android:id="@+id/indicator_holder"
+                    android:background="#90000000"
+                    android:layout_gravity="bottom"
+                    android:padding="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.rd.PageIndicatorView
+                        android:id="@+id/indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:piv_animationType="swap"
+                        android:layout_centerInParent="true"
+                        app:piv_dynamicCount="true"
+                        app:piv_interactiveAnimation="true"
+                        app:piv_selectedColor="@color/colorAccentt"
+                        app:piv_unselectedColor="@color/colorPrimaryy"
+                        app:piv_viewPager="@+id/pager"
+                        app:piv_padding="10dp"
+                        app:piv_radius="3.5dp" />
+
+                </RelativeLayout>
+
+            </FrameLayout>
 
             <me.grantland.widget.AutofitTextView
                 android:id="@+id/post_text"

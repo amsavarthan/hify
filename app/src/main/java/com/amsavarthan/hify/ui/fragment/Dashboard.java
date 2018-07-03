@@ -76,7 +76,7 @@ public class Dashboard extends Fragment {
         currentUser = mAuth.getCurrentUser();
 
         mPostsList = new ArrayList<>();
-        mAdapter = new PostsAdapter(mPostsList, view.getContext());
+        mAdapter = new PostsAdapter(mPostsList, view.getContext(),getActivity());
         mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
 
         mPostsRecyclerView.setItemAnimator(new SlideInLeftAnimator());

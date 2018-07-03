@@ -166,7 +166,7 @@ public class PostText extends AppCompatActivity {
                 postMap.put("name", documentSnapshot.getString("name"));
                 postMap.put("userimage", documentSnapshot.getString("image"));
                 postMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                postMap.put("image", "no_image");
+                postMap.put("image_count",0);
                 postMap.put("likes", "0");
                 postMap.put("favourites", "0");
                 postMap.put("description", text.getText().toString());

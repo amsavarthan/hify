@@ -30,65 +30,141 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:paddingBottom="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/card_image"
+            <RelativeLayout
+                android:id="@+id/pager_layout"
+                android:visibility="gone"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:onClick="onImageSelect"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:cardMaxElevation="5dp"
-                app:cardUseCompatPadding="true">
+                android:layout_height="match_parent">
 
-                <FrameLayout
-                    android:id="@+id/image_holder"
+               <FrameLayout
+                   android:id="@+id/pager_inner_layout"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content">
+
+                   <android.support.v4.view.ViewPager
+                       android:id="@+id/pager"
+                       android:background="@color/colorPrimaryy"
+                       android:layout_gravity="top"
+                       android:layout_width="match_parent"
+                       android:layout_height="350dp"
+                       />
+
+                   <RelativeLayout
+                       android:id="@+id/indicator_holder"
+                       android:background="#90000000"
+                       android:layout_gravity="bottom"
+                       android:padding="12dp"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content">
+
+                       <com.rd.PageIndicatorView
+                           android:id="@+id/indicator"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           app:piv_animationType="swap"
+                           android:layout_centerInParent="true"
+                           app:piv_dynamicCount="true"
+                           app:piv_interactiveAnimation="true"
+                           app:piv_selectedColor="@color/colorAccentt"
+                           app:piv_unselectedColor="@color/colorPrimaryy"
+                           app:piv_viewPager="@+id/pager"
+                           app:piv_padding="10dp"
+                           app:piv_radius="3.5dp" />
+
+                   </RelativeLayout>
+
+               </FrameLayout>
+
+                <EditText
+                    android:id="@+id/text"
+                    android:layout_below="@+id/pager_inner_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="350dp"
-                    android:background="@drawable/gradient_2">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/input_light_white"
+                    android:hint="Some description about the post"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:paddingBottom="15dp"
+                    android:paddingEnd="25dp"
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:paddingStart="25dp"
+                    android:paddingTop="15dp" />
 
-                    <ImageView
-                        android:id="@+id/post_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="post_image"
-                        android:scaleType="centerCrop" />
+            </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/help_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:background="#80000000"
-                        android:padding="15dp"
-                        android:text="Click to change image"
-                        android:textColor="#FFF"
-                        android:textSize="18sp" />
-
-                </FrameLayout>
-
-            </android.support.v7.widget.CardView>
-
-            <EditText
-                android:id="@+id/text"
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/empty_holder"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/input_light_white"
-                android:hint="Some description about the post"
-                android:inputType="textCapSentences|textMultiLine"
-                android:paddingBottom="15dp"
-                android:paddingEnd="25dp"
-                android:paddingLeft="25dp"
-                android:paddingRight="25dp"
-                android:paddingStart="25dp"
-                android:paddingTop="15dp" />
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_gravity="center"
+                    android:padding="34dp"
+                    android:tint="@color/colorAccentt"
+                    android:layout_marginTop="25dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="@drawable/circle_lightwhite"
+                    android:src="@drawable/ic_photo_library_black_24dp"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp" />
+
+                <TextView
+                    android:textColor="@color/colorAccentt"
+                    android:textSize="20sp"
+                    fontPath="fonts/bold.ttf"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="@string/insert_image_s"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:ignore="MissingPrefix" />
+
+                <TextView
+                    android:textSize="17sp"
+                    android:gravity="center"
+                    android:textColor="#212121"
+                    android:padding="5dp"
+                    android:text="@string/click_on_the_button_below_to_select_image_s"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/input_backgtound"
+                    android:onClick="onSelectImage"
+                    android:text="@string/select_from_gallery"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorPrimaryy"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/button1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/input_light_white"
+                    android:onClick="onSelectImageCamera"
+                    android:text="Take a picture"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorAccentt"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
