@@ -2,6 +2,7 @@ package com.amsavarthan.hify.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcelable;
@@ -16,9 +17,12 @@ import android.widget.ImageView;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.MultipleImage;
+import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
+import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.ui.views.HifyImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.jgabrielfreitas.core.BlurImageView;
 import com.yalantis.ucrop.UCrop;
 
@@ -61,7 +65,7 @@ public class PostPhotosAdapter extends PagerAdapter {
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup view, int position) {
+    public Object instantiateItem(@NonNull ViewGroup view, final int position) {
         final View imageLayout = inflater.inflate(R.layout.item_viewpager_image, view, false);
 
         assert imageLayout!=null;
@@ -69,6 +73,17 @@ public class PostPhotosAdapter extends PagerAdapter {
         //BlurImageView background_image = imageLayout.findViewById(R.id.background_image);
 
         if(!local) {
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(context,ImagePreviewSave.class)
+                            .putExtra("uri","")
+                            .putExtra("sender_name","Posts")
+                            .putExtra("url",IMAGES.get(position).getUrl());
+                    context.startActivity(intent);
+                }
+            });
 
             /*Glide.with(context)
                     .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))

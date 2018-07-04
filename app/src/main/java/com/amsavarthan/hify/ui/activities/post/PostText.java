@@ -172,7 +172,6 @@ public class PostText extends AppCompatActivity {
                 postMap.put("description", text.getText().toString());
                 postMap.put("color", color);
 
-                Toast.makeText(PostText.this, color, Toast.LENGTH_SHORT).show();
 
                 mFirestore.collection("Posts")
                         .add(postMap)

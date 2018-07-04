@@ -1,116 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    android:id="@+id/main_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryy"
-    tools:context=".ui.activities.message.NotificationActivity">
+    tools:context=".ui.activities.notification.NotificationActivity">
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/page_title"
+        android:text="Flash message"
+        android:padding="10dp"
+        android:textColor="#212121"
+        android:textSize="17sp"
+        fontPath="fonts/bold.ttf"
+        android:layout_alignParentTop="true"
+        android:gravity="center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:ignore="MissingPrefix" />
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progressBar"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/circleImageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/default_user_art_g_2"
+            app:civ_border_color="@color/colorPrimaryy"
+            app:civ_border_width="0dp" />
 
         <LinearLayout
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/progressBar"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp"
-            android:paddingEnd="10dp"
-            android:paddingStart="10dp"
-            android:paddingTop="20dp">
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/circleImageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/default_user_art_g_2"
-                app:civ_border_color="@color/colorPrimaryy"
-                app:civ_border_width="0dp" />
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/name"
+                android:padding="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="Loading name..."
+                android:text="username"
                 android:textColor="#FF000000"
-                android:textSize="20sp" />
+                />
+
+            <TextView
+                android:id="@+id/messagetxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_left"
+                android:padding="10dp"
+                android:layout_marginStart="10dp"
+                android:text="Message"
+                android:textSize="17sp"
+                android:textColor="#fff" />
+
 
         </LinearLayout>
 
 
-        <TextView
-            android:id="@+id/messagetxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/toolbar"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/chat_left"
-            android:padding="20dp"
-            android:text="Message"
-            android:textColor="#fff" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/message_layout"
+        android:layout_above="@+id/send"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/message"
-            android:layout_width="match_parent"
+            android:layout_weight="4"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/messagetxt"
-            android:layout_margin="30dp"
-            android:background="@drawable/input_backgtound_grey"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/chat_right"
             android:hint="Enter Message"
             android:inputType="textCapSentences"
-            android:padding="20dp" />
-
-        <Button
-            android:id="@+id/send"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/message"
-            android:layout_marginBottom="20dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/input_backgtound"
-            android:text="Reply"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="17sp" />
-
-        <Button
-            android:id="@+id/sendNew"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/send"
-            android:layout_marginBottom="30dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/input_backgtound_grey"
-            android:onClick="SendNew"
-            android:text="Send new Hify"
-            android:textAllCaps="false"
-            android:textSize="17sp" />
+            android:padding="15dp" />
 
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:indeterminate="true"
-            android:visibility="invisible" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/currentProfile"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:src="@drawable/default_user_art_g_2"
+            app:civ_border_color="@color/colorPrimaryy"
+            app:civ_border_width="0dp" />
 
-    </RelativeLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/send"
+        android:layout_above="@+id/sendNew"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/input_backgtound"
+        android:text="Reply"
+        android:textAllCaps="false"
+        android:textColor="#ffffff"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/sendNew"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/input_light_white"
+        android:onClick="SendNew"
+        android:text="Send new Hify"
+        android:textAllCaps="false"
+        android:textSize="15sp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_below="@id/page_title"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+</RelativeLayout>
 
 
-</ScrollView>

@@ -11,6 +11,7 @@ import com.amsavarthan.hify.R;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.jgabrielfreitas.core.BlurImageView;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -19,7 +20,6 @@ public class ImagePreview extends AppCompatActivity {
 
 
     String intent_URI,intent_URL;
-    private PhotoView photoView;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -67,15 +67,18 @@ public class ImagePreview extends AppCompatActivity {
         intent_URI=getIntent().getStringExtra("uri");
         intent_URL=getIntent().getStringExtra("url");
 
-        photoView = (PhotoView) findViewById(R.id.photo_view);
+        PhotoView photoView = findViewById(R.id.photo_view);
 
         if(!TextUtils.isEmpty(intent_URI)) {
             photoView.setImageURI(Uri.parse(intent_URI));
         }else {
+
             Glide.with(this)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.mipmap.fullimage)))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder)))
                     .load(intent_URL)
                     .into(photoView);
+
+
         }
 
     }

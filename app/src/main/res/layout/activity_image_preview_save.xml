@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryy"
-    tools:context=".ui.activities.message.ImagePreviewSave">
+    android:background="@color/colorPrimary"
+    tools:context=".ui.activities.notification.ImagePreviewSave">
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/photo_view"
+        android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/saveImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:background="@color/blackOverlay"
         android:clickable="true"
         android:focusable="true"
         android:onClick="saveImage"
         android:padding="16dp"
-        android:src="@drawable/ic_file_download_black_24dp"
-        android:text="Save Image"
-        android:textColor="@color/colorPrimaryy" />
+        android:src="@drawable/ic_file_download_white_24dp"
+        />
 
 
-</RelativeLayout>
+</FrameLayout>

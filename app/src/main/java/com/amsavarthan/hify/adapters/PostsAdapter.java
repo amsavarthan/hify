@@ -284,27 +284,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         });
 
-        holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
-            @Override
-            public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
-                if (postList.get(holder.getAdapterPosition()).getImage_count()==0) {
 
-                    Intent intent = new Intent(Intent.ACTION_SEND)
-                            .setType("image/*");
-                    //ByteArrayOutputStream stream=new ByteArrayOutputStream();
-                    intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), holder, "hify_user_" + postList.get(holder.getAdapterPosition()).getUserId()));
-                    try {
-                        context.startActivity(Intent.createChooser(intent, "Share using..."));
-                    } catch (ActivityNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    holder.share_btn.setVisibility(View.GONE);
-                }
-            }
-
-        });
 
 
     }
@@ -347,7 +327,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return bitmap;
     }
 
-    private void setupViews(ViewHolder holder) {
+    private void setupViews(final ViewHolder holder) {
 
         int pos = holder.getAdapterPosition();
 
@@ -373,6 +353,27 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.post_text.setVisibility(View.VISIBLE);
             holder.post_text.setText(postList.get(pos).getDescription());
 
+            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
+                @Override
+                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
+                    if (postList.get(holder.getAdapterPosition()).getImage_count()==0) {
+
+                        Intent intent = new Intent(Intent.ACTION_SEND)
+                                .setType("image/*");
+                        intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), holder, "hify_user_" + postList.get(holder.getAdapterPosition()).getUserId()));
+                        try {
+                            context.startActivity(Intent.createChooser(intent, "Share using..."));
+                        } catch (ActivityNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        holder.share_btn.setVisibility(View.GONE);
+                    }
+                }
+
+            });
+
         } else if(postList.get(pos).getImage_count()==1) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
@@ -383,7 +384,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.indicator.setViewPager(holder.pager);
             holder.indicator_holder.setVisibility(View.GONE);
             photosAdapter.notifyDataSetChanged();
-            holder.share_btn.setEnabled(false);
 
             holder.pager_layout.setVisibility(View.VISIBLE);
             holder.post_text.setVisibility(View.GONE);
@@ -391,6 +391,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             String desc = "<b>" + postList.get(pos).getUsername() + "</b> " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
+            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
+                @Override
+                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
+                    Toast.makeText(context, "Click the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
+                }
+
+            });
 
         }else if(postList.get(pos).getImage_count()>0) {
 
@@ -401,7 +408,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.pager.setAdapter(photosAdapter);
             holder.indicator.setViewPager(holder.pager);
             photosAdapter.notifyDataSetChanged();
-            holder.share_btn.setEnabled(false);
 
             holder.pager_layout.setVisibility(View.VISIBLE);
             holder.post_text.setVisibility(View.GONE);
@@ -409,6 +415,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             String desc = "<b>" + postList.get(pos).getUsername() + "</b> " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
+            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
+                @Override
+                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
+                    Toast.makeText(context, "Click the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
+                }
+
+            });
 
         }
     }

@@ -77,10 +77,10 @@ public class NotificationUtil {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setupChannels(NotificationManager notificationManager, String channelName, String channelDesc) {
         NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
         adminChannel.setDescription(channelDesc);
         adminChannel.enableLights(true);
-        adminChannel.setLightColor(Color.RED);
+        adminChannel.setLightColor(Color.BLUE);
         adminChannel.canShowBadge();
         adminChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
         adminChannel.enableVibration(true);

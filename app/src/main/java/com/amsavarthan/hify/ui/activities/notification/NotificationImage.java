@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -93,6 +94,9 @@ public class NotificationImage extends AppCompatActivity {
                 .build()
         );
 
+        /*int[] drawable={R.drawable.gradient_1,R.drawable.gradient_4,R.drawable.gradient_6,R.drawable.gradient_5,R.drawable.gradient_8,R.drawable.gradient_10,R.drawable.gradient_9};
+        findViewById(R.id.main_layout).setBackground(getResources().getDrawable(drawable[new Random().nextInt(drawable.length)]));
+*/
         nameTxt = (TextView) findViewById(R.id.name);
         messageTxt = (TextView) findViewById(R.id.messagetxt);
         imageView = (CircleImageView) findViewById(R.id.circleImageView);
@@ -112,9 +116,30 @@ public class NotificationImage extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
 
         Glide.with(NotificationImage.this)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.mipmap.image))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))
                 .load(imageUri)
                 .into(messageImage);
+
+        mFirestore.collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                String image_ = documentSnapshot.getString("image");
+                CircleImageView imageView=findViewById(R.id.currentProfile);
+
+                Glide.with(NotificationImage.this)
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .load(image_)
+                        .into(imageView);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+
 
         mFirestore.collection("Users").document(user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -177,7 +202,7 @@ public class NotificationImage extends AppCompatActivity {
 
                             Toast.makeText(NotificationImage.this, "Hify sent!", Toast.LENGTH_SHORT).show();
                             message.setText("");
-                            mBar.setVisibility(View.INVISIBLE);
+                            mBar.setVisibility(View.GONE);
                             finish();
 
                         }
@@ -185,7 +210,7 @@ public class NotificationImage extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(NotificationImage.this, "Error sending Hify: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            mBar.setVisibility(View.INVISIBLE);
+                            mBar.setVisibility(View.GONE);
                         }
                     });
 

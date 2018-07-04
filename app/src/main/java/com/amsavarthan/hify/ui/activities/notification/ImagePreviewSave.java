@@ -29,6 +29,7 @@ import com.amsavarthan.hify.utils.Config;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.jgabrielfreitas.core.BlurImageView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -71,7 +72,7 @@ public class ImagePreviewSave extends AppCompatActivity {
                         .setColorized(true)
                         .setSound(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.hify_sound))
                         .setColor(Color.parseColor("#2591FC"))
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.ic_file_download_accent_24dp)
                         .setContentText("Image saved in /Downloads/Hify/" + sender_name)
                         .build();
 
@@ -141,15 +142,20 @@ public class ImagePreviewSave extends AppCompatActivity {
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
-        photoView = (PhotoView) findViewById(R.id.photo_view);
+        photoView = findViewById(R.id.photo_view);
 
         if(!TextUtils.isEmpty(intent_URI)) {
             photoView.setImageURI(Uri.parse(intent_URI));
+
+
         }else {
+
             Glide.with(this)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.mipmap.fullimage)))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder)))
                     .load(intent_URL)
                     .into(photoView);
+
+
         }
 
     }

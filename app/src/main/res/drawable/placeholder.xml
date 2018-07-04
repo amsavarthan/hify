@@ -18,7 +18,7 @@
     </item>
     <item>
         <rotate
-            android:drawable="@drawable/ic_menu_gallery"
+            android:drawable="@drawable/ic_image_post"
             android:fromDegrees="0"
             android:toDegrees="0" />
     </item>
