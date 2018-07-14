@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/image_holder"
-    android:background="@color/colorPrimaryy"
+    android:background="#f7f7f7"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

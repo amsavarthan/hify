@@ -182,7 +182,6 @@ public class PostImage extends AppCompatActivity {
         mStorage=FirebaseStorage.getInstance().getReference();
     }
 
-
     @Override
     public void onPause() {
         if (mAdView != null) {
@@ -511,36 +510,11 @@ public class PostImage extends AppCompatActivity {
 
     InterstitialAd interstitialAd;
 
-    private void showAd(boolean state) {
-
-        if(!state){
-            mAdView.setVisibility(View.GONE);
-            return;
-        }
-
-        mAdView.setVisibility(View.VISIBLE);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener(){
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                mAdView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                mAdView.setVisibility(View.GONE);
-            }
-        });
-    }
-
     public void initAd(){
         interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_2));
+        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
 
-        AdRequest adRequest=new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
         interstitialAd.loadAd(adRequest);
         interstitialAd.setAdListener(new AdListener(){
             @Override
@@ -548,14 +522,41 @@ public class PostImage extends AppCompatActivity {
                 interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         });
+
     }
+
+    private void showAd(boolean state) {
+
+        if(!state) {
+            mAdView.setVisibility(View.GONE);
+        }else{
+
+            mAdView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
+            mAdView.loadAd(adRequest);
+            mAdView.setAdListener(new AdListener(){
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    mAdView.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAdFailedToLoad(int i) {
+                    super.onAdFailedToLoad(i);
+                    mAdView.setVisibility(View.GONE);
+                }
+            });
+
+        }
+    }
+
 
     public void showAd() {
         if(interstitialAd.isLoaded()){
             interstitialAd.show();
         }
     }
-
     //endregion
 
 

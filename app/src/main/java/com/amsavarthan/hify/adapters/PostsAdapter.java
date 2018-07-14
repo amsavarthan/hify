@@ -1,5 +1,9 @@
 package com.amsavarthan.hify.adapters;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
@@ -20,6 +24,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,6 +51,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.pedromassango.doubleclick.DoubleClick;
+import com.pedromassango.doubleclick.DoubleClickListener;
 import com.rd.PageIndicatorView;
 
 import java.io.ByteArrayOutputStream;
@@ -69,6 +78,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private FirebaseUser mCurrentUser;
     private boolean isOwner;
     private Activity activity;
+    private static final DecelerateInterpolator DECCELERATE_INTERPOLATOR = new DecelerateInterpolator();
+    private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
+    private static final OvershootInterpolator OVERSHOOT_INTERPOLATOR = new OvershootInterpolator(4);
 
     public PostsAdapter(List<Post> postList, Context context,Activity activity) {
         this.postList = postList;
@@ -374,6 +386,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             });
 
+
         } else if(postList.get(pos).getImage_count()==1) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
@@ -399,6 +412,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             });
 
+
         }else if(postList.get(pos).getImage_count()>0) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
@@ -422,6 +436,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 }
 
             });
+
 
         }
     }
@@ -535,7 +550,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())+1));
+                                                        //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())+1));
                                                         //Toast.makeText(context, "Liked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
                                                     }
                                                 })
@@ -562,7 +577,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())-1));
+                                                        //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())-1));
                                                         //Toast.makeText(context, "Unliked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
                                                     }
                                                 })
@@ -797,6 +812,93 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     }
 
+    private void animatePhotoLike(final ViewHolder holder) {
+            holder.vBgLike.setVisibility(View.VISIBLE);
+            holder.ivLike.setVisibility(View.VISIBLE);
+
+            holder.vBgLike.setScaleY(0.1f);
+            holder.vBgLike.setScaleX(0.1f);
+            holder.vBgLike.setAlpha(1f);
+            holder.ivLike.setScaleY(0.1f);
+            holder.ivLike.setScaleX(0.1f);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+
+            ObjectAnimator bgScaleYAnim = ObjectAnimator.ofFloat(holder.vBgLike, "scaleY", 0.1f, 1f);
+            bgScaleYAnim.setDuration(200);
+            bgScaleYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator bgScaleXAnim = ObjectAnimator.ofFloat(holder.vBgLike, "scaleX", 0.1f, 1f);
+            bgScaleXAnim.setDuration(200);
+            bgScaleXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator bgAlphaAnim = ObjectAnimator.ofFloat(holder.vBgLike, "alpha", 1f, 0f);
+            bgAlphaAnim.setDuration(200);
+            bgAlphaAnim.setStartDelay(150);
+            bgAlphaAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleUpYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 0.1f, 1f);
+            imgScaleUpYAnim.setDuration(300);
+            imgScaleUpYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleUpXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 0.1f, 1f);
+            imgScaleUpXAnim.setDuration(300);
+            imgScaleUpXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+            ObjectAnimator imgScaleDownYAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleY", 1f, 0f);
+            imgScaleDownYAnim.setDuration(300);
+            imgScaleDownYAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+            ObjectAnimator imgScaleDownXAnim = ObjectAnimator.ofFloat(holder.ivLike, "scaleX", 1f, 0f);
+            imgScaleDownXAnim.setDuration(300);
+            imgScaleDownXAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+
+            animatorSet.playTogether(bgScaleYAnim, bgScaleXAnim, bgAlphaAnim, imgScaleUpYAnim, imgScaleUpXAnim);
+            animatorSet.play(imgScaleDownYAnim).with(imgScaleDownXAnim).after(imgScaleUpYAnim);
+
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    resetLikeAnimationState(holder);
+                    holder.like_btn.setFavorite(true,true);
+                }
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    Map<String, Object> likeMap = new HashMap<>();
+                    likeMap.put("liked", true);
+
+                    try {
+
+                        mFirestore.collection("Posts")
+                                .document(postList.get(holder.getAdapterPosition()).postId)
+                                .collection("Liked_Users")
+                                .document(mCurrentUser.getUid())
+                                .set(likeMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.i("post", "liked");
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e("Error like", e.getMessage());
+                                    }
+                                });
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            animatorSet.start();
+
+    }
+
+    private void resetLikeAnimationState(ViewHolder holder) {
+        holder.vBgLike.setVisibility(View.INVISIBLE);
+        holder.ivLike.setVisibility(View.INVISIBLE);
+    }
+
     private void getCounts(final ViewHolder holder) {
 
         mFirestore.collection("Posts")
@@ -806,7 +908,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(final QuerySnapshot querySnapshot) {
-                        holder.like_count.setText(String.valueOf(querySnapshot.size()));
+                       // holder.like_count.setText(String.valueOf(querySnapshot.size()));
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -851,17 +953,20 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private FrameLayout pager_layout;
         private RelativeLayout indicator_holder;
         private AutofitTextView post_text;
-        private TextView like_count;
         private ImageView delete;
         private ViewPager pager;
         private PageIndicatorView indicator;
+        private View vBgLike;
+        private ImageView ivLike;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             mView = itemView;
             user_image = mView.findViewById(R.id.post_user_image);
-            like_count = mView.findViewById(R.id.like_count);
+            like_btn = mView.findViewById(R.id.like_button);
+            vBgLike = mView.findViewById(R.id.vBgLike);
+            ivLike = mView.findViewById(R.id.ivLike);
             user_name = mView.findViewById(R.id.post_username);
             timestamp = mView.findViewById(R.id.post_timestamp);
             post_desc = mView.findViewById(R.id.post_desc);

@@ -67,7 +67,6 @@ public class CommentsActivity extends AppCompatActivity {
     private boolean owner;
     private CircleImageView user_image;
     private TextView post_desc;
-    private AdView mAdView;
 
     public static void startActivity(Context context, List<Post> post,String desc, int pos,boolean owner) {
         Intent intent = new Intent(context, CommentsActivity.class);
@@ -133,37 +132,9 @@ public class CommentsActivity extends AppCompatActivity {
         setupCommentView();
         mAdapter.notifyDataSetChanged();
 
-        mAdView = findViewById(R.id.adView);
-        showAd(true);
-
         initAd();
     }
 
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
-    }
-
-    /** Called when returning to the activity */
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-    }
-
-    /** Called before the activity is destroyed */
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        super.onDestroy();
-    }
 
     private void setupCommentView() {
 
@@ -219,31 +190,6 @@ public class CommentsActivity extends AppCompatActivity {
 
         getComments(mProgress);
 
-    }
-
-    private void showAd(boolean state) {
-
-        if(!state){
-            mAdView.setVisibility(View.GONE);
-            return;
-        }
-
-        mAdView.setVisibility(View.VISIBLE);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener(){
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                mAdView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                mAdView.setVisibility(View.GONE);
-            }
-        });
     }
 
 
@@ -378,7 +324,7 @@ public class CommentsActivity extends AppCompatActivity {
         interstitialAd=new InterstitialAd(this);
         interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
 
-        AdRequest adRequest=new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
         interstitialAd.loadAd(adRequest);
         interstitialAd.setAdListener(new AdListener(){
             @Override

@@ -284,7 +284,7 @@ public class PostText extends AppCompatActivity {
         interstitialAd=new InterstitialAd(this);
         interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
 
-        AdRequest adRequest=new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
         interstitialAd.loadAd(adRequest);
         interstitialAd.setAdListener(new AdListener(){
             @Override
@@ -292,31 +292,33 @@ public class PostText extends AppCompatActivity {
                 interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         });
+
     }
 
     private void showAd(boolean state) {
 
-        if(!state){
+        if(!state) {
             mAdView.setVisibility(View.GONE);
-            return;
+        }else{
+
+            mAdView.setVisibility(View.VISIBLE);
+            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
+            mAdView.loadAd(adRequest);
+            mAdView.setAdListener(new AdListener(){
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    mAdView.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAdFailedToLoad(int i) {
+                    super.onAdFailedToLoad(i);
+                    mAdView.setVisibility(View.GONE);
+                }
+            });
+
         }
-
-        mAdView.setVisibility(View.VISIBLE);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener(){
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                mAdView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                mAdView.setVisibility(View.GONE);
-            }
-        });
     }
 
 

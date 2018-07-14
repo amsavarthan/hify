@@ -7,6 +7,15 @@
     android:background="#FFF"
     android:orientation="vertical">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_alignParentTop="true"
+        android:visibility="invisible" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
@@ -18,15 +27,6 @@
         android:textColor="#212121"
         style="@style/Base.TextAppearance.AppCompat.Title"
         tools:ignore="MissingPrefix" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:layout_alignParentTop="true"
-        android:visibility="invisible" />
 
     <LinearLayout
         android:id="@+id/post"
@@ -68,7 +68,7 @@
         android:layout_marginBottom="5dp" />
 
     <RelativeLayout
-        android:layout_above="@+id/adView"
+        android:layout_alignParentBottom="true"
         android:id="@+id/comment_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,14 +111,5 @@
 
 
     </RelativeLayout>
-
-    <com.google.android.gms.ads.AdView
-        android:layout_alignParentBottom="true"
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:adSize="BANNER"
-        app:adUnitId="@string/banner_ad_3">
-    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>
