@@ -1,6 +1,6 @@
 # Hify
 
-![alt_text](https://github.com/lvamsavarthan/Hify/blob/master/preview.png) 
+<img src="https://github.com/lvamsavarthan/Hify/blob/master/preview.png">
 
 Just a social app. This app is still in **beta** and lacks some features.
 
@@ -36,7 +36,43 @@ Just a social app. This app is still in **beta** and lacks some features.
 
 ## Screenshots
 
-....
+<table>
+  <tr>
+    <th>Screenshot</th>
+    <th>Description</th>
+  </tr>
+  
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/login.jpg" width=250></td>
+    <td>Login Screen</td>
+  </tr>
+  
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/register.jpg" width=250></td>
+    <td>Registration Screen</td>
+  </tr>
+  
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/dashboard.png" width=250></td>
+    <td>Dashboard</td>
+  </tr>
+
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/post.jpg" width=250></td>
+    <td>Sending post</td>
+  </tr>
+  
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/message.png" width=250></td>
+    <td>Send Flash Messages</td>
+  </tr>
+
+  <tr>
+    <td><img src="https://github.com/lvamsavarthan/hify/blob/master/screenshots/user_edit.jpg" width=250></td>
+    <td>Profile</td>
+  </tr>
+
+</table>
 
 ## Author
 
