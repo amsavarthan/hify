@@ -34,6 +34,12 @@ Just a social app. This app is still in **beta** and lacks some features.
 * Encryption
   - Encrypt user data
 
+## Working
+
+Managing Posts - https://www.youtube.com/watch?v=Qi8Sv590N4Y
+Managing Friends - https://www.youtube.com/watch?v=QaDg34DBShM
+Sending Messages - https://www.youtube.com/watch?v=BKlIbSifVfA
+
 ## Developer
 
 This whole project is maintained only by **Amsavarthan Lv (me)**.
