@@ -24,7 +24,9 @@ Just a social app. This app is still in **beta** and lacks some features.
 * Posts Feed
   - View posts of your friends **(stable)**
   - Like,Share,Comment **(stable)**
+* Mischellaneous
   - Double tap like feature added **(stable)**
+  - Error handling Recycler View **(stable)**
 
 ## In development features (TO-DO)
 
