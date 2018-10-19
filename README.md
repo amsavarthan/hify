@@ -22,8 +22,11 @@ Just a social app. This app is still in **beta** and lacks some features.
   - Send image and text **(stable)**
   - Send location **(stable)**
 * Posts Feed
-  - View posts of your friends **(slightly stable)**
-  - Like,Share,Comment,Add to Loved,Add to Favourites in that post **(slightly stable)**
+  - View posts of your friends **(stable)**
+  - Like,Share,Comment **(stable)**
+* Mischellaneous
+  - Double tap like feature added **(stable)**
+  - Error handling Recycler View **(stable)**
 
 ## In development features (TO-DO)
 
