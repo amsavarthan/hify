@@ -150,9 +150,9 @@
                 android:id="@+id/ivLike"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:tint="#f6f6f6"
+                android:tint="#FF1744"
                 android:layout_gravity="center"
-                android:src="@mipmap/happy"
+                android:src="@mipmap/heart"
                 android:visibility="invisible" />
 
         </FrameLayout>
@@ -176,8 +176,8 @@
                 android:id="@+id/like_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:mfb_not_favorite_image="@drawable/ic_sentiment_satisfied_black_24dp"
-                app:mfb_favorite_image="@drawable/ic_sentiment_very_satisfied_black_24dp"
+                app:mfb_not_favorite_image="@drawable/ic_favorite_border_black_24dp"
+                app:mfb_favorite_image="@drawable/ic_favorite_red_24dp"
                 />
 
             <TextView

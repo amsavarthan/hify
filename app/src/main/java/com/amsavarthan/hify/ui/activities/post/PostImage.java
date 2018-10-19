@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -61,7 +62,6 @@ import java.util.Map;
 import java.util.Random;
 
 import id.zelory.compressor.Compressor;
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -156,7 +156,7 @@ public class PostImage extends AppCompatActivity {
 
         //RecyclerView
         mUploadList=findViewById(R.id.recyclerView);
-        mUploadList.setItemAnimator(new SlideInUpAnimator());
+        mUploadList.setItemAnimator(new DefaultItemAnimator());
         mUploadList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         mUploadList.setLayoutManager(new LinearLayoutManager(this));
         mUploadList.setHasFixedSize(true);

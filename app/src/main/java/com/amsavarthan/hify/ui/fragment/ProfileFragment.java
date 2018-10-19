@@ -17,6 +17,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.app.Fragment;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -79,7 +80,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -173,7 +173,7 @@ public class ProfileFragment extends Fragment {
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                     new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
-            mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
@@ -254,7 +254,7 @@ public class ProfileFragment extends Fragment {
             pbar=rootView.findViewById(R.id.pbar);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
-            mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
@@ -1041,7 +1041,7 @@ public class ProfileFragment extends Fragment {
                 if (resultCode == RESULT_OK) {
                     imageUri = UCrop.getOutput(data);
                     try {
-                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(55).setMaxHeight(160).setMaxWidth(160).compressToFile(new File(imageUri.getPath()));
+                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
                         profile_pic.setImageURI(Uri.fromFile(compressedFile));
                         Toast.makeText(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toast.LENGTH_LONG).show();
                     } catch (IOException e) {

@@ -5,6 +5,7 @@
         <item>Address</item>
         <item>LatLng</item>
     </string-array>
+
     <string-array name="colors_array">
         <item>#f44336</item>
         <item>#e91e63</item>
@@ -15,140 +16,6 @@
         <item>#00897b</item>
         <item>#4caf50</item>
         <item>#ff5722</item>
-    </string-array>
-
-    <!-- UI style. -->
-    <string-array name="ui_styles">
-        <item>Circular sky</item>
-        <item>Material animation</item>
-    </string-array>
-    <string-array name="ui_style_values">
-        <item>circular</item>
-        <item>material</item>
-    </string-array>
-
-    <!-- card order. -->
-    <string-array name="card_orders">
-        <item>Daily first</item>
-        <item>Hourly first</item>
-    </string-array>
-    <string-array name="card_order_values">
-        <item>daily_first</item>
-        <item>hourly_first</item>
-    </string-array>
-
-    <!-- language. -->
-    <string-array name="languages">
-        <item>@string/follow_system</item>
-        <item>中文</item>
-        <item>繁體中文</item>
-        <item>English (America)</item>
-        <item>English (Britain)</item>
-        <item>English (Australia)</item>
-        <item>Türkçe</item>
-        <item>Français</item>
-        <item>Pусский</item>
-        <item>Deutsch</item>
-        <item>Српски</item>
-        <item>Español</item>
-        <item>Italiano</item>
-    </string-array>
-    <string-array name="language_values">
-        <item>follow_system</item>
-        <item>chinese</item>
-        <item>unsimplified_chinese</item>
-        <item>english_america</item>
-        <item>english_britain</item>
-        <item>english_australia</item>
-        <item>turkish</item>
-        <item>french</item>
-        <item>russian</item>
-        <item>german</item>
-        <item>serbian</item>
-        <item>spanish</item>
-        <item>italian</item>
-    </string-array>
-
-    <!-- automatic refresh rate. -->
-    <string-array name="automatic_refresh_rates">
-        <item>0:30</item>
-        <item>1:00</item>
-        <item>1:30</item>
-        <item>2:00</item>
-        <item>2:30</item>
-        <item>3:00</item>
-        <item>3:30</item>
-        <item>4:00</item>
-    </string-array>
-    <string-array name="automatic_refresh_rate_values">
-        <item>0:30</item>
-        <item>1:00</item>
-        <item>1:30</item>
-        <item>2:00</item>
-        <item>2:30</item>
-        <item>3:00</item>
-        <item>3:30</item>
-        <item>4:00</item>
-    </string-array>
-
-    <!-- message text color. -->
-    <string-array name="notification_text_colors">
-        <item>Dark</item>
-        <item>Grey</item>
-        <item>Light</item>
-    </string-array>
-    <string-array name="notification_text_color_values">
-        <item>dark</item>
-        <item>grey</item>
-        <item>light</item>
-    </string-array>
-
-    <!-- widget style. -->
-    <string-array name="widget_styles">
-        <item>Rectangle</item>
-        <item>Symmetry</item>
-        <item>Tile</item>
-        <item>Mini</item>
-        <item>Nano</item>
-        <item>Pixel</item>
-        <item>Vertical</item>
-        <item>Oreo</item>
-    </string-array>
-    <string-array name="widget_style_values">
-        <item>rectangle</item>
-        <item>symmetry</item>
-        <item>tile</item>
-        <item>mini</item>
-        <item>nano</item>
-        <item>pixel</item>
-        <item>vertical</item>
-        <item>oreo</item>
-    </string-array>
-
-    <!-- icon style. -->
-    <string-array name="icon_styles">
-        <item>Material</item>
-        <item>Minimal</item>
-    </string-array>
-    <string-array name="icon_style_values">
-        <item>material</item>
-        <item>minimal</item>
-    </string-array>
-
-    <!-- Widget subtitle data. -->
-    <string-array name="subtitle_data">
-        <item>Refresh time</item>
-        <item>AQI (Invalid in some area.)</item>
-        <item>Wind</item>
-        <item>Sensible temp</item>
-        <item>Lunar Calendar</item>
-    </string-array>
-    <string-array name="subtitle_data_values">
-        <item>time</item>
-        <item>aqi</item>
-        <item>wind</item>
-        <item>sensible_time</item>
-        <item>lunar</item>
     </string-array>
 
     <string-array name="ld_activityScreenTitles">

@@ -13,6 +13,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -56,7 +57,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class FriendProfile extends AppCompatActivity {
@@ -165,7 +165,7 @@ public class FriendProfile extends AppCompatActivity {
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                     new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
-            mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);

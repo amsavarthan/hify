@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
     private FirebaseAuth mAuth;
-    private FirebaseUser currentuser;
+    public static FirebaseUser currentuser;
     private FirebaseFirestore firestore;
     private UserHelper userHelper;
     private StorageReference storageReference;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     public static CircleImageView imageView;
     public static TextView username;
     private AuthCredential credential;
-    private Fragment mCurrentFragment;
+    public static Fragment mCurrentFragment;
     public BroadcastReceiver NetworkChangeReceiver = new BroadcastReceiver() {
 
         @Override
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     };
     private BottomSheetDialog mBottomSheetDialog;
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
     private MenuItem add_post,refresh;
     private boolean mState=true;
 
@@ -586,8 +586,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     }
 
-    private void showFragment(Fragment fragment) {
-        getFragmentManager().beginTransaction()
+    public static void showFragment(Fragment fragment) {
+        activity.getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment)
                 .commit();
         mCurrentFragment=fragment;

@@ -339,7 +339,7 @@ public class RegisterActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 imageUri = UCrop.getOutput(data);
                 try {
-                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(55).setMaxHeight(160).setMaxWidth(160).compressToFile(new File(imageUri.getPath()));
+                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
                     profile_image.setImageURI(Uri.fromFile(compressedFile));
                 } catch (IOException e) {
                     e.printStackTrace();

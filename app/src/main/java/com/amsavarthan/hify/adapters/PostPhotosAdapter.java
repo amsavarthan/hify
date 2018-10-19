@@ -37,7 +37,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jgabrielfreitas.core.BlurImageView;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;

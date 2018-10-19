@@ -15,12 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Friends;
-import com.amsavarthan.hify.ui.activities.friends.AddUserDetail;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;

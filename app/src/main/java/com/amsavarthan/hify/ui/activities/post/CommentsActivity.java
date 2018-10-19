@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -181,7 +181,7 @@ public class CommentsActivity extends AppCompatActivity {
             }
         });
 
-        mCommentsRecycler.setItemAnimator(new SlideInLeftAnimator());
+        mCommentsRecycler.setItemAnimator(new DefaultItemAnimator());
         mCommentsRecycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mCommentsRecycler.setLayoutManager(new LinearLayoutManager(this));
         mCommentsRecycler.setHasFixedSize(true);

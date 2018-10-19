@@ -4,10 +4,10 @@ const functions = require('firebase-functions');
 const admin=require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
-exports.sendFriendRequest=functions.firestore.document("Notifications/{user_id}/Friend_Requests/{user_email}").onWrite((event)=> {
+exports.sendFriendRequest=functions.firestore.document("Notifications/{user_id}/Friend_Requests/{user_email}").onWrite((change,context)=> {
 
-    const user_id=event.params.user_id;
-    const email_id=event.params.user_email;
+    const user_id=context.params.user_id;
+    const email_id=context.params.user_email;
   
   console.log("id: "+user_id+" email: "+email_id);
   

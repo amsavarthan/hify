@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,8 +32,6 @@ import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -112,7 +111,7 @@ public class FriendRequests extends Fragment {
         requestList = new ArrayList<>();
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
 
-        mRequestView.setItemAnimator(new SlideInLeftAnimator());
+        mRequestView.setItemAnimator(new DefaultItemAnimator());
         mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);

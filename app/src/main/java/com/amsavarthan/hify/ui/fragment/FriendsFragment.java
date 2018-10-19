@@ -30,6 +30,18 @@ public class FriendsFragment extends Fragment {
         return mView;
     }
 
+    public static FriendsFragment newInstance(String frag){
+
+        Bundle args=new Bundle();
+        args.putString("frag",frag);
+
+        FriendsFragment friendsFragment=new FriendsFragment();
+        friendsFragment.setArguments(args);
+
+        return friendsFragment;
+
+    }
+
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -41,9 +53,14 @@ public class FriendsFragment extends Fragment {
                gotoSearch();
            }
        });
-        loadFragment(new Friends());
 
         BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        if(getArguments()!=null){
+            bottomNavigationView.setSelectedItemId(R.id.action_view_request);
+           loadFragment(new FriendRequests());
+       }else {
+           loadFragment(new Friends());
+       }
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

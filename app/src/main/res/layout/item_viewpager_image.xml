@@ -31,9 +31,9 @@
            android:id="@+id/ivLike"
            android:layout_width="150dp"
            android:layout_height="150dp"
-           android:tint="#f6f6f6"
+           android:tint="#FF1744"
            android:layout_gravity="center"
-           android:src="@mipmap/happy"
+           android:src="@mipmap/heart"
            android:visibility="invisible" />
 
    </FrameLayout>

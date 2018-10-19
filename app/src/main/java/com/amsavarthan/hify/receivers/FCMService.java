@@ -8,7 +8,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
-import com.amsavarthan.hify.ui.activities.friends.AddUserDetail;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
@@ -108,7 +107,7 @@ public class FCMService extends FirebaseMessagingService {
                 break;
             case "com.amsavarthan.hify.TARGET_DECLINED":
 
-                resultIntent = new Intent(getApplicationContext(), AddUserDetail.class);
+                resultIntent = new Intent(getApplicationContext(), FriendProfile.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_COMMENT":

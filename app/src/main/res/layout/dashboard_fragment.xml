@@ -21,4 +21,29 @@
         android:layout_width="170dp"
         android:layout_height="wrap_content" />
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/friend_req_alert"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardMaxElevation="13dp"
+        app:cardElevation="7dp"
+        app:cardUseCompatPadding="true"
+        app:cardBackgroundColor="@color/colorAccentt"
+        android:foreground="?selectableItemBackground"
+        android:layout_gravity="center_horizontal"
+        app:cardCornerRadius="20dp"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/friend_req_alert_text"
+            android:padding="16dp"
+            android:textColor="#FFF"
+            android:text="@string/you_have_d_new_friend_request_s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </android.support.v7.widget.CardView>
+
 </FrameLayout>

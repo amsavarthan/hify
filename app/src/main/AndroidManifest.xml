@@ -129,19 +129,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.friends.FriendsViewForMessage"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.friends.MessagesView"
-            android:screenOrientation="portrait" />
 
 
-
-        <activity
-            android:name=".ui.activities.friends.AddUserDetail"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activities.friends.SearchUsersActivity"
             android:screenOrientation="portrait"

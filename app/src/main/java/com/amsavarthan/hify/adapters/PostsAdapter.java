@@ -61,8 +61,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.pedromassango.doubleclick.DoubleClick;
-import com.pedromassango.doubleclick.DoubleClickListener;
 import com.rd.PageIndicatorView;
 
 import java.io.ByteArrayOutputStream;
@@ -151,6 +149,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                @Override
                                                public void onSuccess(Void aVoid) {
+
 
                                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_0())) {
                                                        StorageReference img = FirebaseStorage.getInstance()
@@ -290,6 +289,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                        public void onDismiss(DialogInterface dialog) {
                                                            Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
                                                            postList.remove(holder.getAdapterPosition());
+                                                           notifyItemRemoved(holder.getAdapterPosition());
                                                            notifyDataSetChanged();
                                                        }
                                                    });

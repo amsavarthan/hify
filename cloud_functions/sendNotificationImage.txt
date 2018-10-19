@@ -4,10 +4,10 @@ const functions = require('firebase-functions');
 const admin=require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
-exports.sendNotificationImage=functions.firestore.document("Users/{user_id}/Notifications_image/{notification_id}").onWrite(event=> {
+exports.sendNotificationImage=functions.firestore.document("Users/{user_id}/Notifications_image/{notification_id}").onWrite((change,context)=> {
 
-    const user_id=event.params.user_id;
-    const notification_id=event.params.notification_id;
+    const user_id=context.params.user_id;
+    const notification_id=context.params.notification_id;
 
     return admin.firestore().collection("Users").doc(user_id).collection("Notifications_image").doc(notification_id).get().then(queryResult=>{
 
