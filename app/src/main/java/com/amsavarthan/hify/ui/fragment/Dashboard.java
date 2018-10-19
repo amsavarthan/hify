@@ -117,7 +117,7 @@ public class Dashboard extends Fragment {
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(final QuerySnapshot queryDocumentSnapshots) {
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         if (!queryDocumentSnapshots.isEmpty()) {
 
@@ -133,7 +133,7 @@ public class Dashboard extends Fragment {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot querySnapshot) {
 
-                                                    if(!queryDocumentSnapshots.isEmpty()) {
+                                                    if(!querySnapshot.isEmpty()) {
 
                                                         for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
 
@@ -171,6 +171,9 @@ public class Dashboard extends Fragment {
 
                             }
 
+                        }else{
+                            pbar.setVisibility(View.GONE);
+                            mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                         }
 
                     }
