@@ -94,6 +94,21 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
             }
         });
 
+
+        holder.friend_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+                dialog.setTitle("Information");
+                dialog.setMessage("This icons shows to indicate that the user is already your friend.");
+                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).setIcon(R.drawable.ic_friend).show();
+            }
+        });
     }
 
     private void checkIfReqSent(final ViewHolder holder) {
@@ -108,17 +123,13 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if (documentSnapshot.exists()) {
-                    usersList.remove(holder.getAdapterPosition());
-                    notifyDataSetChanged();
-                    holder.exist_icon.animate()
+                    holder.exist_icon.setVisibility(View.GONE);
+                    holder.friend_icon.setVisibility(View.VISIBLE);
+                    holder.friend_icon.setAlpha(0.0f);
+
+                    holder.friend_icon.animate()
                             .setDuration(200)
-                            .alpha(0.0f)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    holder.exist_icon.setVisibility(View.GONE);
-                                }
-                            })
+                            .alpha(1.0f)
                             .start();
                 } else {
                     FirebaseFirestore.getInstance()
@@ -130,6 +141,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                             if (documentSnapshot.exists()) {
+                                holder.friend_icon.setVisibility(View.GONE);
                                 holder.exist_icon.setVisibility(View.VISIBLE);
                                 holder.exist_icon.setAlpha(0.0f);
 
@@ -137,15 +149,8 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                         .alpha(1.0f)
                                         .start();
                             } else {
-                                holder.exist_icon.animate()
-                                        .alpha(0.0f)
-                                        .setListener(new AnimatorListenerAdapter() {
-                                            @Override
-                                            public void onAnimationEnd(Animator animation) {
-                                                holder.exist_icon.setVisibility(View.GONE);
-                                            }
-                                        })
-                                        .start();
+                                holder.exist_icon.setVisibility(View.GONE);
+                                holder.friend_icon.setVisibility(View.GONE);
                             }
                         }
                     });
@@ -210,19 +215,17 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                         @Override
                                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                                            /*if(holderr.friend_icon.getVisibility()!=View.VISIBLE) {
+                                            if(holderr.friend_icon.getVisibility()!=View.VISIBLE) {
 
-
+                                                if (!documentSnapshot.exists()) {
+                                                    executeFriendReq(deletedItem,holderr);
+                                                } else {
+                                                    Snackbar.make(view, "Friend request has been sent already", Snackbar.LENGTH_LONG).show();
+                                                    notifyDataSetChanged();
+                                                }
 
                                             }else{
                                                 Snackbar.make(view, usersList.get(position).getName()+" is already your friend", Snackbar.LENGTH_LONG).show();
-                                                notifyDataSetChanged();
-                                            }*/
-
-                                            if (!documentSnapshot.exists()) {
-                                                executeFriendReq(deletedItem,holderr);
-                                            } else {
-                                                Snackbar.make(view, "Friend request has been sent already", Snackbar.LENGTH_LONG).show();
                                                 notifyDataSetChanged();
                                             }
 
@@ -284,14 +287,17 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                             @Override
                             public void onSuccess(Void aVoid) {
 
+                                holder.friend_icon.setVisibility(View.GONE);
                                 holder.exist_icon.setVisibility(View.VISIBLE);
                                 holder.exist_icon.setAlpha(0.0f);
 
                                 holder.exist_icon.animate()
+                                        .setDuration(200)
                                         .alpha(1.0f)
                                         .start();
                                 Snackbar.make(view, "Friend request sent to " + deletedItem.getName(), Snackbar.LENGTH_LONG).show();
                                 notifyDataSetChanged();
+                                notifyItemChanged(holder.getAdapterPosition());
 
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -321,7 +327,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
         View mView;
         TextView name, listenerText,username;
         RelativeLayout viewBackground, viewForeground;
-        ImageView exist_icon;
+        ImageView exist_icon,friend_icon;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -334,6 +340,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
             viewForeground = (RelativeLayout) mView.findViewById(R.id.view_foreground);
             listenerText = (TextView) mView.findViewById(R.id.view_foreground_text);
             exist_icon = (ImageView) mView.findViewById(R.id.exist_icon);
+            friend_icon = (ImageView) mView.findViewById(R.id.friend_icon);
 
 
         }

@@ -1039,15 +1039,16 @@ public class ProfileFragment extends Fragment {
             }
             if (requestCode == UCrop.REQUEST_CROP) {
                 if (resultCode == RESULT_OK) {
-                    imageUri = UCrop.getOutput(data);
                     try {
-                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
+                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(UCrop.getOutput(data).getPath()));
                         profile_pic.setImageURI(Uri.fromFile(compressedFile));
+						imageUri=Uri.fromFile(compressedFile);
                         Toast.makeText(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                         Toast.makeText(rootView.getContext(), "Profile photo updated click Save details to apply but unable to compress: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         profile_pic.setImageURI(imageUri);
+                        imageUri = UCrop.getOutput(data);
                     }
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     Log.e("Error", "Crop error:" + UCrop.getError(data).getMessage());

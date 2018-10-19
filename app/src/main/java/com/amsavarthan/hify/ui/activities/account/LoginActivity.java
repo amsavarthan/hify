@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.utils.AnimationUtil;
@@ -100,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void performLogin() {
+    public void performLogin(final boolean override) {
 
         final String email_, pass_;
         email_ = email.getText().toString();
@@ -122,7 +125,101 @@ public class LoginActivity extends AppCompatActivity {
                             mFirestore.collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    if (documentSnapshot.getString("token_id").equals(token_id) || documentSnapshot.getString("token_id").equals("") ) {
+                                    if(!override) {
+                                        if (documentSnapshot.getString("token_id").equals(token_id) || documentSnapshot.getString("token_id").equals("")) {
+
+                                            Map<String, Object> tokenMap = new HashMap<>();
+                                            tokenMap.put("token_id", token_id);
+
+                                            mFirestore.collection("Users").document(current_id).update(tokenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+
+                                                    FirebaseFirestore.getInstance().collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                                            userHelper.insertContact(
+                                                                    documentSnapshot.getString("username")
+                                                                    , documentSnapshot.getString("name")
+                                                                    , documentSnapshot.getString("email")
+                                                                    , documentSnapshot.getString("image")
+                                                                    , pass_
+                                                                    , documentSnapshot.getString("location")
+                                                                    , documentSnapshot.getString("bio")
+                                                            );
+
+                                                            mDialog.dismiss();
+                                                            MainActivity.startActivity(LoginActivity.this);
+                                                            finish();
+
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error", ".." + e.getMessage());
+                                                        }
+                                                    });
+
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    mDialog.dismiss();
+                                                    Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } else {
+                                            mDialog.dismiss();
+                                            new BottomDialog.Builder(LoginActivity.this)
+                                                    .setTitle("Information")
+                                                    .setContent("This account is being used in another device, please logout from that device and try again.")
+                                                    .setPositiveText("Ok")
+                                                    .setPositiveBackgroundColorResource(R.color.colorAccentt)
+                                                    .setNegativeText("Override")
+                                                    .setNegativeTextColor(Color.parseColor("#FF2525"))
+                                                    .setCancelable(true)
+                                                    .onPositive(new BottomDialog.ButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull BottomDialog dialog) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    })
+                                                    .onNegative(new BottomDialog.ButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull BottomDialog bottomDialog) {
+
+                                                            bottomDialog.dismiss();
+                                                            new MaterialDialog.Builder(LoginActivity.this)
+                                                                    .title("Just before you override")
+                                                                    .content("By clicking Proceed you are overriding the account in such a way that any messages sent to this account will be shown through notification only in this device.")
+                                                                    .positiveText("Proceed")
+                                                                    .negativeText("Cancel")
+                                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                                        @Override
+                                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                                                                            performLogin(true);
+
+                                                                        }
+                                                                    })
+                                                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                                                        @Override
+                                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    }).show();
+
+                                                        }
+                                                    })
+                                                    .show();
+
+                                            if (mAuth.getCurrentUser() != null) {
+                                                mAuth.signOut();
+                                            }
+
+                                        }
+                                    }else{
 
                                         Map<String, Object> tokenMap = new HashMap<>();
                                         tokenMap.put("token_id", token_id);
@@ -137,12 +234,12 @@ public class LoginActivity extends AppCompatActivity {
 
                                                         userHelper.insertContact(
                                                                 documentSnapshot.getString("username")
-                                                                ,documentSnapshot.getString("name")
+                                                                , documentSnapshot.getString("name")
                                                                 , documentSnapshot.getString("email")
                                                                 , documentSnapshot.getString("image")
                                                                 , pass_
-                                                                ,documentSnapshot.getString("location")
-                                                                ,documentSnapshot.getString("bio")
+                                                                , documentSnapshot.getString("location")
+                                                                , documentSnapshot.getString("bio")
                                                         );
 
                                                         mDialog.dismiss();
@@ -165,25 +262,6 @@ public class LoginActivity extends AppCompatActivity {
                                                 Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
-                                    } else {
-                                        mDialog.dismiss();
-                                        new BottomDialog.Builder(LoginActivity.this)
-                                                .setTitle("Information")
-                                                .setContent("This account is being used in another device, please logout from that device and try again.")
-                                                .setPositiveText("Ok")
-                                                .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                                .setCancelable(true)
-                                                .onPositive(new BottomDialog.ButtonCallback() {
-                                                    @Override
-                                                    public void onClick(@NonNull BottomDialog dialog) {
-                                                        dialog.dismiss();
-                                                    }
-                                                })
-                                                .show();
-
-                                        if (mAuth.getCurrentUser() != null) {
-                                            mAuth.signOut();
-                                        }
 
                                     }
                                 }
@@ -295,11 +373,38 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLogin(View view) {
-        performLogin();
+        performLogin(false);
     }
 
     public void onRegister(View view) {
         RegisterActivity.startActivity(this, this, findViewById(R.id.button));
     }
 
+    public void onForgotPassword(View view) {
+
+        if(TextUtils.isEmpty(email.getText().toString())) {
+            Toast.makeText(activity, "Enter your email to send reset password mail.", Toast.LENGTH_SHORT).show();
+            AnimationUtil.shakeView(email, this);
+        }else{
+
+            mDialog.show();
+
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    mDialog.dismiss();
+                    Toast.makeText(LoginActivity.this, "Reset password mail sent", Toast.LENGTH_SHORT).show();
+                }
+            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            mDialog.dismiss();
+                            Toast.makeText(LoginActivity.this, "Error sending mail : "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+
+    }
 }

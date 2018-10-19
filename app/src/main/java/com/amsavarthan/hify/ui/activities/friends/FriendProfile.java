@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -132,6 +133,7 @@ public class FriendProfile extends AppCompatActivity {
         String id;
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
+        private ProgressBar pbar;
 
         public PostsFragment() {
         }
@@ -149,6 +151,7 @@ public class FriendProfile extends AppCompatActivity {
                 getActivity().finish();
             }
 
+            pbar=rootView.findViewById(R.id.pbar);
             statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
             mmBottomSheetDialog.setContentView(statsheetView);
@@ -171,6 +174,7 @@ public class FriendProfile extends AppCompatActivity {
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);
 
+            pbar.setVisibility(View.VISIBLE);
             getPosts(id);
 
             return rootView;
@@ -194,11 +198,13 @@ public class FriendProfile extends AppCompatActivity {
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
                                     mAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(View.GONE);
 
                                 }
 
 
                             }else{
+                                pbar.setVisibility(View.GONE);
                                 mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                             }
 
@@ -207,6 +213,7 @@ public class FriendProfile extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            pbar.setVisibility(View.GONE);
                             mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.e("Error",e.getMessage());
                         }
