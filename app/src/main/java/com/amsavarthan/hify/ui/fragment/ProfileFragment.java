@@ -15,6 +15,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.app.Fragment;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +68,7 @@ import com.tylersuehr.esr.TextStateDisplay;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,6 +78,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
 import static android.app.Activity.RESULT_OK;
@@ -138,6 +143,9 @@ public class ProfileFragment extends Fragment {
         List<Post> postList;
         PostsAdapter mAdapter;
         private EmptyStateRecyclerView mRecyclerView;
+        private View statsheetView;
+        private BottomSheetDialog mmBottomSheetDialog;
+        private ProgressBar pbar;
 
         public PostsFragment() {
         }
@@ -147,8 +155,15 @@ public class ProfileFragment extends Fragment {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+            statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
+            mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
+            mmBottomSheetDialog.setContentView(statsheetView);
+            mmBottomSheetDialog.setCanceledOnTouchOutside(true);
+
+            pbar=rootView.findViewById(R.id.pbar);
+
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
@@ -156,7 +171,7 @@ public class ProfileFragment extends Fragment {
                     new ImageTextStateDisplay(rootView.getContext(),R.mipmap.no_posts,"No posts found","Add some posts to see them here."));
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
             mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
             mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
@@ -164,6 +179,7 @@ public class ProfileFragment extends Fragment {
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);
 
+            pbar.setVisibility(View.VISIBLE);
             getPosts();
 
             return rootView;
@@ -185,10 +201,13 @@ public class ProfileFragment extends Fragment {
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
                                     mAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(View.GONE);
                                 }
 
+                                mAdapter.notifyDataSetChanged();
 
                             }else{
+                                pbar.setVisibility(View.GONE);
                                 mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                             }
 
@@ -197,6 +216,8 @@ public class ProfileFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            pbar.setVisibility(View.GONE);
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -211,6 +232,9 @@ public class ProfileFragment extends Fragment {
         List<Post> postList;
         PostsAdapter mAdapter;
         private EmptyStateRecyclerView mRecyclerView;
+        private View statsheetView;
+        private BottomSheetDialog mmBottomSheetDialog;
+        private ProgressBar pbar;
 
         public SavedFragment() {
         }
@@ -221,7 +245,13 @@ public class ProfileFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
+
+            statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
+            mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
+            mmBottomSheetDialog.setContentView(statsheetView);
+            mmBottomSheetDialog.setCanceledOnTouchOutside(true);
+            pbar=rootView.findViewById(R.id.pbar);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
             mRecyclerView.setItemAnimator(new SlideInLeftAnimator());
@@ -234,8 +264,9 @@ public class ProfileFragment extends Fragment {
                     new ImageTextStateDisplay(rootView.getContext(),R.mipmap.no_s_posts,"No saved posts found","All your saved posts appear here."));
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
+            pbar.setVisibility(View.VISIBLE);
             getPosts();
 
             return rootView;
@@ -265,6 +296,7 @@ public class ProfileFragment extends Fragment {
                                                         Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                                         postList.add(post);
                                                         mAdapter.notifyDataSetChanged();
+                                                        pbar.setVisibility(View.GONE);
                                                     }else{
                                                         FirebaseFirestore.getInstance().collection("Users")
                                                                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -289,12 +321,15 @@ public class ProfileFragment extends Fragment {
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
+                                                    pbar.setVisibility(View.GONE);
+                                                    mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                                                     Log.e("Error",e.getMessage());
                                                 }
                                             });
 
                                 }
                             }else{
+                                pbar.setVisibility(View.GONE);
                                 mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                             }
 
@@ -303,6 +338,8 @@ public class ProfileFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            pbar.setVisibility(View.GONE);
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -605,7 +642,7 @@ public class ProfileFragment extends Fragment {
                             dialog.show();
 
                             final String userUid = mAuth.getCurrentUser().getUid();
-                            final StorageReference user_profile = FirebaseStorage.getInstance().getReference().child("images").child(userUid + ".jpg");
+                            final StorageReference user_profile = FirebaseStorage.getInstance().getReference().child("images").child(userUid + ".png");
                             user_profile.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
@@ -1003,8 +1040,15 @@ public class ProfileFragment extends Fragment {
             if (requestCode == UCrop.REQUEST_CROP) {
                 if (resultCode == RESULT_OK) {
                     imageUri = UCrop.getOutput(data);
-                    profile_pic.setImageURI(imageUri);
-                    Toast.makeText(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toast.LENGTH_LONG).show();
+                    try {
+                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(55).setMaxHeight(160).setMaxWidth(160).compressToFile(new File(imageUri.getPath()));
+                        profile_pic.setImageURI(Uri.fromFile(compressedFile));
+                        Toast.makeText(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(rootView.getContext(), "Profile photo updated click Save details to apply but unable to compress: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        profile_pic.setImageURI(imageUri);
+                    }
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     Log.e("Error", "Crop error:" + UCrop.getError(data).getMessage());
                 }

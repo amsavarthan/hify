@@ -73,7 +73,6 @@ public class PostImage extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private EditText mEditText;
-    private AdView mAdView;
     private Map<String, Object> postMap;
     private ProgressDialog mDialog;
     private ArrayList<Image> imagesList;
@@ -174,37 +173,12 @@ public class PostImage extends AppCompatActivity {
         pager_layout.setVisibility(View.GONE);
         empty_holder.setVisibility(View.VISIBLE);
 
-        mAdView = findViewById(R.id.adView);
-        showAd(false);
 
-        initAd();
         mDialog = new ProgressDialog(this);
         mStorage=FirebaseStorage.getInstance().getReference();
     }
 
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        super.onDestroy();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -217,7 +191,6 @@ public class PostImage extends AppCompatActivity {
 
                     empty_holder.setVisibility(View.GONE);
 
-                    showAd(true);
                     pager_layout.setVisibility(View.VISIBLE);
                     pager_layout.setAlpha(0.0f);
 
@@ -461,7 +434,6 @@ public class PostImage extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
                                         mDialog.dismiss();
-                                        showAd();
                                         Toast.makeText(PostImage.this, "Post sent", Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
@@ -470,7 +442,6 @@ public class PostImage extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         mDialog.dismiss();
-                                        showAd();
                                         Log.e("Error sending post", e.getMessage());
                                     }
                                 });
@@ -481,7 +452,6 @@ public class PostImage extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         mDialog.dismiss();
-                        showAd();
                         Log.e("Error getting user", e.getMessage());
                     }
                 });
@@ -505,59 +475,5 @@ public class PostImage extends AppCompatActivity {
     }
 
     //endregion
-
-    //region Ads
-
-    InterstitialAd interstitialAd;
-
-    public void initAd(){
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
-
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-        interstitialAd.loadAd(adRequest);
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-            }
-        });
-
-    }
-
-    private void showAd(boolean state) {
-
-        if(!state) {
-            mAdView.setVisibility(View.GONE);
-        }else{
-
-            mAdView.setVisibility(View.VISIBLE);
-            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-            mAdView.loadAd(adRequest);
-            mAdView.setAdListener(new AdListener(){
-                @Override
-                public void onAdLoaded() {
-                    super.onAdLoaded();
-                    mAdView.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAdFailedToLoad(int i) {
-                    super.onAdFailedToLoad(i);
-                    mAdView.setVisibility(View.GONE);
-                }
-            });
-
-        }
-    }
-
-
-    public void showAd() {
-        if(interstitialAd.isLoaded()){
-            interstitialAd.show();
-        }
-    }
-    //endregion
-
 
 }

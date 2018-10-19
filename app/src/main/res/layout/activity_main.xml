@@ -26,19 +26,10 @@
 
     <FrameLayout
         android:layout_below="@+id/top"
-        android:layout_above="@+id/adView"
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
 
-    <com.google.android.gms.ads.AdView
-        android:layout_alignParentBottom="true"
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:adSize="BANNER"
-        app:adUnitId="@string/banner_ad_3">
-    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

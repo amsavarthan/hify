@@ -132,7 +132,6 @@ public class CommentsActivity extends AppCompatActivity {
         setupCommentView();
         mAdapter.notifyDataSetChanged();
 
-        initAd();
     }
 
 
@@ -221,7 +220,6 @@ public class CommentsActivity extends AppCompatActivity {
                                     public void onSuccess(DocumentReference documentReference) {
                                         mProgress.setVisibility(View.GONE);
                                         sendNotification();
-                                        showAd();
                                         mCommentText.setHint("Add a comment..");
                                         Toast.makeText(CommentsActivity.this, "Comment added", Toast.LENGTH_SHORT).show();
                                         commentList.clear();
@@ -231,7 +229,6 @@ public class CommentsActivity extends AppCompatActivity {
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        showAd();
                                         mProgress.setVisibility(View.GONE);
                                         Toast.makeText(CommentsActivity.this, "Error sending comment: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         Log.e("Error send comment", e.getMessage());
@@ -243,7 +240,6 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        showAd();
                         Log.e("Error getuser", e.getMessage());
                     }
                 });
@@ -318,26 +314,6 @@ public class CommentsActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 
-    InterstitialAd interstitialAd;
 
-    public void initAd(){
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
-
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-        interstitialAd.loadAd(adRequest);
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-            }
-        });
-    }
-
-    public void showAd() {
-        if(interstitialAd.isLoaded()){
-            interstitialAd.show();
-        }
-    }
 
 }

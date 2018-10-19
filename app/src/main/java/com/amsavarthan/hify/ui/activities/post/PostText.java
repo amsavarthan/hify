@@ -49,7 +49,6 @@ public class PostText extends AppCompatActivity {
     String color="7";
     private FrameLayout mImageholder;
     private FirebaseAuth mAuth;
-    private AdView mAdView;
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, PostText.class);
@@ -99,10 +98,6 @@ public class PostText extends AppCompatActivity {
         preview_text = findViewById(R.id.text_preview);
         mImageholder = findViewById(R.id.image_holder);
 
-        mAdView = findViewById(R.id.adView);
-       showAd(true);
-
-        initAd();
 
         text.addTextChangedListener(new TextWatcher() {
             @Override
@@ -179,7 +174,6 @@ public class PostText extends AppCompatActivity {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
                                 mDialog.dismiss();
-                                showAd();
                                 Toast.makeText(PostText.this, "Post sent", Toast.LENGTH_SHORT).show();
                                 finish();
                             }
@@ -188,7 +182,6 @@ public class PostText extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 mDialog.dismiss();
-                                showAd();
                                 Log.e("Error sending post", e.getMessage());
                             }
                         });
@@ -198,7 +191,6 @@ public class PostText extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 mDialog.dismiss();
-                showAd();
                 Log.e("Error getting user", e.getMessage());
             }
         });
@@ -210,17 +202,17 @@ public class PostText extends AppCompatActivity {
         switch (view.getId()) {
 
             case R.id.fab1:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_2));
-                color = "7";
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_1));
+                color = "1";
                 return;
 
             case R.id.fab2:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_7));
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_2));
                 color = "2";
                 return;
 
             case R.id.fab3:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_8));
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_3));
                 color = "3";
                 return;
 
@@ -230,102 +222,82 @@ public class PostText extends AppCompatActivity {
                 return;
 
             case R.id.fab5:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_1));
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_5));
                 color = "5";
                 return;
 
             case R.id.fab6:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_3));
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_6));
                 color = "6";
                 return;
 
             case R.id.fab7:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_9));
-                color = "1";
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_7));
+                color = "7";
                 return;
 
             case R.id.fab8:
-                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_11));
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_8));
                 color = "8";
-        }
+                return;
 
-    }
+            case R.id.fab9:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_9));
+                color = "9";
+                return;
 
+            case R.id.fab10:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_10));
+                color = "10";
+                return;
 
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
-    }
+            case R.id.fab11:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_11));
+                color = "11";
+                return;
 
-    /** Called when returning to the activity */
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-    }
+            case R.id.fab12:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_12));
+                color = "12";
+                return;
 
-    /** Called before the activity is destroyed */
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        super.onDestroy();
-    }
+            case R.id.fab13:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_13));
+                color = "13";
+                return;
 
-    InterstitialAd interstitialAd;
+            case R.id.fab14:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_14));
+                color = "14";
+                return;
 
-    public void initAd(){
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
+            case R.id.fab15:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_15));
+                color = "15";
+                return;
 
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-        interstitialAd.loadAd(adRequest);
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-            }
-        });
+            case R.id.fab16:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_16));
+                color = "16";
+                return;
 
-    }
+            case R.id.fab17:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_17));
+                color = "17";
+                return;
 
-    private void showAd(boolean state) {
+            case R.id.fab18:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_18));
+                color = "18";
+                return;
 
-        if(!state) {
-            mAdView.setVisibility(View.GONE);
-        }else{
-
-            mAdView.setVisibility(View.VISIBLE);
-            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-            mAdView.loadAd(adRequest);
-            mAdView.setAdListener(new AdListener(){
-                @Override
-                public void onAdLoaded() {
-                    super.onAdLoaded();
-                    mAdView.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAdFailedToLoad(int i) {
-                    super.onAdFailedToLoad(i);
-                    mAdView.setVisibility(View.GONE);
-                }
-            });
+            case R.id.fab19:
+                mImageholder.setBackground(getResources().getDrawable(R.drawable.gradient_19));
+                color = "19";
 
         }
+
     }
 
-
-    public void showAd() {
-        if(interstitialAd.isLoaded()){
-            interstitialAd.show();
-        }
-    }
 
 }

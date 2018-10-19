@@ -25,7 +25,6 @@
 
     <ScrollView
         android:layout_below="@+id/top"
-        android:layout_above="@+id/adView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -67,7 +66,7 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#495aff" />
+                        app:backgroundTint="#0E5CAD" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab2"
@@ -76,7 +75,7 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#03a9f4" />
+                        app:backgroundTint="#F55555" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab3"
@@ -85,7 +84,7 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#e91e63" />
+                        app:backgroundTint="#F761A1" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab4"
@@ -94,16 +93,7 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#7579ff" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/fab8"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:onClick="onFabClicked"
-                        android:padding="16dp"
-                        app:backgroundTint="#ffea00" />
+                        app:backgroundTint="#43CBFF" />
 
 
                     <android.support.design.widget.FloatingActionButton
@@ -113,7 +103,7 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#4d69ff" />
+                        app:backgroundTint="#623AA2" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab6"
@@ -122,7 +112,8 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#d500f9" />
+                        app:backgroundTint="#002661" />
+
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/fab7"
@@ -131,7 +122,109 @@
                         android:layout_margin="5dp"
                         android:onClick="onFabClicked"
                         android:padding="16dp"
-                        app:backgroundTint="#12c700" />
+                        app:backgroundTint="#6018DC" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#3CD500" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#3C8CE7" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#F8D800" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab11"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#EA5455" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#43E97B" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab13"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#2575FC" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#F83600" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#537895" />
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#CC208E" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#FA709A" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab18"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#32CCBC" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab19"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:onClick="onFabClicked"
+                        android:padding="16dp"
+                        app:backgroundTint="#C32BAC" />
 
                 </LinearLayout>
 
@@ -184,13 +277,5 @@
 
     </ScrollView>
 
-    <com.google.android.gms.ads.AdView
-        android:layout_alignParentBottom="true"
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:adSize="BANNER"
-        app:adUnitId="@string/banner_ad_2">
-    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

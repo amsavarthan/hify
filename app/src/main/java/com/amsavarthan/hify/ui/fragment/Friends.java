@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
@@ -30,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
+import com.tylersuehr.esr.ImageTextStateDisplay;
 import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class Friends extends Fragment {
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private EmptyStateRecyclerView mRecyclerView;
+    private ProgressBar pbar;
 
     @Nullable
     @Override
@@ -74,10 +77,12 @@ public class Friends extends Fragment {
                                     ViewFriends users = doc.getDocument().toObject(ViewFriends.class);
                                     usersList.add(users);
                                     usersAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(View.GONE);
                                 }
+                                usersAdapter.notifyDataSetChanged();
                             }
                         }else{
-                            Toast.makeText(mView.getContext(), "No friends found.", Toast.LENGTH_SHORT).show();
+                            pbar.setVisibility(View.GONE);
                             mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                         }
 
@@ -87,6 +92,7 @@ public class Friends extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
+                        pbar.setVisibility(View.GONE);
                         mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                         Log.w("Error", "listen:error", e);
 
@@ -103,6 +109,7 @@ public class Friends extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView =  mView.findViewById(R.id.recyclerView);
+        pbar=mView.findViewById(R.id.pbar);
 
         usersList = new ArrayList<>();
         usersAdapter = new ViewFriendAdapter(usersList, view.getContext());
@@ -126,16 +133,16 @@ public class Friends extends Fragment {
         mRecyclerView.setAdapter(usersAdapter);
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No friends found","Add some friends to manage them here"));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.crying,"No friends found","Add some friends to manage them here."));
+
+        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
                 new TextStateDisplay(view.getContext(),"We found some of your friends","We are getting information of your friends.."));
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
-
-
+        pbar.setVisibility(View.VISIBLE);
         startListening();
 
     }

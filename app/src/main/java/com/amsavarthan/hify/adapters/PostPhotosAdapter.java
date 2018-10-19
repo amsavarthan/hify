@@ -1,5 +1,9 @@
 package com.amsavarthan.hify.adapters;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,10 +14,16 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.MultipleImage;
@@ -22,13 +32,19 @@ import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.ui.views.HifyImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.ivbaranov.mfb.MaterialFavoriteButton;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jgabrielfreitas.core.BlurImageView;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import id.zelory.compressor.Compressor;
@@ -43,13 +59,19 @@ public class PostPhotosAdapter extends PagerAdapter {
     private Context context;
     private File compressedFile;
     private Activity activity;
+    private String postId;
+    private static final DecelerateInterpolator DECCELERATE_INTERPOLATOR = new DecelerateInterpolator();
+    private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
+    private MaterialFavoriteButton like_btn;
 
-    public PostPhotosAdapter(Context context, Activity activity, ArrayList<MultipleImage> IMAGES, boolean local) {
+    public PostPhotosAdapter(Context context, Activity activity, ArrayList<MultipleImage> IMAGES, boolean local, String postId, MaterialFavoriteButton like_btn) {
         this.context = context;
         this.IMAGES =IMAGES;
         this.local=local;
         this.activity=activity;
         inflater = LayoutInflater.from(context);
+        this.postId=postId;
+        this.like_btn=like_btn;
     }
 
 
@@ -63,6 +85,94 @@ public class PostPhotosAdapter extends PagerAdapter {
         return IMAGES.size();
     }
 
+
+    private void animatePhotoLike(final View vBgLike, final ImageView ivLike) {
+        vBgLike.setVisibility(View.VISIBLE);
+        ivLike.setVisibility(View.VISIBLE);
+
+        vBgLike.setScaleY(0.1f);
+        vBgLike.setScaleX(0.1f);
+        vBgLike.setAlpha(1f);
+        ivLike.setScaleY(0.1f);
+        ivLike.setScaleX(0.1f);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+
+        ObjectAnimator bgScaleYAnim = ObjectAnimator.ofFloat(vBgLike, "scaleY", 0.1f, 1f);
+        bgScaleYAnim.setDuration(300);
+        bgScaleYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+        ObjectAnimator bgScaleXAnim = ObjectAnimator.ofFloat(vBgLike, "scaleX", 0.1f, 1f);
+        bgScaleXAnim.setDuration(300);
+        bgScaleXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+        ObjectAnimator bgAlphaAnim = ObjectAnimator.ofFloat(vBgLike, "alpha", 1f, 0f);
+        bgAlphaAnim.setDuration(300);
+        bgAlphaAnim.setStartDelay(150);
+        bgAlphaAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+        ObjectAnimator imgScaleUpYAnim = ObjectAnimator.ofFloat(ivLike, "scaleY", 0.1f, 1f);
+        imgScaleUpYAnim.setDuration(300);
+        imgScaleUpYAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+        ObjectAnimator imgScaleUpXAnim = ObjectAnimator.ofFloat(ivLike, "scaleX", 0.1f, 1f);
+        imgScaleUpXAnim.setDuration(300);
+        imgScaleUpXAnim.setInterpolator(DECCELERATE_INTERPOLATOR);
+
+        ObjectAnimator imgScaleDownYAnim = ObjectAnimator.ofFloat(ivLike, "scaleY", 1f, 0f);
+        imgScaleDownYAnim.setDuration(300);
+        imgScaleDownYAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+        ObjectAnimator imgScaleDownXAnim = ObjectAnimator.ofFloat(ivLike, "scaleX", 1f, 0f);
+        imgScaleDownXAnim.setDuration(300);
+        imgScaleDownXAnim.setInterpolator(ACCELERATE_INTERPOLATOR);
+
+        animatorSet.playTogether(bgScaleYAnim, bgScaleXAnim, bgAlphaAnim, imgScaleUpYAnim, imgScaleUpXAnim);
+        animatorSet.play(imgScaleDownYAnim).with(imgScaleDownXAnim).after(imgScaleUpYAnim);
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                resetLikeAnimationState(vBgLike,ivLike);
+                like_btn.setFavorite(true,true);
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                Map<String, Object> likeMap = new HashMap<>();
+                likeMap.put("liked", true);
+
+                try {
+
+                    FirebaseFirestore.getInstance().collection("Posts")
+                            .document(postId)
+                            .collection("Liked_Users")
+                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(likeMap)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.i("post", "liked");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Error like", e.getMessage());
+                                }
+                            });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        animatorSet.start();
+
+    }
+
+    private void resetLikeAnimationState(View vBgLike,ImageView ivLike) {
+        vBgLike.setVisibility(View.INVISIBLE);
+        ivLike.setVisibility(View.INVISIBLE);
+    }
+
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup view, final int position) {
@@ -70,30 +180,46 @@ public class PostPhotosAdapter extends PagerAdapter {
 
         assert imageLayout!=null;
         HifyImageView imageView = imageLayout.findViewById(R.id.image);
-        //BlurImageView background_image = imageLayout.findViewById(R.id.background_image);
+        final View vBgLike = imageLayout.findViewById(R.id.vBgLike);
+        final ImageView ivLike = imageLayout.findViewById(R.id.ivLike);
 
         if(!local) {
 
-            imageView.setOnClickListener(new View.OnClickListener() {
+            final GestureDetector detector=new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
                 @Override
-                public void onClick(View v) {
+                public boolean onDown(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    super.onLongPress(e);
                     Intent intent=new Intent(context,ImagePreviewSave.class)
                             .putExtra("uri","")
                             .putExtra("sender_name","Posts")
                             .putExtra("url",IMAGES.get(position).getUrl());
                     context.startActivity(intent);
                 }
+
+                @Override
+                public boolean onDoubleTap(MotionEvent e) {
+                    animatePhotoLike(vBgLike,ivLike);
+
+                    return true;
+                }
+            }
+            );
+
+            imageView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return detector.onTouchEvent(event);
+                }
             });
 
-            /*Glide.with(context)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))
-                    .load(IMAGES.get(position).getUrl())
-                    .into(background_image);
-
-            background_image.setBlur(20);*/
 
             Glide.with(context)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder2))
                     .load(IMAGES.get(position).getUrl())
                     .into(imageView);
 
@@ -102,25 +228,7 @@ public class PostPhotosAdapter extends PagerAdapter {
             try {
                 compressedFile= new Compressor(context).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(75).setMaxHeight(350).compressToFile(new File(IMAGES.get(position).getLocal_path()));
                 imageView.setImageURI(Uri.fromFile(compressedFile));
-               // background_image.setImageURI(Uri.fromFile(compressedFile));
-               // background_image.setBlur(20);
 
-                /*imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        UCrop.Options options = new UCrop.Options();
-                        options.setCompressionFormat(Bitmap.CompressFormat.PNG);
-                        options.setCompressionQuality(100);
-                        options.setShowCropGrid(true);
-
-                        UCrop.of(Uri.fromFile(compressedFile), Uri.fromFile(new File(context.getCacheDir(), String.format("hify_user_post_%s.png", random()))))
-                                .withAspectRatio(1, 1)
-                                .withOptions(options)
-                                .start(activity);
-
-                    }
-                });*/
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -134,19 +242,6 @@ public class PostPhotosAdapter extends PagerAdapter {
         view.addView(imageLayout, 0);
 
         return imageLayout;
-    }
-
-    @NonNull
-    public static String random() {
-        Random generator = new Random();
-        StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(10);
-        char tempChar;
-        for (int i = 0; i < randomLength; i++) {
-            tempChar = (char) (generator.nextInt(96) + 32);
-            randomStringBuilder.append(tempChar);
-        }
-        return randomStringBuilder.toString();
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -129,6 +130,8 @@ public class FriendProfile extends AppCompatActivity {
         PostsAdapter mAdapter;
         private EmptyStateRecyclerView mRecyclerView;
         String id;
+        private View statsheetView;
+        private BottomSheetDialog mmBottomSheetDialog;
 
         public PostsFragment() {
         }
@@ -146,8 +149,13 @@ public class FriendProfile extends AppCompatActivity {
                 getActivity().finish();
             }
 
+            statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
+            mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
+            mmBottomSheetDialog.setContentView(statsheetView);
+            mmBottomSheetDialog.setCanceledOnTouchOutside(true);
+
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity());
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 

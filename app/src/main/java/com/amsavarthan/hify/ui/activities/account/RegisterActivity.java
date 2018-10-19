@@ -38,11 +38,13 @@ import com.google.firebase.storage.UploadTask;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -233,7 +235,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                 public void onSuccess(Void aVoid) {
 
                                                     final String userUid = task.getResult().getUser().getUid();
-                                                    final StorageReference user_profile = storageReference.child(userUid + ".jpg");
+                                                    final StorageReference user_profile = storageReference.child(userUid + ".png");
                                                     user_profile.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                                         @Override
                                                         public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
@@ -336,7 +338,14 @@ public class RegisterActivity extends AppCompatActivity {
         if (requestCode == UCrop.REQUEST_CROP) {
             if (resultCode == RESULT_OK) {
                 imageUri = UCrop.getOutput(data);
-                profile_image.setImageURI(imageUri);
+                try {
+                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(55).setMaxHeight(160).setMaxWidth(160).compressToFile(new File(imageUri.getPath()));
+                    profile_image.setImageURI(Uri.fromFile(compressedFile));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Unable to compress: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    profile_image.setImageURI(imageUri);
+                }
             } else if (resultCode == UCrop.RESULT_ERROR) {
                 Log.e("Error", "Crop error:" + UCrop.getError(data).getMessage());
             }

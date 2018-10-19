@@ -1,0 +1,64 @@
+'use-strict'
+
+const functions = require('firebase-functions');
+const admin=require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
+
+exports.sendCommentNotification=functions.firestore.document("Notifications/{user_id}/Comment/{comment_id}").onWrite((change,context)=> {
+
+    const user_id=context.params.user_id;
+    const comment_id=context.params.comment_id;
+  
+  console.log(user_id+":"+comment_id);
+
+return admin.firestore().collection("Notifications").doc(user_id).collection("Comment").doc(comment_id).get().then((queryResult)=>{
+
+        const post_id=queryResult.data().post_id;
+        const admin_user_id=queryResult.data().admin_id;
+        const noti_id=queryResult.data().notification_id;
+        const timestamp=queryResult.data().timestamp;    
+        const post_desc=queryResult.data().post_desc;
+
+        const admin_data=admin.firestore().collection("Users").doc(admin_user_id).get();
+        const commenter_data=admin.firestore().collection("Users").doc(user_id).get();
+
+        return Promise.all([commenter_data,admin_data]).then(result=>{
+
+            const commenter_name=result[0].data().name;
+            const commenter_image=result[0].data().image;
+            const admin_token=result[1].data().token_id;
+            const admin_name=result[1].data().name;
+                 
+           if(commenter_name!=admin_name)
+           {
+             
+               
+               const payload={
+               data:{
+                notification_id:noti_id,
+                timestamp:timestamp,
+                post_id:post_id,
+                admin_id:admin_user_id,
+                title:commenter_name,
+                from_image:commenter_image,
+               
+                post_desc:post_desc,
+                body:"Commented on your post",
+                click_action:"com.amsavarthan.hify.TARGET_COMMENT"
+              }
+                
+            };
+            
+            return admin.messaging().sendToDevice(admin_token,payload).then(result=>{
+
+                console.log("Notification Sent.");
+
+            });
+               
+             
+           }
+                        
+          });
+    });
+
+});

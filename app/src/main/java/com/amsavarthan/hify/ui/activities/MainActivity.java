@@ -68,10 +68,6 @@ import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.javiersantos.bottomdialogs.BottomDialog;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -160,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private Toolbar toolbar;
     private MenuItem add_post,refresh;
     private boolean mState=true;
-    private AdView mAdView;
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
@@ -176,9 +171,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
-        if (mAdView != null) {
-            mAdView.resume();
-        }
+
     }
 
     @Override
@@ -290,8 +283,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             userId = currentuser.getUid();
             storageReference = FirebaseStorage.getInstance().getReference().child("images").child(currentuser.getUid() + ".jpg");
 
-            mAdView = findViewById(R.id.adView);
-            showAd(true);
 
             slidingRootNav = new SlidingRootNavBuilder(this)
                     .withToolbarMenuToggle(toolbar)
@@ -440,7 +431,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         switch (position) {
 
             case POS_DASHBOARD:
-                showAd(true);
                 toolbar.setTitle("Dashboard");
                 try {
                     getSupportActionBar().setTitle("Dashboard");
@@ -478,7 +468,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             case POS_FRIENDS:
 
                 if(currentuser.isEmailVerified()) {
-                    showAd(false);
                     toolbar.setTitle("Manage Friends");
                     try {
                         getSupportActionBar().setTitle("Manage Friends");
@@ -498,7 +487,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             case POS_ABOUT:
 
                 if(currentuser.isEmailVerified()) {
-                    showAd(true);
                     toolbar.setTitle("About");
                     try {
                         getSupportActionBar().setTitle("About");
@@ -565,31 +553,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     }
 
-    private void showAd(boolean state) {
-
-        if(!state) {
-            mAdView.setVisibility(View.GONE);
-        }else{
-
-            mAdView.setVisibility(View.VISIBLE);
-            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2EBE8C713C41215971AF33E9ED9F0B97").build();
-            mAdView.loadAd(adRequest);
-            mAdView.setAdListener(new AdListener(){
-                @Override
-                public void onAdLoaded() {
-                    super.onAdLoaded();
-                    mAdView.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onAdFailedToLoad(int i) {
-                    super.onAdFailedToLoad(i);
-                    mAdView.setVisibility(View.GONE);
-                }
-            });
-
-        }
-    }
 
     public void logout() {
         performUploadTask();
@@ -823,9 +786,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-        if (mAdView != null) {
-            mAdView.pause();
-        }
+
         super.onPause();
     }
 
@@ -992,9 +953,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     @Override
     protected void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
         unregisterReceiver(NetworkChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onDestroy();

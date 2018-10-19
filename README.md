@@ -34,10 +34,14 @@ Just a social app. This app is still in **beta** and lacks some features.
 * Encryption
   - Encrypt user data
 
+## Cloud Functions Code
+
+Check out the cloud_functions folder for the code
+
 ## Working
 
-Managing Posts - https://www.youtube.com/watch?v=Qi8Sv590N4Y
-Managing Friends - https://www.youtube.com/watch?v=QaDg34DBShM
+Managing Posts - https://www.youtube.com/watch?v=Qi8Sv590N4Y<br>
+Managing Friends - https://www.youtube.com/watch?v=QaDg34DBShM<br>
 Sending Messages - https://www.youtube.com/watch?v=BKlIbSifVfA
 
 ## Developer
@@ -45,7 +49,7 @@ Sending Messages - https://www.youtube.com/watch?v=BKlIbSifVfA
 This whole project is maintained only by **Amsavarthan Lv (me)**.
 
 If you like to contribute, please let me know
-Email : amsavarthan.a@gmail.com
+<B>Email : amsavarthan.a@gmail.com</B>
 
 ## Credits
 

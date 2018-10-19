@@ -250,6 +250,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
+                                                commentList.remove(holder.getAdapterPosition());
                                                 notifyItemRemoved(holder.getAdapterPosition());
                                                 notifyDataSetChanged();
                                                 progressDialog.dismiss();

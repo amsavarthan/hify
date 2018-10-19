@@ -23,17 +23,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--ScrollView
-        android:layout_above="@+id/adView"
-        android:layout_below="@+id/top"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-    </ScrollView-->
-
     <LinearLayout
-        android:layout_above="@id/adView"
         android:layout_below="@+id/top"
         android:paddingBottom="15dp"
         android:layout_width="match_parent"
@@ -144,13 +134,5 @@
     </LinearLayout>
 
 
-    <com.google.android.gms.ads.AdView
-        android:layout_alignParentBottom="true"
-        android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:adSize="BANNER"
-        app:adUnitId="@string/banner_ad_1">
-    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

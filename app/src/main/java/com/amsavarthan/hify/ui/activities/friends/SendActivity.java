@@ -150,7 +150,6 @@ public class SendActivity extends AppCompatActivity {
         current_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         storageReference= FirebaseStorage.getInstance().getReference().child("notification").child(random()+".jpg");
 
-        initAd();
 
         username=findViewById(R.id.user_name);
         image=findViewById(R.id.image);
@@ -270,7 +269,6 @@ public class SendActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(DocumentReference documentReference) {
 
-                                                    showAd();
                                                     Toast.makeText(SendActivity.this, "Hify sent!", Toast.LENGTH_SHORT).show();
                                                     message.setText("");
                                                     imagePreview.setVisibility(View.GONE);
@@ -282,7 +280,6 @@ public class SendActivity extends AppCompatActivity {
                                             }).addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    showAd();
                                                     Toast.makeText(SendActivity.this, "Error sending Hify: "+e.getMessage(), Toast.LENGTH_SHORT).show();
                                                     mDialog.dismiss();
                                                 }
@@ -599,26 +596,6 @@ public class SendActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 
-    InterstitialAd interstitialAd;
 
-    public void initAd(){
-        interstitialAd=new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.interstitial_ad_1));
-
-        AdRequest adRequest=new AdRequest.Builder().build();
-        interstitialAd.loadAd(adRequest);
-        interstitialAd.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-            }
-        });
-    }
-
-    public void showAd() {
-        if(interstitialAd.isLoaded()){
-            interstitialAd.show();
-        }
-    }
 
 }

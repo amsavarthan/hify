@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,8 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
 
+import static android.view.View.GONE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
@@ -57,6 +60,7 @@ public class MessageHistory extends Fragment {
     private FirebaseAuth mAuth;
     private EmptyStateRecyclerView mRecyclerView;
     private TextView tab_1,tab_2,tab_3,tab_4;
+    private ProgressBar pbar;
 
     @Nullable
     @Override
@@ -79,6 +83,7 @@ public class MessageHistory extends Fragment {
         messageTextReplyAdapter=new MessageTextReplyAdapter(messageReplies,mView.getContext());
 
         mRecyclerView = mView.findViewById(R.id.messageList);
+        pbar=mView.findViewById(R.id.pbar);
         tab_1=mView.findViewById(R.id.text);
         tab_2=mView.findViewById(R.id.text_reply);
         tab_3=mView.findViewById(R.id.image);
@@ -89,10 +94,17 @@ public class MessageHistory extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
 
+        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+
+
         tab_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 messages.clear();
+                pbar.setVisibility(View.VISIBLE);
+                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                        new TextStateDisplay(view.getContext(),"No messages found",""));
                 mRecyclerView.setAdapter(messageTextAdapter);
                 getTextMessage();
             }
@@ -102,6 +114,9 @@ public class MessageHistory extends Fragment {
             @Override
             public void onClick(View v) {
                 messageReplies.clear();
+                pbar.setVisibility(View.VISIBLE);
+                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                        new TextStateDisplay(view.getContext(),"No message replies found",""));
                 mRecyclerView.setAdapter(messageTextReplyAdapter);
                 getTextReplyMessage();
             }
@@ -111,6 +126,9 @@ public class MessageHistory extends Fragment {
             @Override
             public void onClick(View v) {
                 messages.clear();
+                pbar.setVisibility(View.VISIBLE);
+                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                        new TextStateDisplay(view.getContext(),"No messages found",""));
                 mRecyclerView.setAdapter(messageImageAdapter);
                 getImageMessage();
             }
@@ -120,6 +138,9 @@ public class MessageHistory extends Fragment {
             @Override
             public void onClick(View v) {
                 messageReplies.clear();
+                pbar.setVisibility(View.VISIBLE);
+                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
+                        new TextStateDisplay(view.getContext(),"No message replies found",""));
                 mRecyclerView.setAdapter(messageImageReplyAdapter);
                 getImageReplyMessage();
             }
@@ -139,6 +160,7 @@ public class MessageHistory extends Fragment {
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
 
                         if(e!=null){
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.w("error","listen",e);
                             return;
                         }
@@ -152,6 +174,7 @@ public class MessageHistory extends Fragment {
                                     Message message=doc.getDocument().toObject(Message.class);
                                     messages.add(message);
                                     messageTextAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(GONE);
 
                                 }
 
@@ -159,9 +182,10 @@ public class MessageHistory extends Fragment {
 
                             }
 
-                        }else
-                            Toast.makeText(mView.getContext(), "No messages found.", Toast.LENGTH_SHORT).show();
-
+                        }else {
+                            pbar.setVisibility(GONE);
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                        }
 
                     }
                 });
@@ -178,6 +202,7 @@ public class MessageHistory extends Fragment {
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
 
                         if(e!=null){
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.w("error","listen",e);
                             return;
                         }
@@ -191,6 +216,7 @@ public class MessageHistory extends Fragment {
                                     MessageReply messageReply=doc.getDocument().toObject(MessageReply.class);
                                     messageReplies.add(messageReply);
                                     messageTextReplyAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(GONE);
 
                                 }
 
@@ -198,9 +224,10 @@ public class MessageHistory extends Fragment {
 
                             }
 
-                        }else
-                            Toast.makeText(mView.getContext(), "No replies found.", Toast.LENGTH_SHORT).show();
-
+                        }else {
+                            pbar.setVisibility(GONE);
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                        }
 
 
                     }
@@ -218,6 +245,7 @@ public class MessageHistory extends Fragment {
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
 
                         if(e!=null){
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.w("error","listen",e);
                             return;
                         }
@@ -231,16 +259,17 @@ public class MessageHistory extends Fragment {
                                     Message message=doc.getDocument().toObject(Message.class);
                                     messages.add(message);
                                     messageImageAdapter.notifyDataSetChanged();
-
+                                    pbar.setVisibility(GONE);
                                 }
 
                                 messageImageAdapter.notifyDataSetChanged();
 
                             }
 
-                        }else
-                            Toast.makeText(mView.getContext(), "No image messages found.", Toast.LENGTH_SHORT).show();
-
+                        }else {
+                            pbar.setVisibility(GONE);
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                        }
 
 
                     }
@@ -258,6 +287,7 @@ public class MessageHistory extends Fragment {
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
 
                         if(e!=null){
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                             Log.w("error","listen",e);
                             return;
                         }
@@ -278,9 +308,10 @@ public class MessageHistory extends Fragment {
 
                             }
 
-                        }else
-                            Toast.makeText(mView.getContext(), "No image replies found.", Toast.LENGTH_SHORT).show();
-
+                        }else {
+                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            pbar.setVisibility(GONE);
+                        }
 
 
                     }

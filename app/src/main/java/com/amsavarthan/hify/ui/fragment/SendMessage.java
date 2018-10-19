@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.UsersAdapter;
@@ -42,6 +43,7 @@ public class SendMessage extends Fragment {
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private EmptyStateRecyclerView mRecyclerView;
+    private ProgressBar pbar;
 
     @Nullable
     @Override
@@ -58,6 +60,7 @@ public class SendMessage extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView = mView.findViewById(R.id.messageList);
+        pbar=mView.findViewById(R.id.pbar);
         mView.findViewById(R.id.navigator).setVisibility(View.GONE);
 
         usersList = new ArrayList<>();
@@ -75,8 +78,9 @@ public class SendMessage extends Fragment {
                 new TextStateDisplay(view.getContext(),"We found some of your friends","We are getting information of your friends.."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
+        pbar.setVisibility(View.VISIBLE);
         startListening();
 
     }
@@ -98,9 +102,12 @@ public class SendMessage extends Fragment {
                                     Users users = doc.getDocument().toObject(Users.class).withId(doc.getDocument().getId());
                                     usersList.add(users);
                                     usersAdapter.notifyDataSetChanged();
+                                    pbar.setVisibility(View.GONE);
                                 }
+                                usersAdapter.notifyDataSetChanged();
                             }
                         }else{
+                            pbar.setVisibility(View.GONE);
                             mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                         }
 
@@ -110,6 +117,7 @@ public class SendMessage extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
+                        pbar.setVisibility(View.GONE);
                         mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                         Log.w("Error", "listen:error", e);
 

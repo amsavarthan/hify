@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,12 +17,16 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -29,6 +34,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +45,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.MultipleImage;
 import com.amsavarthan.hify.models.Post;
+import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
 import com.bumptech.glide.Glide;
@@ -51,6 +59,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.pedromassango.doubleclick.DoubleClick;
 import com.pedromassango.doubleclick.DoubleClickListener;
 import com.rd.PageIndicatorView;
@@ -80,12 +90,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private Activity activity;
     private static final DecelerateInterpolator DECCELERATE_INTERPOLATOR = new DecelerateInterpolator();
     private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
-    private static final OvershootInterpolator OVERSHOOT_INTERPOLATOR = new OvershootInterpolator(4);
+    private BottomSheetDialog mmBottomSheetDialog;
+    private View statsheetView;
 
-    public PostsAdapter(List<Post> postList, Context context,Activity activity) {
+    public PostsAdapter(List<Post> postList, Context context,Activity activity,BottomSheetDialog mmBottomSheetDialog,View statsheetView) {
         this.postList = postList;
         this.activity=activity;
         this.context = context;
+        this.mmBottomSheetDialog=mmBottomSheetDialog;
+        this.statsheetView=statsheetView;
     }
 
     @NonNull
@@ -101,6 +114,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+
+        try {
+            setupViews(holder);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         if(postList.get(position).getUserId().equals(mCurrentUser.getUid())){
             isOwner=true;
@@ -132,10 +151,150 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                @Override
                                                public void onSuccess(Void aVoid) {
+
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_0())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_0());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_1())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_1());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_2())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_2());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_3())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_3());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_4())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_4());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_5())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_5());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
+                                                   pdialog.show();
+                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_6())) {
+                                                       StorageReference img = FirebaseStorage.getInstance()
+                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_6());
+                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                           @Override
+                                                           public void onSuccess(Void aVoid) {
+                                                               pdialog.dismiss();
+                                                               Log.i("Post Image","deleted");
+                                                           }
+                                                       })
+                                                               .addOnFailureListener(new OnFailureListener() {
+                                                                   @Override
+                                                                   public void onFailure(@NonNull Exception e) {
+                                                                       Log.e("Post Image",e.getLocalizedMessage());
+                                                                   }
+                                                               });
+                                                   }
+
                                                    pdialog.dismiss();
-                                                   notifyItemRemoved(holder.getAdapterPosition());
-                                                   notifyDataSetChanged();
-                                                   Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                                   pdialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                       @Override
+                                                       public void onDismiss(DialogInterface dialog) {
+                                                           Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                                           postList.remove(holder.getAdapterPosition());
+                                                           notifyDataSetChanged();
+                                                       }
+                                                   });
+
+
                                                }
                                            })
                                            .addOnFailureListener(new OnFailureListener() {
@@ -160,12 +319,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }else{
             isOwner=false;
             holder.delete.setVisibility(View.GONE);
-        }
-
-        try {
-            setupViews(holder);
-        }catch (Exception e){
-            e.printStackTrace();
         }
 
 
@@ -324,27 +477,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return bitmap;
     }
 
-    private Bitmap getBitmap(ImageView view) {
-
-        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        Drawable bgDrawable = view.getBackground();
-        if (bgDrawable != null) {
-            bgDrawable.draw(canvas);
-        } else {
-            canvas.drawColor(Color.parseColor("#212121"));
-        }
-        view.draw(canvas);
-
-        return bitmap;
-    }
 
     private void setupViews(final ViewHolder holder) {
 
         int pos = holder.getAdapterPosition();
 
         getLikeandFav(holder);
-        getCounts(holder);
 
         holder.user_name.setText(postList.get(pos).getUsername());
 
@@ -356,6 +494,64 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         String timeAgo = TimeAgo.using(Long.parseLong(postList.get(pos).getTimestamp()));
 
         holder.timestamp.setText(timeAgo);
+
+       enableDoubleTap(holder);
+
+        holder.stat_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+            @Override
+            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+
+                mmBottomSheetDialog.show();
+
+                final ProgressBar pbar=statsheetView.findViewById(R.id.pbar);
+                final LinearLayout main=statsheetView.findViewById(R.id.main);
+                final TextView smile=statsheetView.findViewById(R.id.smiles);
+                final TextView save=statsheetView.findViewById(R.id.saves);
+
+                pbar.setVisibility(View.VISIBLE);
+                main.setVisibility(View.GONE);
+                FirebaseFirestore.getInstance().collection("Posts")
+                        .document(postList.get(holder.getAdapterPosition()).postId)
+                        .collection("Liked_Users")
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                smile.setText(String.format(context.getString(R.string.s_people_have_smiled_for_this_post),queryDocumentSnapshots.size()));
+
+                                FirebaseFirestore.getInstance().collection("Posts")
+                                        .document(postList.get(holder.getAdapterPosition()).postId)
+                                        .collection("Saved_Users")
+                                        .get()
+                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                save.setText(String.format(context.getString(R.string.s_people_have_saved_this_post),queryDocumentSnapshots.size()));
+                                                pbar.setVisibility(View.GONE);
+                                                main.setVisibility(View.VISIBLE);
+
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        });
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+            }
+        });
 
         if (postList.get(pos).getImage_count()==0) {
 
@@ -390,7 +586,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         } else if(postList.get(pos).getImage_count()==1) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
-            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false);
+            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn);
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
@@ -407,7 +603,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
                 @Override
                 public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
-                    Toast.makeText(context, "Click the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Long press the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
                 }
 
             });
@@ -416,7 +612,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }else if(postList.get(pos).getImage_count()>0) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
-            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false);
+            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn);
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
@@ -439,6 +635,38 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
 
         }
+    }
+
+    private void enableDoubleTap(final ViewHolder holder) {
+
+        //Double Tap for Photo is set on PostPhotosAdapter
+
+        final GestureDetector detector=new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                animatePhotoLike(holder);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                super.onLongPress(e);
+            }
+        }
+        );
+
+        holder.post_text.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return detector.onTouchEvent(event);
+            }
+        });
+
     }
 
     private void setUrls(ViewHolder holder, ArrayList<MultipleImage> multipleImages, PostPhotosAdapter photosAdapter) {
@@ -573,7 +801,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                 .document(postList.get(holder.getAdapterPosition()).postId)
                                                 .collection("Liked_Users")
                                                 .document(mCurrentUser.getUid())
-                                                .set(likeMap)
+                                                //.set(likeMap)
+                                                .delete()
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
@@ -732,7 +961,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                 .document(postList.get(holder.getAdapterPosition()).postId)
                                                 .collection("Saved_Users")
                                                 .document(mCurrentUser.getUid())
-                                                .set(favMap)
+                                                //.set(favMap)
+                                                .delete()
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
@@ -785,28 +1015,61 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private void setmImageHolderBg(String color, FrameLayout mImageholder) {
         switch (Integer.parseInt(color)) {
             case 1:
-                mImageholder.setBackgroundResource(R.drawable.gradient_9);
+                mImageholder.setBackgroundResource(R.drawable.gradient_1);
                 break;
             case 2:
-                mImageholder.setBackgroundResource(R.drawable.gradient_7);
+                mImageholder.setBackgroundResource(R.drawable.gradient_2);
                 break;
             case 3:
-                mImageholder.setBackgroundResource(R.drawable.gradient_8);
+                mImageholder.setBackgroundResource(R.drawable.gradient_3);
                 break;
             case 4:
                 mImageholder.setBackgroundResource(R.drawable.gradient_4);
                 break;
             case 5:
-                mImageholder.setBackgroundResource(R.drawable.gradient_1);
+                mImageholder.setBackgroundResource(R.drawable.gradient_5);
                 break;
             case 6:
-                mImageholder.setBackgroundResource(R.drawable.gradient_3);
+                mImageholder.setBackgroundResource(R.drawable.gradient_6);
                 break;
             case 7:
-                mImageholder.setBackgroundResource(R.drawable.gradient_2);
+                mImageholder.setBackgroundResource(R.drawable.gradient_7);
                 break;
             case 8:
+                mImageholder.setBackgroundResource(R.drawable.gradient_8);
+                break;
+            case 9:
+                mImageholder.setBackgroundResource(R.drawable.gradient_9);
+                break;
+            case 10:
+                mImageholder.setBackgroundResource(R.drawable.gradient_10);
+                break;
+            case 11:
                 mImageholder.setBackgroundResource(R.drawable.gradient_11);
+                break;
+            case 12:
+                mImageholder.setBackgroundResource(R.drawable.gradient_12);
+                break;
+            case 13:
+                mImageholder.setBackgroundResource(R.drawable.gradient_13);
+                break;
+            case 14:
+                mImageholder.setBackgroundResource(R.drawable.gradient_14);
+                break;
+            case 15:
+                mImageholder.setBackgroundResource(R.drawable.gradient_15);
+                break;
+            case 16:
+                mImageholder.setBackgroundResource(R.drawable.gradient_16);
+                break;
+            case 17:
+                mImageholder.setBackgroundResource(R.drawable.gradient_17);
+                break;
+            case 18:
+                mImageholder.setBackgroundResource(R.drawable.gradient_18);
+                break;
+            case 19:
+                mImageholder.setBackgroundResource(R.drawable.gradient_19);
                 break;
         }
 
@@ -948,7 +1211,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private View mView;
         private CircleImageView user_image;
         private TextView user_name, timestamp, post_desc;
-        private MaterialFavoriteButton sav_button, like_btn, share_btn, comment_btn;
+        private MaterialFavoriteButton sav_button, like_btn, share_btn, comment_btn,stat_btn;
         private FrameLayout mImageholder;
         private FrameLayout pager_layout;
         private RelativeLayout indicator_holder;
@@ -967,6 +1230,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             like_btn = mView.findViewById(R.id.like_button);
             vBgLike = mView.findViewById(R.id.vBgLike);
             ivLike = mView.findViewById(R.id.ivLike);
+            stat_btn=mView.findViewById(R.id.stat_button);
             user_name = mView.findViewById(R.id.post_username);
             timestamp = mView.findViewById(R.id.post_timestamp);
             post_desc = mView.findViewById(R.id.post_desc);
@@ -981,6 +1245,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             delete = mView.findViewById(R.id.delete_button);
             sav_button = mView.findViewById(R.id.save_button);
             mImageholder = mView.findViewById(R.id.image_holder);
+
+
 
 
         }

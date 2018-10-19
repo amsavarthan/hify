@@ -151,7 +151,7 @@ public class ImagePreviewSave extends AppCompatActivity {
         }else {
 
             Glide.with(this)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder)))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder2)))
                     .load(intent_URL)
                     .into(photoView);
 

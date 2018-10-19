@@ -6,6 +6,7 @@ import android.renderscript.Matrix2f;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
@@ -54,6 +56,9 @@ public class Dashboard extends Fragment {
     PostsAdapter mAdapter;
     View mView;
     private List<String> mFriendIdList=new ArrayList<>();
+    private View statsheetView;
+    private BottomSheetDialog mmBottomSheetDialog;
+    private ProgressBar pbar;
 
     @Nullable
     @Override
@@ -75,8 +80,15 @@ public class Dashboard extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
+        pbar=view.findViewById(R.id.pbar);
+
+        statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
+        mmBottomSheetDialog = new BottomSheetDialog(view.getContext());
+        mmBottomSheetDialog.setContentView(statsheetView);
+        mmBottomSheetDialog.setCanceledOnTouchOutside(true);
+
         mPostsList = new ArrayList<>();
-        mAdapter = new PostsAdapter(mPostsList, view.getContext(),getActivity());
+        mAdapter = new PostsAdapter(mPostsList, view.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
         mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
 
         mPostsRecyclerView.setItemAnimator(new SlideInLeftAnimator());
@@ -89,9 +101,9 @@ public class Dashboard extends Fragment {
                 new ImageTextStateDisplay(view.getContext(),R.mipmap.no_posts,"No posts found","Add some friends to see their posts."));
 
         mPostsRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
-
+        pbar.setVisibility(View.VISIBLE);
         getPosts();
 
 
@@ -105,14 +117,13 @@ public class Dashboard extends Fragment {
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    public void onSuccess(final QuerySnapshot queryDocumentSnapshots) {
 
                         if (!queryDocumentSnapshots.isEmpty()) {
 
                             for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
 
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
-
 
                                     mFirestore.collection("Users")
                                             .document(currentUser.getUid())
@@ -122,28 +133,35 @@ public class Dashboard extends Fragment {
                                                 @Override
                                                 public void onSuccess(QuerySnapshot querySnapshot) {
 
+                                                    if(!queryDocumentSnapshots.isEmpty()) {
+
                                                         for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
 
                                                             if (documentChange.getType() == DocumentChange.Type.ADDED) {
 
-                                                                if(documentChange.getDocument().getId().equals(doc.getDocument().get("userId"))){
+                                                                if (documentChange.getDocument().getId().equals(doc.getDocument().get("userId"))) {
 
                                                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                                                     mPostsList.add(post);
                                                                     mAdapter.notifyDataSetChanged();
+                                                                    pbar.setVisibility(View.GONE);
 
                                                                 }
-
+                                                                mAdapter.notifyDataSetChanged();
                                                             }
-
+                                                            mAdapter.notifyDataSetChanged();
                                                         }
-
+                                                    }else{
+                                                        pbar.setVisibility(View.GONE);
+                                                        mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                                    }
 
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
+                                                    pbar.setVisibility(View.GONE);
                                                     mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                                                     Log.w("Error", "listen:error", e);
                                                 }
@@ -160,6 +178,7 @@ public class Dashboard extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        pbar.setVisibility(View.GONE);
                         mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                         Log.w("Error", "listen:error", e);
                     }

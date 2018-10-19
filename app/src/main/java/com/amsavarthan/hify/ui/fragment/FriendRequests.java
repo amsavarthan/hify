@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
@@ -46,6 +47,7 @@ public class FriendRequests extends Fragment {
     private FirebaseAuth mAuth;
     private Query mRequestQuery;
     private EmptyStateRecyclerView mRequestView;
+    private ProgressBar pbar;
 
     public void getUsers() {
         requestList.clear();
@@ -67,12 +69,13 @@ public class FriendRequests extends Fragment {
                                     FriendRequest friendRequest = doc.getDocument().toObject(FriendRequest.class).withId(doc.getDocument().getId());
                                     requestList.add(friendRequest);
                                     requestAdapter.notifyDataSetChanged();
-
+                                    pbar.setVisibility(View.GONE);
                                 }
 
+                                requestAdapter.notifyDataSetChanged();
                             }
                         }else{
-                            Toast.makeText(mView.getContext(), "No friend requests found.", Toast.LENGTH_SHORT).show();
+                            pbar.setVisibility(View.GONE);
                             mRequestView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                         }
 
@@ -81,6 +84,7 @@ public class FriendRequests extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        pbar.setVisibility(View.GONE);
                         mRequestView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                         Log.w("Error", "listen:error", e);
                     }
@@ -103,6 +107,7 @@ public class FriendRequests extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRequestView = mView.findViewById(R.id.recyclerView);
+        pbar=mView.findViewById(R.id.pbar);
 
         requestList = new ArrayList<>();
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
@@ -113,14 +118,15 @@ public class FriendRequests extends Fragment {
         mRequestView.setAdapter(requestAdapter);
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No friend requests","Add some friends to see their posts."));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.happy2,"No friend requests","People who have sent you friend request will be shown here."));
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
                 new TextStateDisplay(view.getContext(),"There are some friend request","We are getting information of those users.."));
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
+        pbar.setVisibility(View.VISIBLE);
         getUsers();
 
     }

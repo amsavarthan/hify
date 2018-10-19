@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/layout"
+<FrameLayout android:id="@+id/layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.tylersuehr.esr.EmptyStateRecyclerView
@@ -12,4 +12,12 @@
         android:layout_height="match_parent"
        />
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/pbar"
+        android:indeterminate="true"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_gravity="center"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content" />
+
+</FrameLayout>

@@ -78,4 +78,13 @@
         android:layout_height="match_parent"
        />
 
+    <ProgressBar
+        android:layout_centerInParent="true"
+        android:id="@+id/pbar"
+        android:indeterminate="true"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_gravity="center"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

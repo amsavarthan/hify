@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
@@ -42,6 +43,8 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FlipInTopXAnimator;
 
+import static android.view.View.GONE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
@@ -54,6 +57,7 @@ public class AddFriends extends Fragment {
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
     private EmptyStateRecyclerView mRecyclerView;
+    private ProgressBar pbar;
 
     @Nullable
     @Override
@@ -70,6 +74,7 @@ public class AddFriends extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView = mView.findViewById(R.id.recyclerView);
+        pbar=mView.findViewById(R.id.pbar);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerViewTouchHelper(0, ItemTouchHelper.LEFT, new RecyclerViewTouchHelper.RecyclerItemTouchHelperListener() {
             @Override
@@ -103,21 +108,24 @@ public class AddFriends extends Fragment {
         mRecyclerView.setAdapter(usersAdapter);
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No user found","All Hify users can be seen here"));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.happy2,"No more users found","You are friends with all the users."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
                 new TextStateDisplay(view.getContext(),"We found some users","We are getting information of those users.."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
-
+        pbar.setVisibility(View.VISIBLE);
         getAllUsers();
 
     }
 
     public void getAllUsers() {
+        usersList.clear();
         firestore.collection("Users")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .collection("Friends")
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -125,31 +133,103 @@ public class AddFriends extends Fragment {
 
                         if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
 
-                            for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-                                if (doc.getType() == DocumentChange.Type.ADDED) {
+                            for (final DocumentChange docu : queryDocumentSnapshots.getDocumentChanges()) {
+                                if (docu.getType() == DocumentChange.Type.ADDED) {
 
-                                    if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
-                                        Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
-                                        usersList.add(friends);
-                                        usersAdapter.notifyDataSetChanged();
-                                    }
+                                    //All users
+                                    firestore.collection("Users")
+                                            .get()
+                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                                    if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
+
+                                                        for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                                                            if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                                                if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
+                                                                    if(!doc.getDocument().getId().equals(docu.getDocument().getId()))
+                                                                    {
+                                                                        Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
+                                                                        usersList.add(friends);
+                                                                        usersAdapter.notifyDataSetChanged();
+                                                                        pbar.setVisibility(GONE);
+                                                                    }
+                                                                    usersAdapter.notifyDataSetChanged();
+                                                                }
+
+                                                                usersAdapter.notifyDataSetChanged();
+                                                            }
+                                                        }
+
+                                                    }else{
+                                                        pbar.setVisibility(GONE);
+                                                        mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                                    }
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                                                    pbar.setVisibility(GONE);
+                                                    Log.w("Error", "listen:error", e);
+                                                }
+                                            });
+
 
                                 }
                             }
 
-                        }else{
-                            Toast.makeText(mView.getContext(), "It's empty in here.", Toast.LENGTH_SHORT).show();
-                        }
+                        } else {
 
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                        Log.w("Error", "listen:error", e);
+                            firestore.collection("Users")
+                                    .get()
+                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                            if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
+
+                                                for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                                                    if (doc.getType() == DocumentChange.Type.ADDED) {
+
+                                                        if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
+
+                                                                Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
+                                                                usersList.add(friends);
+                                                                usersAdapter.notifyDataSetChanged();
+                                                                pbar.setVisibility(GONE);
+                                                        }
+
+                                                        usersAdapter.notifyDataSetChanged();
+                                                    }
+                                                    usersAdapter.notifyDataSetChanged();
+                                                }
+
+                                            }else{
+                                                pbar.setVisibility(GONE);
+                                                mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                            }
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            pbar.setVisibility(GONE);
+                                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                                            Log.w("Error", "listen:error", e);
+                                        }
+                                    });
+
+
+                        }
                     }
                 });
+
 
     }
 

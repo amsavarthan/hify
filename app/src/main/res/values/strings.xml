@@ -348,5 +348,7 @@
     <string name="select_from_gallery">Select from gallery</string>
     <string name="click_on_the_button_below_to_select_image_s">Click on the button below to select image(s)</string>
     <string name="insert_image_s">Insert Image(s)</string>
+    <string name="s_people_have_smiled_for_this_post">%d people have smiled for this post</string>
+    <string name="s_people_have_saved_this_post">%d people have saved this post</string>
 
 </resources>

@@ -103,9 +103,11 @@
         </activity>
         <activity
             android:name=".ui.activities.notification.ImagePreviewSave"
+            android:theme="@style/LoginAppTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.notification.ImagePreview"
+            android:theme="@style/LoginAppTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.notification.NotificationImage"
