@@ -29,7 +29,7 @@
        <TextView
            android:layout_marginTop="5dp"
            android:textSize="16sp"
-           android:text="beta4"
+           android:text="beta5"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content" />
 
@@ -191,34 +191,6 @@
                        android:textSize="18sp"
                        android:layout_marginStart="10dp"
                        android:text="Add me to your circles"
-                       android:gravity="center_vertical"
-                       android:layout_width="match_parent"
-                       android:layout_height="match_parent" />
-
-               </LinearLayout>
-
-               <LinearLayout
-                   android:id="@+id/manage"
-                   android:clickable="true"
-                   android:focusable="true"
-                   android:foreground="?selectableItemBackground"
-                   android:padding="10dp"
-                   android:layout_marginTop="5dp"
-                   android:orientation="horizontal"
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content">
-
-                   <ImageView
-                       android:src="@drawable/ic_storage_white_24dp"
-                       android:tint="#FFF"
-                       android:layout_width="24dp"
-                       android:layout_height="24dp" />
-
-                   <TextView
-                       android:textColor="#FFF"
-                       android:textSize="18sp"
-                       android:layout_marginStart="10dp"
-                       android:text="Manage space"
                        android:gravity="center_vertical"
                        android:layout_width="match_parent"
                        android:layout_height="match_parent" />

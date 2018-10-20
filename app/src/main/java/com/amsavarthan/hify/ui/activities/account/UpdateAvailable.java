@@ -93,7 +93,7 @@ public class UpdateAvailable extends AppCompatActivity {
         setContentView(R.layout.activity_update_available);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

@@ -64,7 +64,12 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
         holderr=holder;
         checkIfReqSent(holder);
         holder.name.setText(usersList.get(position).getName());
+        if(holder.username.getText().equals("null")){
+            holder.username.setText("loading...");
+        }
+
         holder.username.setText("@"+usersList.get(position).getUsername());
+
         holder.listenerText.setText("Add as friend");
 
         Glide.with(context)

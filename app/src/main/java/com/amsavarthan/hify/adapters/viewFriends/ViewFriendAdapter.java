@@ -56,6 +56,11 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
 
 
         holder.name.setText(usersList.get(position).getName());
+
+        if(holder.username.getText().equals("null")){
+            holder.username.setText("loading...");
+        }
+
         holder.username.setText("@"+usersList.get(position).getUsername());
 
         Glide.with(context)

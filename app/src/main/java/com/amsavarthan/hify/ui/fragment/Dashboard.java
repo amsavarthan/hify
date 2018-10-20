@@ -107,7 +107,7 @@ public class Dashboard extends Fragment {
         mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
 
         mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mPostsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
+       // mPostsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mPostsRecyclerView.setHasFixedSize(true);
         mPostsRecyclerView.setAdapter(mAdapter);
@@ -216,14 +216,14 @@ public class Dashboard extends Fragment {
 
                                                         if(mPostsList.isEmpty()){
                                                             pbar.setVisibility(View.GONE);
-                                                            mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                                                         }
 
                                                     }else{
 
-                                                        pbar.setVisibility(View.GONE);
-                                                        mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
-
+													pbar.setVisibility(View.GONE);
+                                                        if(mPostsList.isEmpty()){
+                                                            pbar.setVisibility(View.GONE);
+                                                        }
                                                     }
 
                                                 }
@@ -242,8 +242,10 @@ public class Dashboard extends Fragment {
                             }
 
                         }else{
-                            pbar.setVisibility(View.GONE);
-                            mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            if(mPostsList.isEmpty())
+							{
+                                pbar.setVisibility(View.GONE);
+                            }
                         }
 
                     }

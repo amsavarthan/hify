@@ -9,8 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
-    <uses-permission android:name="android.permission.DELETE_CACHE_FILES" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
@@ -25,7 +23,6 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
-        android:manageSpaceActivity=".ui.activities.ManageSpace"
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activities.MainActivity"
@@ -169,6 +166,7 @@
         </activity>
         <activity
             android:name=".ui.activities.account.UpdateAvailable"
+            android:screenOrientation="portrait"
             android:theme="@style/UpdateAppTheme">
             <intent-filter>
                 <action android:name="com.amsavarthan.hify.TARGET_UPDATE" />
@@ -176,9 +174,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.ManageSpace"
-            android:screenOrientation="portrait"
-            android:theme="@style/UpdateAppTheme"/>
     </application>
 
 </manifest>

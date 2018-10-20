@@ -4,7 +4,7 @@ package com.amsavarthan.hify.models;
  * Created by amsavarthan on 22/2/18.
  */
 
-public class Message {
+public class Message extends MessageId {
 
     private String from, message,userimage,username,timestamp,notification_id,image;
 

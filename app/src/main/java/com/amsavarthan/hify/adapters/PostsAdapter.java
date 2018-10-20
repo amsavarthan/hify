@@ -597,7 +597,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.pager_layout.setVisibility(View.VISIBLE);
             holder.post_text.setVisibility(View.GONE);
             holder.post_desc.setVisibility(View.VISIBLE);
-            String desc = "<b>" + postList.get(pos).getUsername() + "</b> " + postList.get(pos).getDescription();
+            String desc = "<b>" + postList.get(pos).getUsername() + "</b> : " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
             holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
@@ -622,7 +622,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.pager_layout.setVisibility(View.VISIBLE);
             holder.post_text.setVisibility(View.GONE);
             holder.post_desc.setVisibility(View.VISIBLE);
-            String desc = "<b>" + postList.get(pos).getUsername() + "</b> " + postList.get(pos).getDescription();
+            String desc = "<b>" + postList.get(pos).getUsername() + "</b> : " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
             holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {

@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.Message;
 import com.amsavarthan.hify.models.MessageReply;
@@ -17,7 +19,9 @@ import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.marlonlom.utilities.timeago.TimeAgo;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -86,6 +90,53 @@ public class MessageImageReplyAdapter extends RecyclerView.Adapter<MessageImageR
         holder.time.setText(timeAgo);
 
         holder.message.setText(String.format(Locale.ENGLISH,"Reply for image you sent with message: %s\nMessage: %s",messageList.get(position).getReply_for(),messageList.get(position).getMessage()));
+
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                new MaterialDialog.Builder(context)
+                        .title("Delete message")
+                        .content("Are you sure do you want to delete this message?")
+                        .positiveText("Yes")
+                        .negativeText("No")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                                mFirestore.collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Notifications_reply_image")
+                                        .document(messageList.get(holder.getAdapterPosition()).msgId)
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                messageList.remove(holder.getAdapterPosition());
+                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                notifyDataSetChanged();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        });
+
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+                return true;
+            }
+        });
 
     }
 

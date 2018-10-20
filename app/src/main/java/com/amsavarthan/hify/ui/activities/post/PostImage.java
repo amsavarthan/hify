@@ -136,7 +136,7 @@ public class PostImage extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

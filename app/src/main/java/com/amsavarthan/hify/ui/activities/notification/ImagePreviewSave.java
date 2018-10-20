@@ -127,7 +127,7 @@ public class ImagePreviewSave extends AppCompatActivity {
         setContentView(R.layout.activity_image_preview_save);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

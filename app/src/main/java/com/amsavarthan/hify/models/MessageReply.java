@@ -1,6 +1,6 @@
 package com.amsavarthan.hify.models;
 
-public class MessageReply {
+public class MessageReply extends MessageId {
 
     private String from,message,notification_id,reply_for,reply_image,timestamp;
 

@@ -189,7 +189,7 @@ public class MessageHistory extends Fragment {
 
                                 if(doc.getType()== DocumentChange.Type.ADDED){
 
-                                    Message message=doc.getDocument().toObject(Message.class);
+                                    Message message=doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
                                     messages.add(message);
                                     messageTextAdapter.notifyDataSetChanged();
                                     pbar.setVisibility(GONE);
@@ -231,7 +231,7 @@ public class MessageHistory extends Fragment {
 
                                 if(doc.getType()== DocumentChange.Type.ADDED){
 
-                                    MessageReply messageReply=doc.getDocument().toObject(MessageReply.class);
+                                    MessageReply messageReply=doc.getDocument().toObject(MessageReply.class).withId(doc.getDocument().getId());
                                     messageReplies.add(messageReply);
                                     messageTextReplyAdapter.notifyDataSetChanged();
                                     pbar.setVisibility(GONE);
@@ -274,7 +274,7 @@ public class MessageHistory extends Fragment {
 
                                 if(doc.getType()== DocumentChange.Type.ADDED){
 
-                                    Message message=doc.getDocument().toObject(Message.class);
+                                    Message message=doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
                                     messages.add(message);
                                     messageImageAdapter.notifyDataSetChanged();
                                     pbar.setVisibility(GONE);
@@ -316,7 +316,7 @@ public class MessageHistory extends Fragment {
 
                                 if(doc.getType()== DocumentChange.Type.ADDED){
 
-                                    MessageReply messageReply=doc.getDocument().toObject(MessageReply.class);
+                                    MessageReply messageReply=doc.getDocument().toObject(MessageReply.class).withId(doc.getDocument().getId());
                                     messageReplies.add(messageReply);
                                     messageImageReplyAdapter.notifyDataSetChanged();
 

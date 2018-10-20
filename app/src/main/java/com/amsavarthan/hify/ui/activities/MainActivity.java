@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             Log.e("Error", e.getMessage());
         }
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

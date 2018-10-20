@@ -85,7 +85,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_reply);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

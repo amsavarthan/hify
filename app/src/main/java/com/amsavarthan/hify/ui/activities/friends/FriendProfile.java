@@ -78,7 +78,7 @@ public class FriendProfile extends AppCompatActivity {
         setContentView(R.layout.activity_friend_profile);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/regular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
@@ -169,7 +169,7 @@ public class FriendProfile extends AppCompatActivity {
                     new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+            //mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);

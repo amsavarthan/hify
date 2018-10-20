@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.ui.activities.ManageSpace;
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -21,7 +20,7 @@ import com.amsavarthan.hify.ui.activities.ManageSpace;
 public class About extends Fragment {
 
     View mView;
-    LinearLayout email,website,instagram,google,github,manage;
+    LinearLayout email,website,instagram,google,github;
 
     @Nullable
     @Override
@@ -39,14 +38,6 @@ public class About extends Fragment {
         instagram=mView.findViewById(R.id.instagram);
         google=mView.findViewById(R.id.google);
         github=mView.findViewById(R.id.github);
-        manage=mView.findViewById(R.id.manage);
-
-        manage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(mView.getContext(), ManageSpace.class));
-            }
-        });
 
         email.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +57,7 @@ public class About extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String url = "http://www.rebrand.ly/lvstore";
+                String url = "http://lvamsavarthan.github.io/lvstore";
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
@@ -102,7 +93,7 @@ public class About extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String url = "https://github.com/lvamsavarthan";
+                String url = "https://github.com/lvamsavarthan/Hify";
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);

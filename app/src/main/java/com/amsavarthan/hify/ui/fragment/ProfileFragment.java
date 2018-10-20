@@ -174,7 +174,7 @@ public class ProfileFragment extends Fragment {
                     new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+            //mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);

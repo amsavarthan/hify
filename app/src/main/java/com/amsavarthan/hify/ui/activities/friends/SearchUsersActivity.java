@@ -160,7 +160,7 @@ public class SearchUsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_users);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Roboto-RobotoRegular.ttf")
+                .setDefaultFontPath("fonts/bold.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );

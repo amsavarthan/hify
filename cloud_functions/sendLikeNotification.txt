@@ -1,0 +1,60 @@
+'use-strict'
+
+const functions = require('firebase-functions');
+const admin=require('firebase-admin');
+admin.initializeApp(functions.config().firebase);
+
+exports.sendLikeNotification=functions.firestore.document("Posts/{post_id}/Liked_Users/{user_id}").onWrite((change,context)=> {
+
+    const post_id=context.params.post_id;
+    const user_id=context.params.user_id;
+  
+    return admin.firestore().collection("Posts").doc(post_id).get().then((queryResult)=>{
+
+      const admin_id=queryResult.data().userId;
+      
+       return admin.firestore().collection("Posts").doc(post_id).collection("Liked_Users").doc(user_id).get().then((queryRes)=>{
+       
+        const admin_data=admin.firestore().collection("Users").doc(admin_id).get();
+        const liker_data=admin.firestore().collection("Users").doc(user_id).get();
+
+        return Promise.all([liker_data,admin_data]).then(result=>{
+
+            const liker_name=result[0].data().name;
+            const liker_image=result[0].data().image;
+            const admin_token=result[1].data().token_id;
+            const admin_name=result[1].data().name;
+                 
+           if(liker_name!=admin_name)
+           {
+             
+            const payload={
+               data:{
+                post_id:post_id,
+                admin_id:admin_id,
+                title:liker_name,
+                from_image:liker_image,
+                body:"Liked your post",
+                click_action:"com.amsavarthan.hify.TARGET_LIKE"
+              }
+                
+            };
+            
+            return admin.messaging().sendToDevice(admin_token,payload).then(result=>{
+
+                console.log("Notification Sent.");
+
+            });
+               
+             
+           }
+                        
+          });
+         
+       
+       });
+        
+    });
+
+});
+
