@@ -90,13 +90,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
     private BottomSheetDialog mmBottomSheetDialog;
     private View statsheetView;
+    private boolean forComment;
 
-    public PostsAdapter(List<Post> postList, Context context,Activity activity,BottomSheetDialog mmBottomSheetDialog,View statsheetView) {
+    public PostsAdapter(List<Post> postList, Context context,Activity activity,BottomSheetDialog mmBottomSheetDialog,View statsheetView,boolean forComment) {
         this.postList = postList;
         this.activity=activity;
         this.context = context;
         this.mmBottomSheetDialog=mmBottomSheetDialog;
         this.statsheetView=statsheetView;
+        this.forComment=forComment;
     }
 
     @NonNull
@@ -449,7 +451,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         });
 
-
+        if(forComment){
+            holder.comment_btn.performClick();
+        }
 
 
     }

@@ -59,6 +59,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class FriendProfile extends AppCompatActivity {
 
@@ -70,6 +71,12 @@ public class FriendProfile extends AppCompatActivity {
             context.startActivity(new Intent(context,FriendProfile.class).putExtra("f_id",id));
         }
 
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -158,7 +165,7 @@ public class FriendProfile extends AppCompatActivity {
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 

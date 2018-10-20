@@ -155,10 +155,8 @@ public class AddFriends extends Fragment {
                                                                         usersAdapter.notifyDataSetChanged();
                                                                         pbar.setVisibility(GONE);
                                                                     }
-                                                                    usersAdapter.notifyDataSetChanged();
                                                                 }
 
-                                                                usersAdapter.notifyDataSetChanged();
                                                             }
                                                         }
 
@@ -203,9 +201,7 @@ public class AddFriends extends Fragment {
                                                                 pbar.setVisibility(GONE);
                                                         }
 
-                                                        usersAdapter.notifyDataSetChanged();
                                                     }
-                                                    usersAdapter.notifyDataSetChanged();
                                                 }
 
                                             }else{

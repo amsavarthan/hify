@@ -102,7 +102,6 @@ public class SendMessage extends Fragment {
                                     usersAdapter.notifyDataSetChanged();
                                     pbar.setVisibility(View.GONE);
                                 }
-                                usersAdapter.notifyDataSetChanged();
                             }
                         }else{
                             pbar.setVisibility(View.GONE);

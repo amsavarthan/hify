@@ -13,6 +13,26 @@ public class Post extends PostId {
     private int image_count;
     private String image_url_0,image_url_1,image_url_2,image_url_3,image_url_4,image_url_5,image_url_6;
 
+    public Post(String userId, String name, String timestamp, String likes, String favourites, String description, String color, String username, String userimage, int image_count, String image_url_0, String image_url_1, String image_url_2, String image_url_3, String image_url_4, String image_url_5, String image_url_6) {
+        this.userId = userId;
+        this.name = name;
+        this.timestamp = timestamp;
+        this.likes = likes;
+        this.favourites = favourites;
+        this.description = description;
+        this.color = color;
+        this.username = username;
+        this.userimage = userimage;
+        this.image_count = image_count;
+        this.image_url_0 = image_url_0;
+        this.image_url_1 = image_url_1;
+        this.image_url_2 = image_url_2;
+        this.image_url_3 = image_url_3;
+        this.image_url_4 = image_url_4;
+        this.image_url_5 = image_url_5;
+        this.image_url_6 = image_url_6;
+    }
+
     public Post() {
     }
 

@@ -32,7 +32,7 @@ public class FCMService extends FirebaseMessagingService {
     private static final String TAG = FCMService.class.getSimpleName();
 
     private NotificationUtil notificationUtils;
-    private String cName, cDesc;
+    private String cDesc;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -41,8 +41,6 @@ public class FCMService extends FirebaseMessagingService {
 
     private void handleDataMessage(RemoteMessage remoteMessage) {
 
-        cName = "Notifications Messages";
-        cDesc = "Used for showing messages received.";
         final String title = remoteMessage.getData().get("title");
         final String body = remoteMessage.getData().get("body");
         String click_action = remoteMessage.getData().get("click_action");
@@ -62,15 +60,17 @@ public class FCMService extends FirebaseMessagingService {
         String friend_image = remoteMessage.getData().get("friend_image");
         String friend_token = remoteMessage.getData().get("friend_token");
 
-        //CommentData
+        //CommentData and Like Data
         String post_id=remoteMessage.getData().get("post_id");
         String admin_id=remoteMessage.getData().get("admin_id");
         String post_desc=remoteMessage.getData().get("post_desc");
+        String channel=remoteMessage.getData().get("channel");
 
         //UpdateData
         String version=remoteMessage.getData().get("version");
         String improvements=remoteMessage.getData().get("improvements");
         String link=remoteMessage.getData().get("link");
+
 
         final Intent resultIntent;
 
@@ -112,12 +112,17 @@ public class FCMService extends FirebaseMessagingService {
                 break;
             case "com.amsavarthan.hify.TARGET_COMMENT":
 
-                resultIntent = new Intent(getApplicationContext(), CommentsActivity.class);
+                resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forComment");
 
                 break;
             case "com.amsavarthan.hify.TARGET_UPDATE":
 
                 resultIntent = new Intent(getApplicationContext(), UpdateAvailable.class);
+
+                break;
+            case "com.amsavarthan.hify.TARGET_LIKE":
+
+                resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forLike");
 
                 break;
             default:
@@ -149,9 +154,12 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("post_id", post_id);
         resultIntent.putExtra("post_desc", post_desc);
 
+        resultIntent.putExtra("channel", channel);
         resultIntent.putExtra("version", version);
         resultIntent.putExtra("improvements", improvements);
         resultIntent.putExtra("link", link);
+
+        cDesc="Used to show "+channel+" Messages";
 
         try {
             boolean foreground=new ForegroundCheckTask().execute(getApplicationContext()).get();
@@ -162,17 +170,17 @@ public class FCMService extends FirebaseMessagingService {
                 if (TextUtils.isEmpty(imageUrl)) {
 
                     if (!TextUtils.isEmpty(from_image)) {
-                        showNotificationMessage((int) id, timeStamp, click_action, cName, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
                     } else {
-                        showNotificationMessage((int) id, timeStamp, click_action, cName, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
+                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
                     }
 
                 } else {
                     // image is present, show notification with image
                     if (!TextUtils.isEmpty(from_image)) {
-                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, cName, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                     } else {
-                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, cName, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                     }
                 }
 
@@ -203,14 +211,16 @@ public class FCMService extends FirebaseMessagingService {
 
                     intent.putExtra("user_id", admin_id);
                     intent.putExtra("post_id", post_id);
+                    intent.putExtra("post_desc", post_desc);
                     intent.putExtra("click_action", click_action);
 
                     intent.putExtra("version", version);
                     intent.putExtra("improvements", improvements);
                     intent.putExtra("link", link);
+                    intent.putExtra("channel",channel);
 
                     if (title.toLowerCase().contains("update")) {
-                        showNotificationMessage((int) id, timeStamp, click_action, cName, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                     } else
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -219,17 +229,17 @@ public class FCMService extends FirebaseMessagingService {
                     if (TextUtils.isEmpty(imageUrl)) {
 
                         if (!TextUtils.isEmpty(from_image)) {
-                            showNotificationMessage((int) id, timeStamp, click_action, cName, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+                            showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
                         } else {
-                            showNotificationMessage((int) id, timeStamp, click_action, cName, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
+                            showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
                         }
 
                     } else {
                         // image is present, show notification with image
                         if (!TextUtils.isEmpty(from_image)) {
-                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, cName, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                         } else {
-                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, cName, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                         }
                     }
 

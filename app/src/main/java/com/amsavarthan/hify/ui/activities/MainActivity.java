@@ -31,6 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +53,7 @@ import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
 import com.amsavarthan.hify.ui.activities.post.PostImage;
 import com.amsavarthan.hify.ui.activities.post.PostText;
+import com.amsavarthan.hify.ui.activities.post.SinglePostView;
 import com.amsavarthan.hify.ui.fragment.Dashboard;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
@@ -335,6 +337,15 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     PostImage.startActivity(MainActivity.this);
                 }
             });
+
+            if(!TextUtils.isEmpty(getIntent().getStringExtra("openFragment"))){
+
+                if(getIntent().getStringExtra("openFragment").equals("forLike")) {
+                    startActivity(new Intent(this, SinglePostView.class).putExtra("post_id", getIntent().getStringExtra("post_id")).putExtra("forComment",false));
+                }else{
+                    startActivity(new Intent(this, SinglePostView.class).putExtra("post_id", getIntent().getStringExtra("post_id")).putExtra("forComment",true));
+                }
+            }
 
 
         }
@@ -723,15 +734,17 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     private void showAlert(final Intent resultIntent, Intent intent) {
 
+        String title = intent.getStringExtra("title");
+        String body = intent.getStringExtra("body");
         String name = intent.getStringExtra("name");
         String from_image = intent.getStringExtra("from_image");
         String message = intent.getStringExtra("message");
         String from_id = intent.getStringExtra("from_id");
-        int notification_id = intent.getIntExtra("notification_id", (int) System.currentTimeMillis());
+        String notification_id = intent.getStringExtra("notification_id");
+        String timestamp = intent.getStringExtra("timestamp");
         String reply_for = intent.getStringExtra("reply_for");
-        final String imageUrl = intent.getStringExtra("image");
-        final String body = intent.getStringExtra("body");
-        final String title = intent.getStringExtra("title");
+        String image = intent.getStringExtra("image");
+        String reply_image = intent.getStringExtra("reply_image");
 
         String f_id = intent.getStringExtra("f_id");
         String f_name = intent.getStringExtra("f_name");
@@ -739,8 +752,14 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         String f_token = intent.getStringExtra("f_token");
         String f_image = intent.getStringExtra("f_image");
 
+        String user_id=intent.getStringExtra("user_id");
         String post_id=intent.getStringExtra("post_id");
-        String admin_id=intent.getStringExtra("admin_id");
+        String post_desc=intent.getStringExtra("post_desc");
+
+        String channel=intent.getStringExtra("channel");
+        String version=intent.getStringExtra("version");
+        String improvements=intent.getStringExtra("improvements");
+        String link=intent.getStringExtra("link");
 
         resultIntent.putExtra("title", title);
         resultIntent.putExtra("body", body);
@@ -749,9 +768,10 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("message", message);
         resultIntent.putExtra("from_id", from_id);
         resultIntent.putExtra("notification_id", notification_id);
+        resultIntent.putExtra("timestamp", timestamp);
         resultIntent.putExtra("reply_for", reply_for);
-        resultIntent.putExtra("image", imageUrl);
-        resultIntent.putExtra("reply_image", from_image);
+        resultIntent.putExtra("image", image);
+        resultIntent.putExtra("reply_image", reply_image);
 
         resultIntent.putExtra("f_id", f_id);
         resultIntent.putExtra("f_name", f_name);
@@ -759,14 +779,20 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("f_image", f_image);
         resultIntent.putExtra("f_token", f_token);
 
-        resultIntent.putExtra("user_id", admin_id);
+        resultIntent.putExtra("user_id", user_id);
         resultIntent.putExtra("post_id", post_id);
+        resultIntent.putExtra("post_desc", post_desc);
+
+        resultIntent.putExtra("channel", channel);
+        resultIntent.putExtra("version", version);
+        resultIntent.putExtra("improvements", improvements);
+        resultIntent.putExtra("link", link);
 
         Alerter.create(MainActivity.this)
                 .setTitle(title)
                 .setText(body)
                 .enableSwipeToDismiss()
-                .setDuration(7000)//5sec
+                .setDuration(7000)//7sec
                 .enableProgress(true)
                 .enableVibration(true)
                 .setBackgroundColorRes(R.color.colorAccentt)

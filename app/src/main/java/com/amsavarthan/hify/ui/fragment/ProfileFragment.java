@@ -101,6 +101,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         loadFragment(new ProfileFragment.AboutFragment());
 
         BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
@@ -163,7 +164,7 @@ public class ProfileFragment extends Fragment {
             pbar=rootView.findViewById(R.id.pbar);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
@@ -180,7 +181,7 @@ public class ProfileFragment extends Fragment {
             mRecyclerView.setAdapter(mAdapter);
 
             pbar.setVisibility(View.VISIBLE);
-            getPosts();
+           getPosts();
 
             return rootView;
         }
@@ -204,7 +205,6 @@ public class ProfileFragment extends Fragment {
                                     pbar.setVisibility(View.GONE);
                                 }
 
-                                mAdapter.notifyDataSetChanged();
 
                             }else{
                                 pbar.setVisibility(View.GONE);
@@ -223,7 +223,6 @@ public class ProfileFragment extends Fragment {
                     });
 
         }
-
 
     }
 
@@ -245,7 +244,7 @@ public class ProfileFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
             statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());

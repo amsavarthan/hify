@@ -9,6 +9,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -68,7 +69,13 @@ public class CommentsActivity extends AppCompatActivity {
     private CircleImageView user_image;
     private TextView post_desc;
 
-    public static void startActivity(Context context, List<Post> post,String desc, int pos,boolean owner) {
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    public static void startActivity(Context context, List<Post> post, String desc, int pos, boolean owner) {
         Intent intent = new Intent(context, CommentsActivity.class);
         intent.putExtra("user_id", post.get(pos).getUserId());
         intent.putExtra("post_desc", desc);
@@ -126,11 +133,18 @@ public class CommentsActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        Toolbar toolbar=findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Comments");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Comments");
+
         user_image=findViewById(R.id.comment_admin);
         post_desc=findViewById(R.id.comment_post_desc);
 
         setupCommentView();
-        mAdapter.notifyDataSetChanged();
 
     }
 

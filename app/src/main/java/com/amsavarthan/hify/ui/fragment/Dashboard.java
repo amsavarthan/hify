@@ -103,7 +103,7 @@ public class Dashboard extends Fragment {
         mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
         mPostsList = new ArrayList<>();
-        mAdapter = new PostsAdapter(mPostsList, view.getContext(),getActivity(),mmBottomSheetDialog,statsheetView);
+        mAdapter = new PostsAdapter(mPostsList, view.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
         mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
 
         mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -209,9 +209,7 @@ public class Dashboard extends Fragment {
                                                                         pbar.setVisibility(View.GONE);
 
                                                                 }
-                                                                mAdapter.notifyDataSetChanged();
                                                             }
-                                                            mAdapter.notifyDataSetChanged();
                                                         }
 
                                                         if(mPostsList.isEmpty()){

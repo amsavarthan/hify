@@ -7,31 +7,37 @@
     android:background="#FFF"
     android:orientation="vertical">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/top"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:title="Comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF"
+            />
+
+    </android.support.design.widget.AppBarLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
+        android:layout_below="@id/top"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:layout_alignParentTop="true"
         android:visibility="invisible" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="Comments"
-        android:layout_below="@+id/progressBar"
-        fontPath="fonts/bold.ttf"
-        android:textColor="#212121"
-        style="@style/Base.TextAppearance.AppCompat.Title"
-        tools:ignore="MissingPrefix" />
 
     <LinearLayout
         android:id="@+id/post"
         android:padding="10dp"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

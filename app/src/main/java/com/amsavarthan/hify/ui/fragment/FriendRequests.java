@@ -71,7 +71,6 @@ public class FriendRequests extends Fragment {
                                     pbar.setVisibility(View.GONE);
                                 }
 
-                                requestAdapter.notifyDataSetChanged();
                             }
                         }else{
                             pbar.setVisibility(View.GONE);

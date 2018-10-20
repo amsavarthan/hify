@@ -100,12 +100,12 @@
         </activity>
         <activity
             android:name=".ui.activities.notification.ImagePreviewSave"
-            android:theme="@style/LoginAppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/LoginAppTheme" />
         <activity
             android:name=".ui.activities.notification.ImagePreview"
-            android:theme="@style/LoginAppTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/LoginAppTheme" />
         <activity
             android:name=".ui.activities.notification.NotificationImage"
             android:excludeFromRecents="true"
@@ -126,8 +126,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".ui.activities.friends.SearchUsersActivity"
             android:screenOrientation="portrait"
@@ -174,6 +172,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.activities.post.SinglePostView"></activity>
     </application>
 
 </manifest>

@@ -196,7 +196,6 @@ public class MessageHistory extends Fragment {
 
                                 }
 
-                                messageTextAdapter.notifyDataSetChanged();
 
                             }
 
@@ -238,7 +237,6 @@ public class MessageHistory extends Fragment {
 
                                 }
 
-                                messageTextReplyAdapter.notifyDataSetChanged();
 
                             }
 
@@ -280,7 +278,6 @@ public class MessageHistory extends Fragment {
                                     pbar.setVisibility(GONE);
                                 }
 
-                                messageImageAdapter.notifyDataSetChanged();
 
                             }
 
@@ -322,7 +319,6 @@ public class MessageHistory extends Fragment {
 
                                 }
 
-                                messageImageReplyAdapter.notifyDataSetChanged();
 
                             }
 
