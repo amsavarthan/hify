@@ -122,21 +122,10 @@ public class AddFriends extends Fragment {
 
     public void getAllUsers() {
         usersList.clear();
-        firestore.collection("Users")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .collection("Friends")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
-
-                            for (final DocumentChange docu : queryDocumentSnapshots.getDocumentChanges()) {
-                                if (docu.getType() == DocumentChange.Type.ADDED) {
-
-                                    //All users
-                                    firestore.collection("Users")
+        
+		//getting all users
+		
+		firestore.collection("Users")
                                             .get()
                                             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                                 @Override
@@ -148,13 +137,11 @@ public class AddFriends extends Fragment {
                                                             if (doc.getType() == DocumentChange.Type.ADDED) {
 
                                                                 if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
-                                                                    if(!doc.getDocument().getId().equals(docu.getDocument().getId()))
-                                                                    {
-                                                                        Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
+                                                                       Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
                                                                         usersList.add(friends);
                                                                         usersAdapter.notifyDataSetChanged();
                                                                         pbar.setVisibility(GONE);
-                                                                    }
+
                                                                 }
 
                                                             }
@@ -176,54 +163,6 @@ public class AddFriends extends Fragment {
                                                 }
                                             });
 
-
-                                }
-                            }
-
-                        } else {
-
-                            firestore.collection("Users")
-                                    .get()
-                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                            if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
-
-                                                for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-                                                    if (doc.getType() == DocumentChange.Type.ADDED) {
-
-                                                        if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
-
-                                                                Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
-                                                                usersList.add(friends);
-                                                                usersAdapter.notifyDataSetChanged();
-                                                                pbar.setVisibility(GONE);
-                                                        }
-
-                                                    }
-                                                }
-
-                                            }else{
-                                                pbar.setVisibility(GONE);
-                                                mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
-                                            }
-
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            pbar.setVisibility(GONE);
-                                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                                            Log.w("Error", "listen:error", e);
-                                        }
-                                    });
-
-
-                        }
-                    }
-                });
 
 
     }

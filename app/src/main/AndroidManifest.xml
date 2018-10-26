@@ -172,7 +172,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.post.SinglePostView"></activity>
+        <activity android:name=".ui.activities.post.SinglePostView"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="com.amsavarthan.hify.TARGET_UPDATE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

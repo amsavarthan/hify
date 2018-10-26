@@ -174,6 +174,15 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
 
+        if(!TextUtils.isEmpty(getIntent().getStringExtra("openFragment"))){
+
+            if(getIntent().getStringExtra("openFragment").equals("forLike")) {
+                startActivity(new Intent(this, SinglePostView.class).putExtra("post_id", getIntent().getStringExtra("post_id")).putExtra("forComment",false));
+            }else{
+                startActivity(new Intent(this, SinglePostView.class).putExtra("post_id", getIntent().getStringExtra("post_id")).putExtra("forComment",true));
+            }
+        }
+
     }
 
     @Override
