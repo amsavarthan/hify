@@ -54,6 +54,16 @@ public class MessageImageReplyAdapter extends RecyclerView.Adapter<MessageImageR
         return new ViewHolder(view);
     }
 
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
+	
     @Override
     public void onBindViewHolder(@NonNull final MessageImageReplyAdapter.ViewHolder holder, int position) {
 

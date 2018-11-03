@@ -73,6 +73,15 @@ public class PostPhotosAdapter extends PagerAdapter {
         this.like_btn=like_btn;
     }
 
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {

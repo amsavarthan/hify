@@ -55,6 +55,16 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
         return new ViewHolder(view);
     }
 
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
+	
     @Override
     public void onBindViewHolder(@NonNull final MessageTextReplyAdapter.ViewHolder holder, int position) {
 

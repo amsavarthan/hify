@@ -48,6 +48,16 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
+	
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 

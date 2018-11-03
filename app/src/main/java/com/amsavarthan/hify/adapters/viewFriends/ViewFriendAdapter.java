@@ -51,6 +51,16 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
         return new ViewHolder(view);
     }
 
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
+	
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 

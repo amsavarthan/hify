@@ -169,6 +169,16 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
     public int getItemCount() {
         return usersList.size();
     }
+	
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
 
     public void removeItem(final int position, final Snackbar snackbar, final int deletedIndex, final Friends deletedItem) {
 

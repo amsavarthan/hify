@@ -37,6 +37,16 @@ public class UploadListAdapter extends RecyclerView.Adapter<UploadListAdapter.Vi
         uploadedImagesUrl=new ArrayList<>();
 
     }
+	
+	@Override
+    public long getItemId(int position) {
+        return position;
+    }
+	
+	@Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
