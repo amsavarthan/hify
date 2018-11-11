@@ -172,16 +172,43 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.post.SinglePostView"
+        <activity
+            android:name=".ui.activities.post.SinglePostView"
             android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.amsavarthan.hify.TARGET_LIKE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Professor -->
+
+        <meta-data
+            android:name="android.app.searchable"
+            android:resource="@xml/searchable" />
+
+        <activity
+            android:name=".feature_ai.activities.ResultActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".feature_ai.activities.ResultState"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".feature_ai.activities.AddQuestion"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".feature_ai.activities.AnswersActivity"
+            android:screenOrientation="portrait" >
 
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_UPDATE" />
+                <action android:name="com.amsavarthan.hify.TARGET_FORUM" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
         </activity>
+        <activity android:name=".feature_ai.activities.Preview" />
     </application>
 
 </manifest>

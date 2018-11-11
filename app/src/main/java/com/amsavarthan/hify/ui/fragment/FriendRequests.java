@@ -54,10 +54,15 @@ public class FriendRequests extends Fragment {
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Friend_Requests")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                        if(e!=null){
+                            pbar.setVisibility(View.GONE);
+                            mRequestView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                            Log.w("Error", "listen:error", e);
+                        }
 
                         if(!queryDocumentSnapshots.isEmpty()) {
 
@@ -77,14 +82,6 @@ public class FriendRequests extends Fragment {
                             mRequestView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
                         }
 
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        pbar.setVisibility(View.GONE);
-                        mRequestView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                        Log.w("Error", "listen:error", e);
                     }
                 });
 

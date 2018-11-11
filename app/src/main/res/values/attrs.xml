@@ -20,4 +20,11 @@
         <attr name="insetBackground" format="color|reference" />
     </declare-styleable>
 
+    <attr name="digitCellStyle"
+        format="reference"/>
+    <attr name="keypadBackgroundColor"
+        format="color"/>
+    <attr name="keypadTextColor"
+        format="color"/>
+
 </resources>

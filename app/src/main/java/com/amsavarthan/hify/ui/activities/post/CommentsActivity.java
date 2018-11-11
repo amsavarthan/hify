@@ -28,10 +28,6 @@ import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,7 +37,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -49,6 +47,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -267,10 +267,15 @@ public class CommentsActivity extends AppCompatActivity {
                 .document(post_id)
                 .collection("Comments")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(QuerySnapshot querySnapshot) {
+                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException e) {
+
+                        if(e!=null){
+                            mProgress.setVisibility(View.GONE);
+                            e.printStackTrace();
+                            return;
+                        }
 
                         for (DocumentChange doc : querySnapshot.getDocumentChanges()) {
 
@@ -293,19 +298,7 @@ public class CommentsActivity extends AppCompatActivity {
                         }
 
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error get comment", e.getMessage());
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isComplete())
-                    mProgress.setVisibility(View.GONE);
-            }
-        });
+                });
     }
 
     @Override

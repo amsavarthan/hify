@@ -6,6 +6,22 @@
         <item>LatLng</item>
     </string-array>
 
+    <string-array name="subject" translatable="false">
+        <item>Accountancy</item>
+        <item>Astronomy</item>
+        <item>Biology</item>
+        <item>Business Maths</item>
+        <item>Computer Science</item>
+        <item>Commerce</item>
+        <item>Chemistry</item>
+        <item>Economics</item>
+        <item>Geography</item>
+        <item>History</item>
+        <item>Physics</item>
+        <item>Political Science</item>
+        <item>Maths</item>
+    </string-array>
+
     <string-array name="colors_array">
         <item>#f44336</item>
         <item>#e91e63</item>
@@ -20,6 +36,7 @@
 
     <string-array name="ld_activityScreenTitles">
         <item>Dashboard</item>
+        <item>Forum</item>
         <item>Flash Message</item>
         <item>Manage Friends</item>
         <item>About</item>
@@ -29,6 +46,7 @@
 
     <array name="ld_activityScreenIcons">
         <item>@drawable/ic_dashboard_black_24dp</item>
+        <item>@drawable/ic_forum_black_24dp</item>
         <item>@drawable/ic_flash_on_black_24dp</item>
         <item>@drawable/ic_friend</item>
         <item>@drawable/ic_about</item>

@@ -162,10 +162,10 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
     public long getItemId(int position) {
         return position;
     }
-	
-	@Override
+
+    @Override
     public int getItemViewType(int position) {
-        return 1;
+        return position;
     }
 
     public void removeItem(final int position, final Snackbar snackbar, final int deletedIndex, final Friends deletedItem) {

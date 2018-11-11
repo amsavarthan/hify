@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
+import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,16 +45,19 @@ public class SinglePostView extends AppCompatActivity {
     private ProgressBar pbar;
     private FirebaseFirestore mFirestore;
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
+
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +76,9 @@ public class SinglePostView extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Post");
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Post");
-
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if(!TextUtils.isEmpty(post_id)){
 

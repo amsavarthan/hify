@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -71,16 +73,6 @@ public class PostPhotosAdapter extends PagerAdapter {
         inflater = LayoutInflater.from(context);
         this.postId=postId;
         this.like_btn=like_btn;
-    }
-
-	@Override
-    public long getItemId(int position) {
-        return position;
-    }
-	
-	@Override
-    public int getItemViewType(int position) {
-        return 1;
     }
 
     @Override
@@ -181,6 +173,13 @@ public class PostPhotosAdapter extends PagerAdapter {
         ivLike.setVisibility(View.INVISIBLE);
     }
 
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
     @NonNull
     @Override
     public Object instantiateItem(@NonNull ViewGroup view, final int position) {
@@ -211,7 +210,10 @@ public class PostPhotosAdapter extends PagerAdapter {
 
                 @Override
                 public boolean onDoubleTap(MotionEvent e) {
-                    animatePhotoLike(vBgLike,ivLike);
+
+                    if(isOnline()) {
+                        animatePhotoLike(vBgLike, ivLike);
+                    }
 
                     return true;
                 }

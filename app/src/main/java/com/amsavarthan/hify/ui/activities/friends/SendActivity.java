@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -31,9 +32,6 @@ import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -81,7 +79,6 @@ public class SendActivity extends AppCompatActivity {
     private String user_id,current_id;
     private EditText message;
     private FirebaseFirestore mFirestore;
-    private CircleImageView image;
     private Uri imageUri;
     private ImageView imagePreview;
     private String image_;
@@ -120,6 +117,12 @@ public class SendActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
@@ -136,6 +139,12 @@ public class SendActivity extends AppCompatActivity {
         );
 
 
+        final Toolbar toolbar=findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Please wait..");
         mDialog.setIndeterminate(true);
@@ -151,8 +160,6 @@ public class SendActivity extends AppCompatActivity {
         storageReference= FirebaseStorage.getInstance().getReference().child("notification").child(random()+".jpg");
 
 
-        username=findViewById(R.id.user_name);
-        image=findViewById(R.id.image);
         imagePreview=findViewById(R.id.imagePreview);
         mSend=findViewById(R.id.send);
         message=findViewById(R.id.message);
@@ -162,21 +169,19 @@ public class SendActivity extends AppCompatActivity {
         text.setVisibility(View.VISIBLE);
 
         String name=getIntent().getStringExtra("user__name");
-        if(!TextUtils.isEmpty(name))
-            username.setText(name);
+        if(!TextUtils.isEmpty(name)) {
+            getSupportActionBar().setTitle(name);
+            toolbar.setTitle(name);
+        }
 
         mFirestore.collection("Users").document(user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                username.setText(documentSnapshot.getString("name"));
+                getSupportActionBar().setTitle(documentSnapshot.getString("name"));
+                toolbar.setTitle(documentSnapshot.getString("name"));
 
-                Glide.with(SendActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                        .load(documentSnapshot.getString("image"))
-                        .into(image);
-
-                username.setOnClickListener(new View.OnClickListener() {
+                toolbar.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         FriendProfile.startActivity(SendActivity.this,user_id);
@@ -308,15 +313,29 @@ public class SendActivity extends AppCompatActivity {
             }
         });
 
+        imagePreview.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(imageUri!=null){
+                    RemoveImage();
+                }
+                return true;
+            }
+        });
+
 
     }
 
     public void SelectImage(View view) {
 
-        Intent intent=new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Pick an image..."),PICK_IMAGE);
+        if(imageUri==null) {
+
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Pick an image..."), PICK_IMAGE);
+
+        }
 
     }
 
@@ -425,6 +444,7 @@ public class SendActivity extends AppCompatActivity {
                         imagePreview.setVisibility(View.VISIBLE);
                         text.setVisibility(View.GONE);
                         imageUri=data.getData();
+                        Toast.makeText(SendActivity.this, "You can long press to remove the attachment", Toast.LENGTH_SHORT).show();
                         imagePreview.setImageURI(imageUri);
                         dialog.dismiss();
                     }
@@ -449,49 +469,35 @@ public class SendActivity extends AppCompatActivity {
 
     private void showRemoveButton() {
 
-        findViewById(R.id.attachment).setAlpha(1.0f);
-        findViewById(R.id.attachment).animate().alpha(0.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                findViewById(R.id.attachment).setVisibility(View.GONE);
-            }
-        }).start();
-
         findViewById(R.id.location).setAlpha(1.0f);
         findViewById(R.id.location).animate().alpha(0.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 findViewById(R.id.location).setVisibility(View.GONE);
+                findViewById(R.id.remove).setVisibility(View.VISIBLE);
+                findViewById(R.id.remove).setAlpha(0.0f);
+                findViewById(R.id.remove).animate().alpha(1.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        findViewById(R.id.remove).setVisibility(View.VISIBLE);
+                    }
+                }).start();
             }
         }).start();
 
-        findViewById(R.id.removeImage).setVisibility(View.VISIBLE);
-        findViewById(R.id.removeImage).setAlpha(0.0f);
-        findViewById(R.id.removeImage).animate().alpha(1.0f).setDuration(500).start();
 
     }
 
     private void hideRemoveButton() {
 
-        findViewById(R.id.removeImage).setAlpha(1.0f);
-        findViewById(R.id.removeImage).animate().alpha(0.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
+        findViewById(R.id.remove).setAlpha(1.0f);
+        findViewById(R.id.remove).animate().alpha(0.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                findViewById(R.id.removeImage).setVisibility(View.GONE);
-
-                findViewById(R.id.attachment).setVisibility(View.VISIBLE);
-                findViewById(R.id.attachment).setAlpha(0.0f);
-                findViewById(R.id.attachment).animate().alpha(1.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        findViewById(R.id.attachment).setVisibility(View.VISIBLE);
-                    }
-                }).start();
-
+                findViewById(R.id.remove).setVisibility(View.GONE);
                 findViewById(R.id.location).setVisibility(View.VISIBLE);
                 findViewById(R.id.location).setAlpha(0.0f);
                 findViewById(R.id.location).animate().alpha(1.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
@@ -501,15 +507,15 @@ public class SendActivity extends AppCompatActivity {
                         findViewById(R.id.location).setVisibility(View.VISIBLE);
                     }
                 }).start();
-
             }
         }).start();
 
 
 
+
     }
 
-    public void RemoveImage(View view) {
+    public void RemoveImage() {
         new MaterialDialog.Builder(this)
                 .title("Attachment")
                 .content("Do you want to remove the attachment?")
@@ -531,6 +537,8 @@ public class SendActivity extends AppCompatActivity {
             }
         }).show();
     }
+
+
 
     public void PreviewImage(View view) {
 
@@ -597,5 +605,7 @@ public class SendActivity extends AppCompatActivity {
     }
 
 
-
+    public void removeAttachment(View view) {
+        RemoveImage();
+    }
 }

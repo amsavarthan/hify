@@ -14,7 +14,7 @@
        android:layout_height="wrap_content">
 
        <ImageView
-           android:src="@mipmap/logo"
+           android:src="@mipmap/logo_hify"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content" />
 

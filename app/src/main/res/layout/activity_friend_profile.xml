@@ -8,8 +8,25 @@
     android:orientation="vertical"
     >
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/top"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:title=""
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </android.support.design.widget.AppBarLayout>
+
+
     <FrameLayout
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/top"
         android:id="@+id/frame_container"
         android:layout_above="@+id/bottom_nav"
         android:layout_width="match_parent"

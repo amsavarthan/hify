@@ -65,10 +65,10 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public long getItemId(int position) {
         return position;
     }
-	
-	@Override
+
+    @Override
     public int getItemViewType(int position) {
-        return 1;
+        return position;
     }
 	
     @Override

@@ -52,10 +52,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public long getItemId(int position) {
         return position;
     }
-	
-	@Override
+
+    @Override
     public int getItemViewType(int position) {
-        return 1;
+        return position;
     }
 	
     @Override

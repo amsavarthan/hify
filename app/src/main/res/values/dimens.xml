@@ -3,6 +3,14 @@
     <dimen name="card_padding">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <dimen name="margin_view_small">4dp</dimen>
+    <dimen name="margin_view_typical">8dp</dimen>
+    <dimen name="margin_view_large">16dp</dimen>
+    <dimen name="margin_view_xlarge">32dp</dimen>
+    <dimen name="horizontal_margin">16dp</dimen>
+    <dimen name="digit_button_text_size">22sp</dimen>
+    <dimen name="output_elevation">4dp</dimen>
+
     <dimen name="title_padding_right">16dp</dimen>
     <dimen name="title_padding_left">58dp</dimen>
     <dimen name="list_padding">0dp</dimen>

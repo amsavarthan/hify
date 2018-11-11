@@ -184,8 +184,8 @@ public class NotificationUtil {
                 .setSound(Uri.parse("android.resource://"+mContext.getPackageName()+"/"+R.raw.hify_sound))
                 .setColor(Color.parseColor("#2591FC"))
                 .setStyle(bigTextStyle)
-                .addPerson(user_image)
-                .setLargeIcon(getBitmapFromURL(user_image))
+                //.addPerson(user_image)
+                //.setLargeIcon(getBitmapFromURL(user_image))
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText(message)
                 .build();
@@ -217,9 +217,9 @@ public class NotificationUtil {
                 .setWhen(getTimeMilliSec(timeStamp))
                 .setColor(Color.parseColor("#2591FC"))
                 .setStyle(bigPictureStyle)
-                .setLargeIcon(getBitmapFromURL(user_image))
+                //.setLargeIcon(getBitmapFromURL(user_image))
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .addPerson(user_image)
+                //.addPerson(user_image)
                 .setContentText(message)
                 .build();
 

@@ -2,18 +2,19 @@ package com.amsavarthan.hify.models;
 
 public class MessageReply extends MessageId {
 
-    private String from,message,notification_id,reply_for,reply_image,timestamp;
+    private String from,message,notification_id,reply_for,reply_image,timestamp,read;
 
     public MessageReply() {
     }
 
-    public MessageReply(String from, String message, String notification_id, String reply_for, String reply_image, String timestamp) {
+    public MessageReply(String from, String message, String notification_id, String reply_for, String reply_image, String timestamp, String read) {
         this.from = from;
         this.message = message;
         this.notification_id = notification_id;
         this.reply_for = reply_for;
         this.reply_image = reply_image;
         this.timestamp = timestamp;
+        this.read = read;
     }
 
     public String getReply_image() {
@@ -62,5 +63,13 @@ public class MessageReply extends MessageId {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getRead() {
+        return read;
+    }
+
+    public void setRead(String read) {
+        this.read = read;
     }
 }

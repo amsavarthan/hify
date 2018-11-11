@@ -1,22 +1,21 @@
 package com.amsavarthan.hify.ui.activities;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -24,12 +23,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
-import android.support.multidex.MultiDex;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +38,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +49,12 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.DrawerAdapter;
+import com.amsavarthan.hify.feature_ai.activities.AddQuestion;
+import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
+import com.amsavarthan.hify.feature_ai.activities.ResultActivity;
+import com.amsavarthan.hify.feature_ai.adapter.RecentsAdapter;
+import com.amsavarthan.hify.feature_ai.models.Recents;
+import com.amsavarthan.hify.feature_ai.utils.RecentsDatabase;
 import com.amsavarthan.hify.models.DrawerItem;
 import com.amsavarthan.hify.models.SimpleItem;
 import com.amsavarthan.hify.ui.activities.account.LoginActivity;
@@ -61,9 +71,9 @@ import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
 import com.amsavarthan.hify.ui.activities.notification.NotificationReplyActivity;
 import com.amsavarthan.hify.ui.fragment.About;
 import com.amsavarthan.hify.ui.fragment.FlashMessage;
+import com.amsavarthan.hify.ui.fragment.Forum;
 import com.amsavarthan.hify.ui.fragment.FriendsFragment;
 import com.amsavarthan.hify.ui.fragment.ProfileFragment;
-import com.amsavarthan.hify.ui.fragment.SendMessage;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.NetworkUtil;
 import com.amsavarthan.hify.utils.database.UserHelper;
@@ -78,7 +88,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -88,15 +97,17 @@ import com.google.firebase.storage.UploadTask;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 import com.tapadoo.alerter.Alerter;
+import com.tylersuehr.esr.EmptyStateRecyclerView;
+import com.tylersuehr.esr.ImageTextStateDisplay;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -113,10 +124,11 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener {
 
     private static final int POS_DASHBOARD = 0;
-    private static final int POS_SEND_MESSAGE = 1;
-    private static final int POS_FRIENDS = 2;
-    private static final int POS_ABOUT = 3;
-    private static final int POS_LOGOUT = 5;
+    private static final int POS_FORUM = 1;
+    private static final int POS_SEND_MESSAGE = 2;
+    private static final int POS_FRIENDS = 3;
+    private static final int POS_ABOUT = 4;
+    private static final int POS_LOGOUT = 6;
     public static String userId;
     public static MainActivity activity;
     DrawerAdapter adapter;
@@ -149,6 +161,12 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }else{
+                    try {
+                        Snackbar.make(findViewById(R.id.activity_main), "No Internet Connection...", Snackbar.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -158,6 +176,15 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     public static Toolbar toolbar;
     private MenuItem add_post,refresh;
     private boolean mState=true;
+    private EmptyStateRecyclerView recentsRecyclerView;
+    ArrayList<Recents> recentsList;
+    RecentsAdapter recentsAdapter;
+    private FrameLayout search_container;
+    private SearchView searchView;
+    private boolean searchOpen;
+    private MenuItem searchViewItem;
+    private boolean mStateForum=false;
+    private MenuItem add_question;
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
@@ -228,26 +255,55 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     @Override
     public void onBackPressed() {
-        if(!toolbar.getTitle().toString().equals("Dashboard")){
 
-            toolbar.setTitle("Dashboard");
-            try {
-                getSupportActionBar().setTitle("Dashboard");
-            }catch (Exception e){
-                Log.e("Error",e.getMessage());
+        if(searchOpen){
+
+            searchOpen=false;
+            if(mState){
+                add_post.setVisible(true);
+                refresh.setVisible(true);
             }
-            this.invalidateOptionsMenu();
-            mState=true;
-            showFragment(new Dashboard());
-            if(slidingRootNav.isMenuOpened()) {
+            search_container.animate()
+                    .setDuration(100)
+                    .alpha(0.0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            searchViewItem.collapseActionView();
+                            search_container.setVisibility(View.GONE);
+                        }
+                    })
+                    .start();
+
+            searchView.setQuery("", false);
+            searchView.onActionViewCollapsed();
+            searchViewItem.collapseActionView();
+
+        }else {
+
+            if (!mState) {
+
+                toolbar.setTitle("Dashboard");
+                try {
+                    getSupportActionBar().setTitle("Dashboard");
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                }
+                this.invalidateOptionsMenu();
+                mState = true;
+                showFragment(new Dashboard());
+                if (slidingRootNav.isMenuOpened()) {
+                    slidingRootNav.closeMenu(true);
+                }
+                adapter.setSelected(POS_DASHBOARD);
+
+            } else if (slidingRootNav.isMenuOpened()) {
                 slidingRootNav.closeMenu(true);
+            } else {
+                super.onBackPressed();
             }
-            adapter.setSelected(POS_DASHBOARD);
 
-        }else if(slidingRootNav.isMenuOpened()){
-            slidingRootNav.closeMenu(true);
-        }else{
-            super.onBackPressed();
         }
     }
 
@@ -294,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             userId = currentuser.getUid();
             storageReference = FirebaseStorage.getInstance().getReference().child("images").child(currentuser.getUid() + ".jpg");
 
-
             slidingRootNav = new SlidingRootNavBuilder(this)
                     .withToolbarMenuToggle(toolbar)
                     .withMenuOpened(false)
@@ -308,6 +363,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
             adapter = new DrawerAdapter(Arrays.asList(
                     createItemFor(POS_DASHBOARD).setChecked(true),
+                    createItemFor (POS_FORUM),
                     createItemFor (POS_SEND_MESSAGE),
                     createItemFor(POS_FRIENDS),
                     createItemFor(POS_ABOUT),
@@ -356,8 +412,25 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 }
             }
 
+            setRecentsView();
 
         }
+    }
+
+    private void setRecentsView() {
+
+        search_container=findViewById(R.id.search_container);
+        recentsRecyclerView = findViewById(R.id.recentsView);
+        recentsList = new ArrayList<>();
+        recentsAdapter = new RecentsAdapter(recentsList);
+
+        recentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        recentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recentsRecyclerView.setHasFixedSize(true);
+        recentsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        recentsRecyclerView.setAdapter(recentsAdapter);
+
     }
 
     private void askPermission() {
@@ -459,8 +532,79 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 }
                 this.invalidateOptionsMenu();
                 mState=true;
+                mStateForum=false;
                 selectedScreen = new Dashboard();
                 showFragment(selectedScreen);
+
+                if(searchOpen){
+
+                    searchOpen=false;
+                    if(mState){
+                        add_post.setVisible(true);
+                        refresh.setVisible(true);
+                    }
+                    search_container.animate()
+                            .setDuration(100)
+                            .alpha(0.0f)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    searchViewItem.collapseActionView();
+                                    search_container.setVisibility(View.GONE);
+                                }
+                            })
+                            .start();
+
+                    searchView.setQuery("", false);
+                    searchView.onActionViewCollapsed();
+                    searchViewItem.collapseActionView();
+
+                }
+
+                slidingRootNav.closeMenu(true);
+
+                return;
+
+            case POS_FORUM:
+                toolbar.setTitle("Forum");
+                try {
+                    getSupportActionBar().setTitle("Forum");
+                }catch (Exception e){
+                    Log.e("Error",e.getMessage());
+                }
+                this.invalidateOptionsMenu();
+                mState=false;
+                mStateForum=true;
+                selectedScreen = new Forum();
+                showFragment(selectedScreen);
+
+                if(searchOpen){
+
+                    searchOpen=false;
+                    if(mState){
+                        add_post.setVisible(true);
+                        refresh.setVisible(true);
+                    }
+                    search_container.animate()
+                            .setDuration(100)
+                            .alpha(0.0f)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    searchViewItem.collapseActionView();
+                                    search_container.setVisibility(View.GONE);
+                                }
+                            })
+                            .start();
+
+                    searchView.setQuery("", false);
+                    searchView.onActionViewCollapsed();
+                    searchViewItem.collapseActionView();
+
+                }
+
                 slidingRootNav.closeMenu(true);
 
                 return;
@@ -476,8 +620,36 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     }
                     this.invalidateOptionsMenu();
                     mState = false;
+                    mStateForum=false;
                     selectedScreen = new FlashMessage();
                     showFragment(selectedScreen);
+
+                    if(searchOpen){
+
+                        searchOpen=false;
+                        if(mState){
+                            add_post.setVisible(true);
+                            refresh.setVisible(true);
+                        }
+                        search_container.animate()
+                                .setDuration(100)
+                                .alpha(0.0f)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        searchViewItem.collapseActionView();
+                                        search_container.setVisibility(View.GONE);
+                                    }
+                                })
+                                .start();
+
+                        searchView.setQuery("", false);
+                        searchView.onActionViewCollapsed();
+                        searchViewItem.collapseActionView();
+
+                    }
+
                     slidingRootNav.closeMenu(true);
                 }else{
                     showDialog();
@@ -496,8 +668,36 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     }
                     this.invalidateOptionsMenu();
                     mState = false;
+                    mStateForum=false;
                     selectedScreen = new FriendsFragment();
                     showFragment(selectedScreen);
+
+                    if(searchOpen){
+
+                        searchOpen=false;
+                        if(mState){
+                            add_post.setVisible(true);
+                            refresh.setVisible(true);
+                        }
+                        search_container.animate()
+                                .setDuration(100)
+                                .alpha(0.0f)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        searchViewItem.collapseActionView();
+                                        search_container.setVisibility(View.GONE);
+                                    }
+                                })
+                                .start();
+
+                        searchView.setQuery("", false);
+                        searchView.onActionViewCollapsed();
+                        searchViewItem.collapseActionView();
+
+                    }
+
                     slidingRootNav.closeMenu(true);
                 }else{
                     showDialog();
@@ -515,8 +715,36 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     }
                     this.invalidateOptionsMenu();
                     mState = false;
+                    mStateForum=false;
                     selectedScreen = new About();
                     showFragment(selectedScreen);
+
+                    if(searchOpen){
+
+                        searchOpen=false;
+                        if(mState){
+                            add_post.setVisible(true);
+                            refresh.setVisible(true);
+                        }
+                        search_container.animate()
+                                .setDuration(100)
+                                .alpha(0.0f)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        searchViewItem.collapseActionView();
+                                        search_container.setVisibility(View.GONE);
+                                    }
+                                })
+                                .start();
+
+                        searchView.setQuery("", false);
+                        searchView.onActionViewCollapsed();
+                        searchViewItem.collapseActionView();
+
+                    }
+
                     slidingRootNav.closeMenu(true);
                 }else{
                     showDialog();
@@ -615,8 +843,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     private DrawerItem createItemFor(int position) {
         return new SimpleItem(screenIcons[position], screenTitles[position])
-                .withIconTint(color(R.color.textColorSecondary))
-                .withTextTint(color(R.color.textColorPrimary))
+                .withIconTint(color(R.color.minimal_black))
+                .withTextTint(color(R.color.minimal_black))
                 .withSelectedIconTint(color(R.color.colorAccentt))
                 .withSelectedTextTint(color(R.color.colorAccentt));
     }
@@ -730,6 +958,20 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                             showAlert(resultIntent,intent);
 
                             break;
+                        case "com.amsavarthan.hify.TARGET_LIKE":
+
+                            resultIntent = new Intent(MainActivity.this, SinglePostView.class);
+
+                            showAlert(resultIntent,intent);
+
+                            break;
+                        case "com.amsavarthan.hify.TARGET_FORUM":
+
+                            resultIntent = new Intent(MainActivity.this, AnswersActivity.class);
+
+                            showAlert(resultIntent,intent);
+
+                            break;
                         default:
 
                             resultIntent = null;
@@ -764,11 +1006,14 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         String user_id=intent.getStringExtra("user_id");
         String post_id=intent.getStringExtra("post_id");
         String post_desc=intent.getStringExtra("post_desc");
+        String admin_id=intent.getStringExtra("admin_id");
 
         String channel=intent.getStringExtra("channel");
         String version=intent.getStringExtra("version");
         String improvements=intent.getStringExtra("improvements");
         String link=intent.getStringExtra("link");
+        String question_id=intent.getStringExtra("question_id");
+        String question_timestamp=intent.getStringExtra("question_timestamp");
 
         resultIntent.putExtra("title", title);
         resultIntent.putExtra("body", body);
@@ -791,13 +1036,16 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("user_id", user_id);
         resultIntent.putExtra("post_id", post_id);
         resultIntent.putExtra("post_desc", post_desc);
+        resultIntent.putExtra("admin_id", admin_id);
 
         resultIntent.putExtra("channel", channel);
         resultIntent.putExtra("version", version);
         resultIntent.putExtra("improvements", improvements);
         resultIntent.putExtra("link", link);
+        resultIntent.putExtra("question_id", question_id);
+        resultIntent.putExtra("question_timestamp", question_timestamp);
 
-        Alerter.create(MainActivity.this)
+        /*Alerter.create(MainActivity.this)
                 .setTitle(title)
                 .setText(body)
                 .enableSwipeToDismiss()
@@ -813,7 +1061,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     public void onClick(View view) {
                         startActivity(resultIntent);
                     }
-                }).show();
+                }).show();*/
 
 
     }
@@ -1021,6 +1269,13 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         menuInflater.inflate(R.menu.menu_posts, menu);
         add_post=menu.findItem(R.id.action_new);
         refresh=menu.findItem(R.id.action_refresh);
+        add_question=menu.findItem(R.id.action_new_question);
+
+        if(mStateForum){
+            add_question.setVisible(true);
+        }else{
+            add_question.setVisible(false);
+        }
 
         if(mState){
             add_post.setVisible(true);
@@ -1030,7 +1285,117 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             refresh.setVisible(false);
         }
 
-        return true;
+        searchViewItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager=(SearchManager)MainActivity.this.getSystemService(Context.SEARCH_SERVICE);
+        searchView =null;
+        if(searchViewItem!=null){
+            searchView=(SearchView)searchViewItem.getActionView();
+        }
+        if(searchView!=null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(MainActivity.this.getComponentName()));
+            searchView.setQueryHint("Search Anything");
+            searchView.setOnSearchClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mState){
+                        add_post.setVisible(false);
+                        refresh.setVisible(false);
+                    }
+                    if(mStateForum){
+                        add_question.setVisible(false);
+                    }
+                    searchOpen=true;
+
+                    search_container.setVisibility(View.VISIBLE);
+                    search_container.setAlpha(0.0f);
+                    search_container.animate()
+                            .setDuration(100)
+                            .alpha(1.0f)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+
+                                    RecentsDatabase recentsDatabase = new RecentsDatabase(MainActivity.this);
+
+                                    if (!recentsDatabase.getAllQueries().isEmpty()) {
+
+                                        recentsList.clear();
+                                        for (String query : recentsDatabase.getAllQueries()) {
+                                            Recents recents = new Recents(query);
+                                            recentsList.add(recents);
+                                            recentsAdapter.notifyDataSetChanged();
+                                        }
+
+                                    }
+
+                                }
+                            })
+                            .start();
+                }
+            });
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+
+                    searchView.clearFocus();
+                    Recents recents = new Recents(query);
+                    recentsList.add(recents);
+                    recentsAdapter.notifyDataSetChanged();
+                    ResultActivity.startActivity(MainActivity.this, query);
+
+                    return false;
+
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+
+                    return false;
+                }
+            });
+
+            ImageView closebutton=searchView.findViewById(R.id.search_close_btn);
+            closebutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditText editText=findViewById(R.id.search_src_text);
+                    if(StringUtils.isNotEmpty(editText.getText())) {
+                        editText.setText("");
+                    }else {
+                        searchOpen=false;
+                        if(mState){
+                            add_post.setVisible(true);
+                            refresh.setVisible(true);
+                        }
+                        if(mStateForum){
+                            add_question.setVisible(true);
+                        }
+                        search_container.animate()
+                                .setDuration(100)
+                                .alpha(0.0f)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        searchViewItem.collapseActionView();
+                                        search_container.setVisibility(View.GONE);
+                                    }
+                                })
+                                .start();
+
+                        searchView.setQuery("", false);
+                        searchView.onActionViewCollapsed();
+                        searchViewItem.collapseActionView();
+                    }
+                }
+            });
+
+        }
+
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -1048,7 +1413,9 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             case R.id.action_refresh:
                 showFragment(new Dashboard());
                 return true;
-
+            case R.id.action_new_question:
+                startActivity(new Intent(MainActivity.this, AddQuestion.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

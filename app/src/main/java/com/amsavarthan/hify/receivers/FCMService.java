@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
@@ -71,6 +72,7 @@ public class FCMService extends FirebaseMessagingService {
         String improvements=remoteMessage.getData().get("improvements");
         String link=remoteMessage.getData().get("link");
 
+        String question_id=remoteMessage.getData().get("question_id");
 
         final Intent resultIntent;
 
@@ -125,6 +127,10 @@ public class FCMService extends FirebaseMessagingService {
                 resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forLike");
 
                 break;
+            case "com.amsavarthan.hify.TARGET_FORUM":
+
+                resultIntent = new Intent(getApplicationContext(), AnswersActivity.class);
+                break;
             default:
 
                 resultIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -158,6 +164,8 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("version", version);
         resultIntent.putExtra("improvements", improvements);
         resultIntent.putExtra("link", link);
+
+        resultIntent.putExtra("question_id",question_id);
 
         cDesc="Used to show "+channel+" Messages";
 
@@ -218,12 +226,15 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("improvements", improvements);
                     intent.putExtra("link", link);
                     intent.putExtra("channel",channel);
+                    intent.putExtra("question_id",question_id);
 
                     if (title.toLowerCase().contains("update")) {
                         showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-                    } else
+                    } else {
+                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    }
                 }else{
 
                     if (TextUtils.isEmpty(imageUrl)) {

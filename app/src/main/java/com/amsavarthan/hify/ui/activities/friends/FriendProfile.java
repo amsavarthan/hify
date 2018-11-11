@@ -30,6 +30,8 @@ import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
+import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
+import com.amsavarthan.hify.feature_ai.fragment.MyQuestions;
 import com.amsavarthan.hify.models.Friends;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.utils.database.UserHelper;
@@ -64,6 +66,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class FriendProfile extends AppCompatActivity {
 
     private String id;
+    private Toolbar toolbar;
 
     public static void startActivity(Context context, String id){
 
@@ -80,6 +83,12 @@ public class FriendProfile extends AppCompatActivity {
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_profile);
@@ -89,8 +98,34 @@ public class FriendProfile extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+        toolbar=findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Profile");
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Profile");
 
         id=getIntent().getStringExtra("f_id");
+
+        FirebaseFirestore.getInstance().collection("Users")
+                .document(id)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        toolbar.setTitle(documentSnapshot.getString("name"));
+                        getSupportActionBar().setTitle(documentSnapshot.getString("name"));
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        toolbar.setTitle("Friend Profile");
+                        getSupportActionBar().setTitle("Friend Profile");
+                        e.printStackTrace();
+                    }
+                });
 
         final Bundle bundle = new Bundle();
         bundle.putString("id", id);
@@ -114,12 +149,30 @@ public class FriendProfile extends AppCompatActivity {
                         profilefragment.setArguments(bundle);
                         loadFragment(profilefragment);
                         break;
+                    case R.id.action_question:
+                        loadFragment(FriendQuestions.newInstance(id));
+                        break;
                     default:
                         Fragment fragment=new AboutFragment();
                         fragment.setArguments(bundle);
                         loadFragment(fragment);
                 }
                 return true;
+            }
+        });
+
+        bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+            @Override
+            public void onNavigationItemReselected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_profile:
+                        break;
+                    case R.id.action_posts:
+                        break;
+                    case R.id.action_question:
+                        break;
+
+                }
             }
         });
 

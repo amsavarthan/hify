@@ -18,7 +18,8 @@ import com.amsavarthan.hify.ui.activities.friends.SearchUsersActivity;
  * Created by amsavarthan on 29/3/18.
  */
 
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends Fragment implements BottomNavigationView.OnNavigationItemReselectedListener,
+BottomNavigationView.OnNavigationItemSelectedListener{
 
     View mView;
     FloatingActionButton fab;
@@ -61,25 +62,8 @@ public class FriendsFragment extends Fragment {
        }else {
            loadFragment(new Friends());
        }
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_view:
-                        loadFragment(new Friends());
-                        break;
-                    case R.id.action_view_request:
-                        loadFragment(new FriendRequests());
-                        break;
-                    case R.id.action_add:
-                        loadFragment(new com.amsavarthan.hify.ui.fragment.AddFriends());
-                        break;
-                    default:
-
-                }
-                return true;
-            }
-        });
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemReselectedListener(this);
 
 
     }
@@ -95,4 +79,34 @@ public class FriendsFragment extends Fragment {
         SearchUsersActivity.startActivity(getActivity(), mView.getContext(), fab);
     }
 
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_view:
+                break;
+            case R.id.action_view_request:
+                break;
+            case R.id.action_add:
+                break;
+
+
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_view:
+                loadFragment(new Friends());
+                break;
+            case R.id.action_view_request:
+                loadFragment(new FriendRequests());
+                break;
+            case R.id.action_add:
+                loadFragment(new com.amsavarthan.hify.ui.fragment.AddFriends());
+                break;
+
+        }
+        return true;
+    }
 }

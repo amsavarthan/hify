@@ -21,10 +21,6 @@ import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.utils.AnimationUtil;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +28,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +50,11 @@ public class PostText extends AppCompatActivity {
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, PostText.class);
+        context.startActivity(intent);
+    }
+
+    public static void startActivity(Context context,String preText) {
+        Intent intent = new Intent(context, PostText.class).putExtra("preText",preText);
         context.startActivity(intent);
     }
 
@@ -98,6 +101,10 @@ public class PostText extends AppCompatActivity {
         preview_text = findViewById(R.id.text_preview);
         mImageholder = findViewById(R.id.image_holder);
 
+        if(StringUtils.isNotEmpty(getIntent().getStringExtra("preText"))){
+            text.setText(getIntent().getStringExtra("preText"));
+            preview_text.setText(getIntent().getStringExtra("preText"));
+        }
 
         text.addTextChangedListener(new TextWatcher() {
             @Override

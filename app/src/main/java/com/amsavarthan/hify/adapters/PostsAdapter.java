@@ -14,6 +14,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -48,6 +50,7 @@ import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
+import com.amsavarthan.hify.utils.NetworkUtil;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -62,6 +65,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.rd.PageIndicatorView;
+
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -105,10 +110,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     public long getItemId(int position) {
         return position;
     }
-	
-	@Override
+
+    @Override
     public int getItemViewType(int position) {
-        return 1;
+        return position;
     }
 	
     @NonNull
@@ -468,6 +473,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     }
 
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
     private Uri getBitmapUri(Bitmap bitmap, ViewHolder holder, String name) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
@@ -498,7 +510,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         getLikeandFav(holder);
 
-        holder.user_name.setText(postList.get(pos).getUsername());
+        if(!TextUtils.isEmpty(postList.get(pos).getUsername())) {
+            holder.user_name.setText(postList.get(pos).getUsername());
+        }
 
         Glide.with(context)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))
@@ -509,7 +523,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         holder.timestamp.setText(timeAgo);
 
-       enableDoubleTap(holder);
+        if(isOnline()) {
+            enableDoubleTap(holder);
+        }
 
         holder.stat_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             @Override
@@ -775,68 +791,69 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
                         }
 
-                        holder.like_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                            @Override
-                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                if(favorite) {
-                                    Map<String, Object> likeMap = new HashMap<>();
-                                    likeMap.put("liked", true);
+                        if(isOnline()) {
+                            holder.like_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                                @Override
+                                public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                                    if (favorite) {
+                                        Map<String, Object> likeMap = new HashMap<>();
+                                        likeMap.put("liked", true);
 
-                                    try {
+                                        try {
 
-                                        mFirestore.collection("Posts")
-                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                .collection("Liked_Users")
-                                                .document(mCurrentUser.getUid())
-                                                .set(likeMap)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())+1));
-                                                        //Toast.makeText(context, "Liked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.e("Error like", e.getMessage());
-                                                    }
-                                                });
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                }else{
-                                    Map<String, Object> likeMap = new HashMap<>();
-                                    likeMap.put("liked", false);
+                                            mFirestore.collection("Posts")
+                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                    .collection("Liked_Users")
+                                                    .document(mCurrentUser.getUid())
+                                                    .set(likeMap)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())+1));
+                                                            //Toast.makeText(context, "Liked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error like", e.getMessage());
+                                                        }
+                                                    });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        Map<String, Object> likeMap = new HashMap<>();
+                                        likeMap.put("liked", false);
 
-                                    try {
+                                        try {
 
-                                        mFirestore.collection("Posts")
-                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                .collection("Liked_Users")
-                                                .document(mCurrentUser.getUid())
-                                                //.set(likeMap)
-                                                .delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())-1));
-                                                        //Toast.makeText(context, "Unliked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.e("Error unlike", e.getMessage());
-                                                    }
-                                                });
-                                    }catch (Exception e){
-                                        e.printStackTrace();
+                                            mFirestore.collection("Posts")
+                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                    .collection("Liked_Users")
+                                                    .document(mCurrentUser.getUid())
+                                                    //.set(likeMap)
+                                                    .delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())-1));
+                                                            //Toast.makeText(context, "Unliked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error unlike", e.getMessage());
+                                                        }
+                                                    });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
-                            }
-                        });
-
+                            });
+                        }
 
 
                     }
@@ -871,150 +888,151 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
                         }
 
-                        holder.sav_button.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                            @Override
-                            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                if(favorite) {
+                        if(isOnline()) {
+                            holder.sav_button.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                                @Override
+                                public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                                    if (favorite) {
 
-                                    Map<String, Object> favMap = new HashMap<>();
-                                    favMap.put("Saved", true);
+                                        Map<String, Object> favMap = new HashMap<>();
+                                        favMap.put("Saved", true);
 
-                                    try {
+                                        try {
 
-                                        mFirestore.collection("Posts")
-                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                .collection("Saved_Users")
-                                                .document(mCurrentUser.getUid())
-                                                .set(favMap)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
+                                            mFirestore.collection("Posts")
+                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                    .collection("Saved_Users")
+                                                    .document(mCurrentUser.getUid())
+                                                    .set(favMap)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
 
-                                                        Map<String, Object> postMap = new HashMap<>();
+                                                            Map<String, Object> postMap = new HashMap<>();
 
-                                                        postMap.put("userId", postList.get(holder.getAdapterPosition()).getUserId());
-                                                        postMap.put("name", postList.get(holder.getAdapterPosition()).getName());
-                                                        postMap.put("username", postList.get(holder.getAdapterPosition()).getUsername());
-                                                        postMap.put("timestamp", postList.get(holder.getAdapterPosition()).getTimestamp());
-                                                        postMap.put("image_count", postList.get(holder.getAdapterPosition()).getImage_count());
-                                                        postMap.put("description", postList.get(holder.getAdapterPosition()).getDescription());
-                                                        postMap.put("color", postList.get(holder.getAdapterPosition()).getColor());
+                                                            postMap.put("userId", postList.get(holder.getAdapterPosition()).getUserId());
+                                                            postMap.put("name", postList.get(holder.getAdapterPosition()).getName());
+                                                            postMap.put("username", postList.get(holder.getAdapterPosition()).getUsername());
+                                                            postMap.put("timestamp", postList.get(holder.getAdapterPosition()).getTimestamp());
+                                                            postMap.put("image_count", postList.get(holder.getAdapterPosition()).getImage_count());
+                                                            postMap.put("description", postList.get(holder.getAdapterPosition()).getDescription());
+                                                            postMap.put("color", postList.get(holder.getAdapterPosition()).getColor());
 
-                                                        try {
-                                                            postMap.put("image_url_0", postList.get(holder.getAdapterPosition()).getImage_url_0());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_1", postList.get(holder.getAdapterPosition()).getImage_url_1());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_2", postList.get(holder.getAdapterPosition()).getImage_url_2());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_3", postList.get(holder.getAdapterPosition()).getImage_url_3());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_4", postList.get(holder.getAdapterPosition()).getImage_url_4());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_5", postList.get(holder.getAdapterPosition()).getImage_url_5());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-                                                        try {
-                                                            postMap.put("image_url_6", postList.get(holder.getAdapterPosition()).getImage_url_6());
-                                                        }catch (Exception e){
-                                                            e.printStackTrace();
-                                                        }
-
-                                                        mFirestore.collection("Users")
-                                                                .document(mCurrentUser.getUid())
-                                                                .collection("Saved_Posts")
-                                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                                .set(postMap)
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        // Toast.makeText(context, "Added to Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                }).addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-                                                                Log.e("Error add fav", e.getMessage());
+                                                            try {
+                                                                postMap.put("image_url_0", postList.get(holder.getAdapterPosition()).getImage_url_0());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
                                                             }
-                                                        });
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.e("Error fav", e.getMessage());
-                                                    }
-                                                });
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
+                                                            try {
+                                                                postMap.put("image_url_1", postList.get(holder.getAdapterPosition()).getImage_url_1());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            try {
+                                                                postMap.put("image_url_2", postList.get(holder.getAdapterPosition()).getImage_url_2());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            try {
+                                                                postMap.put("image_url_3", postList.get(holder.getAdapterPosition()).getImage_url_3());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            try {
+                                                                postMap.put("image_url_4", postList.get(holder.getAdapterPosition()).getImage_url_4());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            try {
+                                                                postMap.put("image_url_5", postList.get(holder.getAdapterPosition()).getImage_url_5());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            try {
+                                                                postMap.put("image_url_6", postList.get(holder.getAdapterPosition()).getImage_url_6());
+                                                            } catch (Exception e) {
+                                                                e.printStackTrace();
+                                                            }
 
-                                }else {
+                                                            mFirestore.collection("Users")
+                                                                    .document(mCurrentUser.getUid())
+                                                                    .collection("Saved_Posts")
+                                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                                    .set(postMap)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            // Toast.makeText(context, "Added to Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.e("Error add fav", e.getMessage());
+                                                                }
+                                                            });
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error fav", e.getMessage());
+                                                        }
+                                                    });
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
 
-                                    Map<String, Object> favMap = new HashMap<>();
-                                    favMap.put("Saved", false);
+                                    } else {
 
-                                    try {
+                                        Map<String, Object> favMap = new HashMap<>();
+                                        favMap.put("Saved", false);
 
-                                        mFirestore.collection("Posts")
-                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                .collection("Saved_Users")
-                                                .document(mCurrentUser.getUid())
-                                                //.set(favMap)
-                                                .delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
+                                        try {
 
-                                                        mFirestore.collection("Users")
-                                                                .document(mCurrentUser.getUid())
-                                                                .collection("Saved_Posts")
-                                                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                                                .delete()
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
-                                                                        // Toast.makeText(context, "Removed from Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                })
-                                                                .addOnFailureListener(new OnFailureListener() {
-                                                                    @Override
-                                                                    public void onFailure(@NonNull Exception e) {
-                                                                        Log.e("Error remove fav", e.getMessage());
-                                                                    }
-                                                                });
+                                            mFirestore.collection("Posts")
+                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                    .collection("Saved_Users")
+                                                    .document(mCurrentUser.getUid())
+                                                    //.set(favMap)
+                                                    .delete()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
 
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Log.e("Error fav", e.getMessage());
-                                                    }
-                                                });
+                                                            mFirestore.collection("Users")
+                                                                    .document(mCurrentUser.getUid())
+                                                                    .collection("Saved_Posts")
+                                                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                                                    .delete()
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            // Toast.makeText(context, "Removed from Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            Log.e("Error remove fav", e.getMessage());
+                                                                        }
+                                                                    });
 
-                                    }catch (Exception e){
-                                        e.printStackTrace();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error fav", e.getMessage());
+                                                        }
+                                                    });
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
-                            }
-                        });
-
+                            });
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -1253,7 +1271,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             indicator_holder=mView.findViewById(R.id.indicator_holder);
             pager=mView.findViewById(R.id.pager);
             pager_layout=mView.findViewById(R.id.pager_layout);
-            like_btn = mView.findViewById(R.id.like_button);
             comment_btn = mView.findViewById(R.id.comment_button);
             share_btn = mView.findViewById(R.id.share_button);
             delete = mView.findViewById(R.id.delete_button);

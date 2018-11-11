@@ -137,28 +137,32 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                             .alpha(1.0f)
                             .start();
                 } else {
-                    FirebaseFirestore.getInstance()
-                            .collection("Users")
-                            .document(usersList.get(holder.getAdapterPosition()).userId)
-                            .collection("Friend_Requests")
-                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            if (documentSnapshot.exists()) {
-                                holder.friend_icon.setVisibility(View.GONE);
-                                holder.exist_icon.setVisibility(View.VISIBLE);
-                                holder.exist_icon.setAlpha(0.0f);
+                    try {
+                        FirebaseFirestore.getInstance()
+                                .collection("Users")
+                                .document(usersList.get(holder.getAdapterPosition()).userId)
+                                .collection("Friend_Requests")
+                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists()) {
+                                    holder.friend_icon.setVisibility(View.GONE);
+                                    holder.exist_icon.setVisibility(View.VISIBLE);
+                                    holder.exist_icon.setAlpha(0.0f);
 
-                                holder.exist_icon.animate()
-                                        .alpha(1.0f)
-                                        .start();
-                            } else {
-                                holder.exist_icon.setVisibility(View.GONE);
-                                holder.friend_icon.setVisibility(View.GONE);
+                                    holder.exist_icon.animate()
+                                            .alpha(1.0f)
+                                            .start();
+                                } else {
+                                    holder.exist_icon.setVisibility(View.GONE);
+                                    holder.friend_icon.setVisibility(View.GONE);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -174,10 +178,10 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
     public long getItemId(int position) {
         return position;
     }
-	
-	@Override
+
+    @Override
     public int getItemViewType(int position) {
-        return 1;
+        return position;
     }
 
     public void removeItem(final int position, final Snackbar snackbar, final int deletedIndex, final Friends deletedItem) {

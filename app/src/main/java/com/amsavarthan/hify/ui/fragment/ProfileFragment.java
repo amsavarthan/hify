@@ -41,6 +41,7 @@ import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.account.RegisterActivity;
+import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
@@ -126,6 +127,23 @@ public class ProfileFragment extends Fragment {
 
                 }
                 return true;
+            }
+        });
+
+        bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+            @Override
+            public void onNavigationItemReselected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_profile:
+                        break;
+                    case R.id.action_posts:
+                        break;
+                    case R.id.action_saved:
+                        break;
+                    case R.id.action_edit:
+                        break;
+
+                }
             }
         });
 
@@ -364,7 +382,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.frag_about_profile, container, false);
+            final View rootView = inflater.inflate(R.layout.frag_about_profile, container, false);
 
 
             mAuth = FirebaseAuth.getInstance();
@@ -399,7 +417,7 @@ public class ProfileFragment extends Fragment {
             String usernam=rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
             String nam = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_NAME));
             String emai = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_EMAIL));
-            String imag = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+            final String imag = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
             String loc=rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_LOCATION));
             String bi=rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_BIO));
 
@@ -417,7 +435,14 @@ public class ProfileFragment extends Fragment {
                     .load(imag)
                     .into(profile_pic);
 
-
+            profile_pic.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    rootView.getContext().startActivity(new Intent(rootView.getContext(),ImagePreview.class)
+                            .putExtra("url",imag));
+                    return false;
+                }
+            });
 
             FirebaseFirestore.getInstance().collection("Posts")
                     .whereEqualTo("userId",mAuth.getCurrentUser().getUid())
@@ -616,11 +641,19 @@ public class ProfileFragment extends Fragment {
             bio.setText(bi);
             location.setText(loc);
 
-
             Glide.with(rootView.getContext())
                     .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
                     .load(imag)
                     .into(profile_pic);
+
+            profile_pic.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    rootView.getContext().startActivity(new Intent(rootView.getContext(),ImagePreview.class)
+                            .putExtra("url",imag));
+                    return false;
+                }
+            });
 
             updatebtn.setOnClickListener(new View.OnClickListener() {
                 @Override

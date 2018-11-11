@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import com.amsavarthan.hify.R;
 
-public class FlashMessage extends Fragment {
+public class FlashMessage extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener,BottomNavigationView.OnNavigationItemReselectedListener{
 
     View mView;
 
@@ -29,23 +29,8 @@ public class FlashMessage extends Fragment {
         loadFragment(new SendMessage());
 
         BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_send:
-                        loadFragment(new SendMessage());
-                        break;
-                    case R.id.action_history:
-                        loadFragment(new MessageHistory());
-                        break;
-                    default:
-                        loadFragment(new SendMessage());
-
-                }
-                return true;
-            }
-        });
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemReselectedListener(this);
 
 
     }
@@ -55,5 +40,31 @@ public class FlashMessage extends Fragment {
                 .beginTransaction()
                 .replace(R.id.frame_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_send:
+                break;
+            case R.id.action_history:
+                break;
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_send:
+                loadFragment(new SendMessage());
+                break;
+            case R.id.action_history:
+                loadFragment(new MessageHistory());
+                break;
+            default:
+                loadFragment(new SendMessage());
+
+        }
+        return true;
     }
 }
