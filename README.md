@@ -1,4 +1,4 @@
-<img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Design.png" width="400">
+<img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Design.png">
 <br>
 
 [![Hify](https://forthebadge.com/images/badges/built-by-developers.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
