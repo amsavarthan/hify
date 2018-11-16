@@ -139,10 +139,10 @@ public class Dashboard extends Fragment {
         }
 
         mPostsRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.no_posts,"No posts found","Your friends haven't added any posts or you don't have any friends."));
+                new TextStateDisplay(view.getContext(),"No posts found","Your friends haven't added any posts or you don't have any friends."));
 
         mPostsRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
         mPostsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -179,34 +179,37 @@ public class Dashboard extends Fragment {
                         }
 
                         if(!queryDocumentSnapshots.isEmpty()){
-                            request_alert_text.setText(String.format(getString(R.string.you_have_d_new_friend_request_s),queryDocumentSnapshots.size()));
-                            request_alert.setVisibility(View.VISIBLE);
-                            request_alert.setAlpha(0.0f);
+                            try {
+                                request_alert_text.setText(String.format(getString(R.string.you_have_d_new_friend_request_s), queryDocumentSnapshots.size()));
+                                request_alert.setVisibility(View.VISIBLE);
+                                request_alert.setAlpha(0.0f);
 
-                            request_alert.animate()
-                                    .setDuration(300)
-                                    .scaleX(1.0f)
-                                    .scaleY(1.0f)
-                                    .alpha(1.0f)
-                                    .start();
+                                request_alert.animate()
+                                        .setDuration(300)
+                                        .scaleX(1.0f)
+                                        .scaleY(1.0f)
+                                        .alpha(1.0f)
+                                        .start();
 
-                            request_alert.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if(currentuser.isEmailVerified()) {
-                                        toolbar.setTitle("Manage Friends");
-                                        try {
-                                            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Manage Friends");
-                                        } catch (Exception e) {
-                                            Log.e("Error", e.getMessage());
+                                request_alert.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (currentuser.isEmailVerified()) {
+                                            toolbar.setTitle("Manage Friends");
+                                            try {
+                                                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Manage Friends");
+                                            } catch (Exception e) {
+                                                Log.e("Error", e.getMessage());
+                                            }
+                                            showFragment(FriendsFragment.newInstance("request"));
+                                        } else {
+                                            showDialog();
                                         }
-                                        showFragment(FriendsFragment.newInstance("request"));
-                                    }else{
-                                        showDialog();
                                     }
-                                }
-                            });
-
+                                });
+                            }catch (Exception e1){
+                                e1.printStackTrace();
+                            }
                         }
 
                     }

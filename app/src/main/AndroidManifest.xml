@@ -199,16 +199,16 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".feature_ai.activities.AnswersActivity"
-            android:screenOrientation="portrait" >
-
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.amsavarthan.hify.TARGET_FORUM" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
         <activity android:name=".feature_ai.activities.Preview" />
+        <activity android:name=".ui.activities.chat.StartChat" />
+        <activity android:name=".ui.activities.chat.ChatScreen"></activity>
     </application>
 
 </manifest>

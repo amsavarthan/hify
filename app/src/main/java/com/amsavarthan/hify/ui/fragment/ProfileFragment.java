@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,6 +39,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
+import com.amsavarthan.hify.adapters.PostsAdapter_v19;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.account.RegisterActivity;
@@ -65,7 +67,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
+import com.tylersuehr.esr.TextStateDisplay;
 import com.tylersuehr.esr.TextStateDisplay;
 import com.yalantis.ucrop.UCrop;
 
@@ -165,6 +167,7 @@ public class ProfileFragment extends Fragment {
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
         private ProgressBar pbar;
+        private PostsAdapter_v19 mAdapter_v19;
 
         public PostsFragment() {
         }
@@ -182,22 +185,26 @@ public class ProfileFragment extends Fragment {
             pbar=rootView.findViewById(R.id.pbar);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.no_posts,"No posts found","Add some posts to see them here."));
+                    new TextStateDisplay(rootView.getContext(),"No posts found","Add some posts to see them here."));
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            //mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(mAdapter);
-
+            if(Build.VERSION.SDK_INT>19) {
+                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+                mRecyclerView.setAdapter(mAdapter);
+            }else{
+                mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+                mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+                mRecyclerView.setAdapter(mAdapter_v19);
+            }
             pbar.setVisibility(View.VISIBLE);
            getPosts();
 
@@ -219,7 +226,11 @@ public class ProfileFragment extends Fragment {
                                 for(DocumentChange doc:querySnapshot.getDocumentChanges()){
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
-                                    mAdapter.notifyDataSetChanged();
+                                    if(Build.VERSION.SDK_INT>19) {
+                                        mAdapter.notifyDataSetChanged();
+                                    }else{
+                                        mAdapter_v19.notifyDataSetChanged();
+                                    }
                                     pbar.setVisibility(View.GONE);
                                 }
 
@@ -252,6 +263,7 @@ public class ProfileFragment extends Fragment {
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
         private ProgressBar pbar;
+        private PostsAdapter_v19 mAdapter_v19;
 
         public SavedFragment() {
         }
@@ -262,7 +274,6 @@ public class ProfileFragment extends Fragment {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
             statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
@@ -272,16 +283,23 @@ public class ProfileFragment extends Fragment {
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(mAdapter);
+
+            if(Build.VERSION.SDK_INT>19) {
+                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+                mRecyclerView.setAdapter(mAdapter);
+            }else{
+                mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+                mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+                mRecyclerView.setAdapter(mAdapter_v19);
+            }
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.no_s_posts,"No saved posts found","All your saved posts appear here."));
+                    new TextStateDisplay(rootView.getContext(),"No saved posts found","All your saved posts appear here."));
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
             pbar.setVisibility(View.VISIBLE);
             getPosts();
@@ -312,7 +330,11 @@ public class ProfileFragment extends Fragment {
                                                     if(documentSnapshot.exists()){
                                                         Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                                         postList.add(post);
-                                                        mAdapter.notifyDataSetChanged();
+                                                        if(Build.VERSION.SDK_INT>19) {
+                                                            mAdapter.notifyDataSetChanged();
+                                                        }else{
+                                                            mAdapter_v19.notifyDataSetChanged();
+                                                        }
                                                         pbar.setVisibility(View.GONE);
                                                     }else{
                                                         FirebaseFirestore.getInstance().collection("Users")

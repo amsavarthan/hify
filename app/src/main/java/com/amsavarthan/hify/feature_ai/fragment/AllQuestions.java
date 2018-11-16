@@ -161,8 +161,8 @@ public class AllQuestions extends Fragment{
 
         recyclerView.clearStateDisplays();
 
-        ImageTextStateDisplay error_style = new ImageTextStateDisplay(context,R.mipmap.sad, "Sorry for the inconvenience", "Something went wrong :(");
-        ImageTextStateDisplay empty_style = new ImageTextStateDisplay(context,R.mipmap.happy2, "It's Empty", "No questions found");
+        TextStateDisplay error_style = new TextStateDisplay(context, "Sorry for the inconvenience", "Something went wrong :(");
+        TextStateDisplay empty_style = new TextStateDisplay(context, "It's Empty", "No questions found");
 
         recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR, error_style);
         recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY, empty_style);
@@ -173,7 +173,7 @@ public class AllQuestions extends Fragment{
             getQuestions();
         }else{
 
-            Query firstQuery = mFirestore.collection("Question")
+            Query firstQuery = mFirestore.collection("Questions")
                     .whereEqualTo("subject",subject)
                     .orderBy("timestamp", Query.Direction.DESCENDING);
             firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {

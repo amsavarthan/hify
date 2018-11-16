@@ -70,13 +70,13 @@ public class SendMessage extends Fragment {
         mRecyclerView.setAdapter(usersAdapter);
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.no_image,"No friends found","Add some friends to send them flash messages."));
+                new TextStateDisplay(view.getContext(),"No friends found","Add some friends to send them flash messages."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
                 new TextStateDisplay(view.getContext(),"We found some of your friends","We are getting information of your friends.."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
         pbar.setVisibility(View.VISIBLE);
         startListening();

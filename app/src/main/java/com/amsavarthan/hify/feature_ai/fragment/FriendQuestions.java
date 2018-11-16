@@ -27,7 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
+import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,8 +111,8 @@ public class FriendQuestions extends Fragment {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             view.findViewById(R.id.progressbar).setVisibility(View.VISIBLE);
 
-            ImageTextStateDisplay error_style = new ImageTextStateDisplay(context,R.mipmap.sad, "Sorry for the inconvenience", "Something went wrong :(");
-            ImageTextStateDisplay empty_style = new ImageTextStateDisplay(context,R.mipmap.happy2, "It's Empty", "All your questions will appear here");
+            TextStateDisplay error_style = new TextStateDisplay(context, "Sorry for the inconvenience", "Something went wrong :(");
+            TextStateDisplay empty_style = new TextStateDisplay(context, "It's Empty", "All your questions will appear here");
 
             recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR, error_style);
             recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY, empty_style);
@@ -175,8 +175,8 @@ public class FriendQuestions extends Fragment {
 
         recyclerView.clearStateDisplays();
 
-        ImageTextStateDisplay error_style = new ImageTextStateDisplay(context,R.mipmap.sad, "Sorry for the inconvenience", "Something went wrong :(");
-        ImageTextStateDisplay empty_style = new ImageTextStateDisplay(context,R.mipmap.happy2, "It's Empty", "No questions found");
+        TextStateDisplay error_style = new TextStateDisplay(context, "Sorry for the inconvenience", "Something went wrong :(");
+        TextStateDisplay empty_style = new TextStateDisplay(context, "It's Empty", "No questions found");
 
         recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR, error_style);
         recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY, empty_style);

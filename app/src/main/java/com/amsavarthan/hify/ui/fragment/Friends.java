@@ -32,7 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
+import com.tylersuehr.esr.TextStateDisplay;
 import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
@@ -131,14 +131,10 @@ public class Friends extends Fragment {
         mRecyclerView.setAdapter(usersAdapter);
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.crying,"No friends found","Add some friends to manage them here."));
+                new TextStateDisplay(view.getContext(),"No friends found","Add some friends to manage them here."));
 
         mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
-
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
-                new TextStateDisplay(view.getContext(),"We found some of your friends","We are getting information of your friends.."));
-
+                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
         pbar.setVisibility(View.VISIBLE);
         startListening();

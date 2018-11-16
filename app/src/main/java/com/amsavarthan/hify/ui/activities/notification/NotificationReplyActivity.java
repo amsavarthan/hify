@@ -220,7 +220,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
     }
 
 
-    public void onSendNew(View view) {
+    public void SendNew(View view) {
         SendActivity.startActivityExtra(NotificationReplyActivity.this, user_id);
         overridePendingTransitionExit();
     }

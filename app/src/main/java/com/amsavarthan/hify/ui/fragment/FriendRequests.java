@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,7 +28,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
 import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
@@ -108,18 +108,19 @@ public class FriendRequests extends Fragment {
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
 
         mRequestView.setItemAnimator(new DefaultItemAnimator());
-        mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        mRequestView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.happy2,"No friend requests","People who have sent you friend request will be shown here."));
+                new TextStateDisplay(view.getContext(),"No friend requests","People who have sent you friend request will be shown here."));
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
                 new TextStateDisplay(view.getContext(),"There are some friend request","We are getting information of those users.."));
 
         mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
         pbar.setVisibility(View.VISIBLE);
         getUsers();

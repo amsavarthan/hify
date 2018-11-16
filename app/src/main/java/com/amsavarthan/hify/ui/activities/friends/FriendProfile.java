@@ -48,7 +48,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
+import com.tylersuehr.esr.TextStateDisplay;
 import com.tylersuehr.esr.TextStateDisplay;
 
 import java.text.SimpleDateFormat;
@@ -223,7 +223,7 @@ public class FriendProfile extends AppCompatActivity {
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new ImageTextStateDisplay(rootView.getContext(),R.mipmap.no_posts,"No posts found","User hasn't posted any posts yet"));
+                    new TextStateDisplay(rootView.getContext(),"No posts found","User hasn't posted any posts yet"));
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                     new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));

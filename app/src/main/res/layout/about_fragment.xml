@@ -7,6 +7,7 @@
     android:background="@color/colorPrimaryy">
 
    <LinearLayout
+       android:paddingTop="20dp"
        android:paddingBottom="20dp"
        android:orientation="vertical"
        android:gravity="center"

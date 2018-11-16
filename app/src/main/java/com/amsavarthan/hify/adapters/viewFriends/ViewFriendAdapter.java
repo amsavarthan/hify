@@ -1,5 +1,6 @@
 package com.amsavarthan.hify.adapters.viewFriends;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -20,12 +21,18 @@ import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,6 +45,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
     private List<ViewFriends> usersList;
     private Context context;
     private HashMap<String, Object> userMap;
+    private ProgressDialog mDialog;
 
     public ViewFriendAdapter(List<ViewFriends> usersList, Context context) {
         this.usersList = usersList;
@@ -346,6 +354,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
 
     }
 
+
     private void removeUser(final int position) {
 
         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -364,6 +373,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
                     public void onSuccess(Void aVoid) {
                         usersList.remove(position);
                         notifyItemRemoved(position);
+                        notifyDataSetChanged();
                     }
                 });
 

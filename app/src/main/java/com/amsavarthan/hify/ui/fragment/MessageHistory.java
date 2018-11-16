@@ -101,7 +101,7 @@ public class MessageHistory extends Fragment {
                 mRecyclerView.setAdapter(messageTextAdapter);
                 mRecyclerView.clearStateDisplays();
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                         new TextStateDisplay(view.getContext(),"No messages found",""));
@@ -119,7 +119,7 @@ public class MessageHistory extends Fragment {
                 mRecyclerView.clearStateDisplays();
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                         new TextStateDisplay(view.getContext(),"No messages found",""));
@@ -137,7 +137,7 @@ public class MessageHistory extends Fragment {
                 mRecyclerView.clearStateDisplays();
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                         new TextStateDisplay(view.getContext(),"No messages found",""));
@@ -155,7 +155,7 @@ public class MessageHistory extends Fragment {
                 mRecyclerView.clearStateDisplays();
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new ImageTextStateDisplay(view.getContext(),R.mipmap.sad,"Sorry for inconvenience","Something went wrong :("));
+                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
 
                 mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
                         new TextStateDisplay(view.getContext(),"No messages found",""));
