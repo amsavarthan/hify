@@ -1,11 +1,14 @@
-# Hify
+<img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Design.png" width="400">
+<br>
 
-<img src="https://forthebadge.com/images/badges/built-for-android.svg">
+[![Hify](https://forthebadge.com/images/badges/built-by-developers.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
+[![Hify](https://forthebadge.com/images/badges/built-with-love.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
+[![Hify](https://forthebadge.com/images/badges/built-for-android.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
 
-<img src="https://github.com/lvamsavarthan/Hify/blob/master/preview.png">
+
+<br>
 
 Just a social app. This app is mostly completed but some bugs would be there so till i fix them this app will be in **beta**
-
 **google-services.json file has been deleted for security reasons. Place your google-services.json in /app folder**
 
 ## Available feautres
@@ -30,8 +33,8 @@ Just a social app. This app is mostly completed but some bugs would be there so 
   - Double tap like feature added **(stable)**
   - Error handling Recycler View **(stable)**
 * Discuss
-  - Homework helper for students with inbuilt AI (Wolfram|Alpha)
-  - Forum
+  - Homework helper for students with inbuilt AI (Wolfram|Alpha) **(stable)**
+  - Forum **(stable)**
   
 ## Cloud Functions Code
 
@@ -59,12 +62,6 @@ Check out the cloud_functions folder for the code
    </tr>
   
 </table>
-
-## Working
-
-Managing Posts - https://www.youtube.com/watch?v=Qi8Sv590N4Y<br>
-Managing Friends - https://www.youtube.com/watch?v=QaDg34DBShM<br>
-Sending Messages - https://www.youtube.com/watch?v=BKlIbSifVfA
 
 ## Developer
 
