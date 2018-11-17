@@ -46,21 +46,26 @@ Check out the cloud_functions folder for the code
   <tr>
     <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1.jpg" height="400"> </td>
     <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/2.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/3.jpg" height="400"> </td>
   </tr>
   
   <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/4.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/5.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/6.jpg" height="400"> </td>
+        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/3.jpg" height="400"> </td>
+<td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/4.jpg" height="400"> </td>
   </tr>
   
    <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/7.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/8.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/9.jpg" height="400"> </td>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/5.jpg" height="400"> </td>
+ <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/6.jpg" height="400"> </td>
+    </tr>
+    
+   <tr>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/7.jpg" height="400"> </td>
+<td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/8.jpg" height="400"> </td>
    </tr>
   
+  <tr>
+   <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/9.jpg" height="400"> </td>
+   </tr>
 </table>
 
 ## Developer
