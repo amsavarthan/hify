@@ -11,6 +11,8 @@
 Just a social app. This app is mostly completed but some bugs would be there so till i fix them this app will be in **beta** .
 **google-services.json file has been deleted for security reasons. Place your google-services.json in /app folder**
 
+### Download the latest build by clicking [here](https://lvamsavarthan.github.io/lvstore/hify.html)
+
 ## Available feautres
 
 * Registration
@@ -39,6 +41,10 @@ Just a social app. This app is mostly completed but some bugs would be there so 
 ## Cloud Functions Code
 
 Check out the cloud_functions folder for the code
+
+## Tutorial 
+Part - 1 : [Setting up Firebase CLI](https://youtu.be/-T-yGL1qRho)<br>
+Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
 
 ## Screenshots
 
