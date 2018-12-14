@@ -11,6 +11,8 @@
 Just a social app. This app is mostly completed but some bugs would be there so till i fix them this app will be in **beta** .
 **google-services.json file has been deleted for security reasons. Place your google-services.json in /app folder**
 
+### Download the latest build by clicking [here](https://lvamsavarthan.github.io/lvstore/hify.html)
+
 ## Available feautres
 
 * Registration
@@ -40,27 +42,36 @@ Just a social app. This app is mostly completed but some bugs would be there so 
 
 Check out the cloud_functions folder for the code
 
+## Tutorial 
+Part - 1 : [Setting up Firebase CLI](https://youtu.be/-T-yGL1qRho)<br>
+Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
+
 ## Screenshots
 
 <table>
   <tr>
     <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1.jpg" height="400"> </td>
     <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/2.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/3.jpg" height="400"> </td>
   </tr>
   
   <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/4.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/5.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/6.jpg" height="400"> </td>
+        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/3.jpg" height="400"> </td>
+<td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/4.jpg" height="400"> </td>
   </tr>
   
    <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/7.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/8.jpg" height="400"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/9.jpg" height="400"> </td>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/5.jpg" height="400"> </td>
+ <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/6.jpg" height="400"> </td>
+    </tr>
+    
+   <tr>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/7.jpg" height="400"> </td>
+<td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/8.jpg" height="400"> </td>
    </tr>
   
+  <tr>
+   <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/9.jpg" height="400"> </td>
+   </tr>
 </table>
 
 ## Developer
