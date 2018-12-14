@@ -56,7 +56,6 @@
 
     </ScrollView>
 
-
     <Button
         android:text="Download"
         android:id="@+id/button"

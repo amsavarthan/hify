@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -169,9 +170,34 @@ public class NotificationActivity extends AppCompatActivity {
             notificationManager.cancel(getIntent().getIntExtra("notification_id", 0));
         }
 
+        updateReadStatus();
         initReply();
 
     }
+
+    private void updateReadStatus() {
+
+        boolean read=getIntent().getBooleanExtra("read",false);
+        if(!read){
+            Map<String,Object> readMap=new HashMap<>();
+            readMap.put("read",true);
+
+            mFirestore.collection("Users/" + current_id + "/Notifications")
+                    .document(getIntent().getStringExtra("doc_id")).update(readMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.i("done","read:true");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.i("error","read:false::"+e.getLocalizedMessage());
+                }
+            });
+        }
+
+    }
+
 
     private void initReply() {
 

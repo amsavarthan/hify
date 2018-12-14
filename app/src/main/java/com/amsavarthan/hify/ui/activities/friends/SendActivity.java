@@ -27,9 +27,11 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
+import com.amsavarthan.hify.ui.activities.lottie.SendingActivity;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.utils.AnimationUtil;
+import com.amsavarthan.hify.utils.Config;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -70,6 +72,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static com.amsavarthan.hify.utils.Config.random;
+
 public class SendActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 100;
@@ -103,18 +107,6 @@ public class SendActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
-    @NonNull
-    public static String random() {
-        Random generator = new Random();
-        StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(10);
-        char tempChar;
-        for (int i = 0; i < randomLength; i++) {
-            tempChar = (char) (generator.nextInt(96) + 32);
-            randomStringBuilder.append(tempChar);
-        }
-        return randomStringBuilder.toString();
-    }
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -203,105 +195,22 @@ public class SendActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                final String message_=message.getText().toString();
-
+                String message_=message.getText().toString();
                 if(!TextUtils.isEmpty(message_)){
 
                     if(imageUri==null){
 
+                        SendingActivity.startActivity(SendActivity.this,message_,c_name,c_image,current_id,user_id);
                         //Send only message
-                        Toast.makeText(SendActivity.this, "Sending...", Toast.LENGTH_SHORT).show();
+                        message.setText("");
 
-                        mDialog.show();
-                        Map<String,Object> notificationMessage=new HashMap<>();
-                        notificationMessage.put("username",c_name);
-                        notificationMessage.put("userimage",c_image);
-                        notificationMessage.put("message",message_);
-                        notificationMessage.put("from",current_id);
-                        notificationMessage.put("notification_id", String.valueOf(System.currentTimeMillis()));
-                        notificationMessage.put("timestamp", String.valueOf(System.currentTimeMillis()));
+                    }else {
 
-                        mFirestore.collection("Users/"+user_id+"/Notifications").add(notificationMessage).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-
-                                Toast.makeText(SendActivity.this, "Hify sent!", Toast.LENGTH_SHORT).show();
-                                message.setText("");
-                                mDialog.dismiss();
-
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(SendActivity.this, "Error sending Hify: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                mDialog.dismiss();
-                            }
-                        });
-                    }else{
+                        SendingActivity.startActivity(SendActivity.this,message_,imageUri,c_name,c_image,current_id,user_id);
                         //Send message with Image
-                        mDialog.show();
-
-                        Toast.makeText(SendActivity.this, "Image uploading..", Toast.LENGTH_SHORT).show();
-
-                        storageReference.putFile(imageUri).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                mDialog.dismiss();
-                            }
-                        }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-
-                                if(task.isSuccessful() &&task.getResult().toString()!=null){
-
-                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-
-                                            Toast.makeText(SendActivity.this, "Sending...", Toast.LENGTH_SHORT).show();
-
-
-                                            Map<String,Object> notificationMessage=new HashMap<>();
-                                            notificationMessage.put("username",c_name);
-                                            notificationMessage.put("userimage",c_image);
-                                            notificationMessage.put("image",uri.toString());
-                                            notificationMessage.put("message",message_);
-                                            notificationMessage.put("from",current_id);
-                                            notificationMessage.put("notification_id", String.valueOf(System.currentTimeMillis()));
-                                            notificationMessage.put("timestamp", String.valueOf(System.currentTimeMillis()));
-
-                                            mFirestore.collection("Users/"+user_id+"/Notifications_image").add(notificationMessage).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-
-                                                    Toast.makeText(SendActivity.this, "Hify sent!", Toast.LENGTH_SHORT).show();
-                                                    message.setText("");
-                                                    imagePreview.setVisibility(View.GONE);
-                                                    text.setVisibility(View.VISIBLE);
-                                                    imageUri=null;
-                                                    mDialog.dismiss();
-
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(SendActivity.this, "Error sending Hify: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                    mDialog.dismiss();
-                                                }
-                                            });
-
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            mDialog.dismiss();
-                                        }
-                                    });
-
-                                }
-
-                            }
-                        });
+                        message.setText("");
+                        imagePreview.setVisibility(View.GONE);
+                        text.setVisibility(View.VISIBLE);
 
                     }
 
@@ -309,6 +218,7 @@ public class SendActivity extends AppCompatActivity {
                 }else{
                     AnimationUtil.shakeView(message, SendActivity.this);
                 }
+
 
             }
         });
@@ -537,8 +447,6 @@ public class SendActivity extends AppCompatActivity {
             }
         }).show();
     }
-
-
 
     public void PreviewImage(View view) {
 

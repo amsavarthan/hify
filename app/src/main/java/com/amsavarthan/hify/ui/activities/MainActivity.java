@@ -60,6 +60,7 @@ import com.amsavarthan.hify.models.SimpleItem;
 import com.amsavarthan.hify.ui.activities.account.LoginActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
+import com.amsavarthan.hify.ui.activities.lottie.SendingActivity;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
 import com.amsavarthan.hify.ui.activities.post.PostImage;
 import com.amsavarthan.hify.ui.activities.post.PostText;
@@ -413,7 +414,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             }
 
             setRecentsView();
-
         }
     }
 

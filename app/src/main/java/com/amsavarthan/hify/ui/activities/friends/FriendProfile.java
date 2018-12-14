@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
+import com.amsavarthan.hify.adapters.PostsAdapter_v19;
 import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
 import com.amsavarthan.hify.feature_ai.fragment.MyQuestions;
 import com.amsavarthan.hify.models.Friends;
@@ -189,6 +191,7 @@ public class FriendProfile extends AppCompatActivity {
 
         List<Post> postList;
         PostsAdapter mAdapter;
+        PostsAdapter_v19 mAdapter_v19;
         private EmptyStateRecyclerView mRecyclerView;
         String id;
         private View statsheetView;
@@ -218,8 +221,13 @@ public class FriendProfile extends AppCompatActivity {
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
             postList=new ArrayList<>();
-            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
-
+            if(Build.VERSION.SDK_INT<=19){
+                mAdapter_v19=new PostsAdapter_v19(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
+                mRecyclerView.setAdapter(mAdapter_v19);
+            }else {
+                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+                mRecyclerView.setAdapter(mAdapter);
+            }
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
@@ -232,7 +240,6 @@ public class FriendProfile extends AppCompatActivity {
             //mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setAdapter(mAdapter);
 
             pbar.setVisibility(View.VISIBLE);
             getPosts(id);
@@ -257,7 +264,11 @@ public class FriendProfile extends AppCompatActivity {
 
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
-                                    mAdapter.notifyDataSetChanged();
+                                    if(Build.VERSION.SDK_INT>19) {
+                                        mAdapter.notifyDataSetChanged();
+                                    }else{
+                                        mAdapter_v19.notifyDataSetChanged();
+                                    }
                                     pbar.setVisibility(View.GONE);
 
                                 }

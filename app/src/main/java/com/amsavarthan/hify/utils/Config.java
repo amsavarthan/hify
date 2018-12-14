@@ -1,5 +1,9 @@
 package com.amsavarthan.hify.utils;
 
+import android.support.annotation.NonNull;
+
+import java.util.Random;
+
 /**
  * Created by amsavarthan on 10/3/18.
  */
@@ -23,4 +27,18 @@ public class Config {
     public static final String KEY_REPLY = "key_reply";
 
     public static final String FIREBASE_AUTH_KEY = "your_firebase_auth_key";
+
+    @NonNull
+    public static String random() {
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(10);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++) {
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
+    }
+
 }

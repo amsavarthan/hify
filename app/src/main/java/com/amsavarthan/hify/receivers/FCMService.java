@@ -11,6 +11,7 @@ import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
+import com.amsavarthan.hify.ui.activities.lottie.FestivalActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
@@ -74,6 +75,10 @@ public class FCMService extends FirebaseMessagingService {
 
         String question_id=remoteMessage.getData().get("question_id");
 
+        //Festival
+        String festival_name=remoteMessage.getData().get("festival_name");
+        String festival_text=remoteMessage.getData().get("festival_text");
+
         final Intent resultIntent;
 
         switch (click_action) {
@@ -131,6 +136,10 @@ public class FCMService extends FirebaseMessagingService {
 
                 resultIntent = new Intent(getApplicationContext(), AnswersActivity.class);
                 break;
+            case "com.amsavarthan.hify.TARGET_FESTIVAL":
+
+                resultIntent = new Intent(getApplicationContext(), FestivalActivity.class);
+                break;
             default:
 
                 resultIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -166,6 +175,9 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("link", link);
 
         resultIntent.putExtra("question_id",question_id);
+
+        resultIntent.putExtra("festival_name",festival_name);
+        resultIntent.putExtra("festival_text",festival_text);
 
         cDesc="Used to show "+channel+" Messages";
 
@@ -227,6 +239,9 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("link", link);
                     intent.putExtra("channel",channel);
                     intent.putExtra("question_id",question_id);
+
+                    intent.putExtra("festival_name",festival_name);
+                    intent.putExtra("festival_text",festival_text);
 
                     if (title.toLowerCase().contains("update")) {
                         showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);

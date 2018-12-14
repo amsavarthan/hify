@@ -138,23 +138,26 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                        if(!documentSnapshot.getString("name").equals(allQuestionsModels.get(holder.getAdapterPosition()).getName())){
+                        try {
+                            if (!documentSnapshot.getString("name").equals(allQuestionsModels.get(holder.getAdapterPosition()).getName())) {
 
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("name", documentSnapshot.getString("name"));
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("name", documentSnapshot.getString("name"));
 
-                            FirebaseFirestore.getInstance().collection("Answers")
-                                    .document(allQuestionsModels.get(holder.getAdapterPosition()).Answered_doc_id)
-                                    .update(map)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            holder.author.setText(String.format(" %s ", documentSnapshot.getString("name")));
-                                        }
-                                    });
+                                FirebaseFirestore.getInstance().collection("Answers")
+                                        .document(allQuestionsModels.get(holder.getAdapterPosition()).Answered_doc_id)
+                                        .update(map)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                holder.author.setText(String.format(" %s ", documentSnapshot.getString("name")));
+                                            }
+                                        });
 
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
-
                     }
                 });
 

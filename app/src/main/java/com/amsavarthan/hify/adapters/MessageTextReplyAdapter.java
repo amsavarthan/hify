@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -68,6 +69,28 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
     @Override
     public void onBindViewHolder(@NonNull final MessageTextReplyAdapter.ViewHolder holder, int position) {
 
+        try {
+            if (messageList.get(position).isRead()) {
+                holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
+                holder.read_icon.setVisibility(View.VISIBLE);
+                holder.read_icon.setAlpha(0.0f);
+                holder.read_icon.animate()
+                        .alpha(1.0f)
+                        .setDuration(300)
+                        .start();
+            } else {
+                holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.unread_icon));
+                holder.read_icon.setVisibility(View.VISIBLE);
+                holder.read_icon.setAlpha(0.0f);
+                holder.read_icon.animate()
+                        .alpha(1.0f)
+                        .setDuration(300)
+                        .start();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         mFirestore.collection("Users")
                 .document(messageList.get(position).getFrom())
                 .get()
@@ -89,10 +112,22 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(context, NotificationReplyActivity.class);
+                intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
+                intent.putExtra("read", messageList.get(holder.getAdapterPosition()).isRead());
                 intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
                 intent.putExtra("reply_for", messageList.get(holder.getAdapterPosition()).getReply_for());
                 intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
                 context.startActivity(intent);
+
+                messageList.get(holder.getAdapterPosition()).setRead(true);
+                holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
+                holder.read_icon.setVisibility(View.VISIBLE);
+                holder.read_icon.setAlpha(0.0f);
+                holder.read_icon.animate()
+                        .alpha(1.0f)
+                        .setDuration(300)
+                        .start();
+
             }
         });
 
@@ -160,6 +195,7 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
         private View mView;
         private CircleImageView image;
         private TextView message,name,time;
+        private ImageView read_icon;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -169,6 +205,7 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
             name = mView.findViewById(R.id.name);
             message = mView.findViewById(R.id.message);
             time = mView.findViewById(R.id.time);
+            read_icon=mView.findViewById(R.id.read);
 
         }
     }

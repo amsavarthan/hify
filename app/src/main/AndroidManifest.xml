@@ -207,8 +207,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".feature_ai.activities.Preview" />
-        <activity android:name=".ui.activities.chat.StartChat" />
-        <activity android:name=".ui.activities.chat.ChatScreen"></activity>
+        <activity android:name=".ui.activities.lottie.SendingActivity" />
+        <activity android:name=".ui.activities.lottie.FestivalActivity">
+            <intent-filter>
+                <action android:name="com.amsavarthan.hify.TARGET_FESTIVAL" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

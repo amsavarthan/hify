@@ -152,6 +152,7 @@ public class Dashboard extends Fragment {
                 boolean reachedBottom=!recyclerView.canScrollVertically(1);
                 if(reachedBottom){
                     loadMorePost();
+                    Toast.makeText(mView.getContext(), "Getting next posts....", Toast.LENGTH_LONG).show();
                 }
 
             }
