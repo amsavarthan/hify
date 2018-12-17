@@ -6,17 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".ui.activities.lottie.FestivalActivity">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieView"
+    <FrameLayout
         android:layout_alignParentTop="true"
         android:layout_above="@+id/holder"
-        app:lottie_loop="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieView"
+            app:lottie_loop="true"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
 
    <LinearLayout
        android:id="@+id/holder"
        android:padding="15dp"
+       android:layout_marginBottom="15dp"
        android:orientation="vertical"
        android:layout_alignParentBottom="true"
        android:layout_width="match_parent"
@@ -35,9 +44,21 @@
            android:id="@+id/subtext"
            android:textSize="20sp"
            android:gravity="center"
+           android:layout_marginBottom="15dp"
            android:text="Wishes from Hify team"
            android:layout_width="match_parent"
            android:layout_height="wrap_content" />
+
+       <Button
+           android:id="@+id/send"
+           android:layout_weight="1"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@drawable/input_backgtound"
+           android:text=""
+           android:textAllCaps="false"
+           android:textColor="#ffffff"
+           android:textSize="15sp" />
 
    </LinearLayout>
 

@@ -32,6 +32,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
 import com.tylersuehr.esr.ImageTextStateDisplay;
@@ -173,6 +174,7 @@ public class MessageHistory extends Fragment {
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
@@ -214,6 +216,7 @@ public class MessageHistory extends Fragment {
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
@@ -256,6 +259,7 @@ public class MessageHistory extends Fragment {
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_image")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
@@ -297,6 +301,7 @@ public class MessageHistory extends Fragment {
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply_image")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {

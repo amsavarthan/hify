@@ -74,12 +74,15 @@ public class FCMService extends FirebaseMessagingService {
         String link=remoteMessage.getData().get("link");
 
         String question_id=remoteMessage.getData().get("question_id");
-		boolean read=remoteMessage.getData().get("read");
+		boolean read= Boolean.parseBoolean(remoteMessage.getData().get("read"));
 		String doc_id=remoteMessage.getData().get("doc_id");
 
         //Festival
         String festival_name=remoteMessage.getData().get("festival_name");
         String festival_text=remoteMessage.getData().get("festival_text");
+        String send_text=remoteMessage.getData().get("send_text");
+        String dev_id=remoteMessage.getData().get("dev_id");
+        String reason=remoteMessage.getData().get("reason");
 
         final Intent resultIntent;
 
@@ -182,6 +185,9 @@ public class FCMService extends FirebaseMessagingService {
 
         resultIntent.putExtra("festival_name",festival_name);
         resultIntent.putExtra("festival_text",festival_text);
+        resultIntent.putExtra("send_text",send_text);
+        resultIntent.putExtra("dev_id",dev_id);
+        resultIntent.putExtra("reason",reason);
 
         cDesc="Used to show "+channel+" Messages";
 
@@ -244,11 +250,14 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("channel",channel);
                     intent.putExtra("question_id",question_id);
 
-					resultIntent.putExtra("read",read);
-					resultIntent.putExtra("doc_id",doc_id);
+                    intent.putExtra("read",read);
+                    intent.putExtra("doc_id",doc_id);
 
                     intent.putExtra("festival_name",festival_name);
                     intent.putExtra("festival_text",festival_text);
+                    intent.putExtra("send_text",send_text);
+                    intent.putExtra("dev_id",dev_id);
+                    intent.putExtra("reason",reason);
 
                     if (title.toLowerCase().contains("update")) {
                         showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);

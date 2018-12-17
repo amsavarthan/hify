@@ -293,16 +293,12 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
                                                                });
                                                    }
 
+                                                   Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                                   postList.remove(holder.getAdapterPosition());
+                                                   notifyItemRemoved(holder.getAdapterPosition());
+                                                   notifyDataSetChanged();
+
                                                    pdialog.dismiss();
-                                                   pdialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                                       @Override
-                                                       public void onDismiss(DialogInterface dialog) {
-                                                           Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
-                                                           postList.remove(holder.getAdapterPosition());
-                                                           notifyItemRemoved(holder.getAdapterPosition());
-                                                           notifyDataSetChanged();
-                                                       }
-                                                   });
 
 
                                                }

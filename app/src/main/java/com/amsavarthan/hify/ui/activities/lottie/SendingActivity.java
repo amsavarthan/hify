@@ -21,7 +21,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -32,28 +34,37 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.amsavarthan.hify.ui.activities.lottie.FestivalActivity.activity;
 import static com.amsavarthan.hify.utils.Config.random;
 
 public class SendingActivity extends AppCompatActivity {
 
     LottieAnimationView lottieAnimationView;
 
-    public static void startActivity(Context context,String message_,Uri imageUri,String c_name,String c_image,String current_id,String user_id){
+    public static void startActivity(Context context,String reason,String message_,Uri imageUri,String c_name,String c_image,String current_id,String user_id){
         context.startActivity(new Intent(context,SendingActivity.class)
                 .putExtra("message_",message_)
                 .putExtra("imageUri",imageUri.toString())
+                .putExtra("c_name",c_name)
+                .putExtra("reason",reason)
+                .putExtra("c_image",c_image)
+                .putExtra("current_id",current_id)
+                .putExtra("user_id",user_id));
+    }
+    public static void startActivity(Context context,String reason,String message_,String c_name,String c_image,String current_id,String user_id){
+        context.startActivity(new Intent(context,SendingActivity.class)
+                .putExtra("message_",message_)
+                .putExtra("reason",reason)
                 .putExtra("c_name",c_name)
                 .putExtra("c_image",c_image)
                 .putExtra("current_id",current_id)
                 .putExtra("user_id",user_id));
     }
-    public static void startActivity(Context context,String message_,String c_name,String c_image,String current_id,String user_id){
+
+    public static void startActivity(Context context,String reason,String dev_id){
         context.startActivity(new Intent(context,SendingActivity.class)
-                .putExtra("message_",message_)
-                .putExtra("c_name",c_name)
-                .putExtra("c_image",c_image)
-                .putExtra("current_id",current_id)
-                .putExtra("user_id",user_id));
+                .putExtra("reason",reason)
+        .putExtra("dev_id",dev_id));
     }
 
     FirebaseFirestore mFirestore;
@@ -70,22 +81,63 @@ public class SendingActivity extends AppCompatActivity {
         lottieAnimationView=findViewById(R.id.lottie);
         lottieAnimationView.useHardwareAcceleration(true);
 
-        if(StringUtils.isNotEmpty(getIntent().getStringExtra("imageUri"))){
-            sendMessage(getIntent().getStringExtra("message_"),
-                    Uri.parse(getIntent().getStringExtra("imageUri")),
-                    getIntent().getStringExtra("c_name"),
-                    getIntent().getStringExtra("c_image"),
-                    getIntent().getStringExtra("current_id"),
-                    getIntent().getStringExtra("user_id"));
-        }else{
-            sendMessage(getIntent().getStringExtra("message_"),
-                    null,
-                    getIntent().getStringExtra("c_name"),
-                    getIntent().getStringExtra("c_image"),
-                    getIntent().getStringExtra("current_id"),
-                    getIntent().getStringExtra("user_id"));
+        String reason=getIntent().getStringExtra("reason");
+        if(reason.equals("normal_message")) {
+            if (StringUtils.isNotEmpty(getIntent().getStringExtra("imageUri"))) {
+                sendMessage(
+                        "",
+                        getIntent().getStringExtra("message_"),
+                        Uri.parse(getIntent().getStringExtra("imageUri")),
+                        getIntent().getStringExtra("c_name"),
+                        getIntent().getStringExtra("c_image"),
+                        getIntent().getStringExtra("current_id"),
+                        getIntent().getStringExtra("user_id"));
+            } else {
+                sendMessage(
+                        "",
+                        getIntent().getStringExtra("message_"),
+                        null,
+                        getIntent().getStringExtra("c_name"),
+                        getIntent().getStringExtra("c_image"),
+                        getIntent().getStringExtra("current_id"),
+                        getIntent().getStringExtra("user_id"));
+            }
+        }else if(reason.equals("wish_back")){
+            FirebaseFirestore.getInstance().collection("Users")
+                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            sendMessage(
+                                    "festival",
+                                    documentSnapshot.getString("name") + " wished you back for your wishes."
+                                    ,null
+                                    ,documentSnapshot.getString("username")
+                                    ,documentSnapshot.getString("image")
+                                    ,documentSnapshot.getString("id")
+                                    ,getIntent().getStringExtra("dev_id"));
+                        }
+                    });
         }
-
+        else if(reason.equals("thank_back")){
+            FirebaseFirestore.getInstance().collection("Users")
+                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            sendMessage(
+                                    "festival",
+                                    documentSnapshot.getString("name") + " thanked you back for your wishes."
+                                    ,null
+                                    ,documentSnapshot.getString("username")
+                                    ,documentSnapshot.getString("image")
+                                    ,documentSnapshot.getString("id")
+                                    ,getIntent().getStringExtra("dev_id"));
+                        }
+                    });
+        }
 
     }
 
@@ -99,7 +151,7 @@ public class SendingActivity extends AppCompatActivity {
         },delay);
     }
 
-    private void sendMessage(final String message_, Uri imageUri, final String c_name, final String c_image, final String current_id, final String user_id) {
+    private void sendMessage(final String type, final String message_, Uri imageUri, final String c_name, final String c_image, final String current_id, final String user_id) {
 
         if(!TextUtils.isEmpty(message_)){
 
@@ -125,7 +177,11 @@ public class SendingActivity extends AppCompatActivity {
                             public void onAnimationEnd(Animator animation) {
                                 super.onAnimationEnd(animation);
                                 Toast.makeText(SendingActivity.this, "Message sent", Toast.LENGTH_SHORT).show();
-                                finish();
+                                if(type.equals("festival")) {
+                                    activity.finish();
+                                }else{
+                                    finish();
+                                }
                             }
                         });
                     }

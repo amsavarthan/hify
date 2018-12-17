@@ -200,13 +200,13 @@ public class SendActivity extends AppCompatActivity {
 
                     if(imageUri==null){
 
-                        SendingActivity.startActivity(SendActivity.this,message_,c_name,c_image,current_id,user_id);
+                        SendingActivity.startActivity(SendActivity.this,"normal_message",message_,c_name,c_image,current_id,user_id);
                         //Send only message
                         message.setText("");
 
                     }else {
 
-                        SendingActivity.startActivity(SendActivity.this,message_,imageUri,c_name,c_image,current_id,user_id);
+                        SendingActivity.startActivity(SendActivity.this,"normal_message",message_,imageUri,c_name,c_image,current_id,user_id);
                         //Send message with Image
                         message.setText("");
                         imagePreview.setVisibility(View.GONE);

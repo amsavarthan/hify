@@ -220,6 +220,7 @@ public class FriendProfile extends AppCompatActivity {
             mmBottomSheetDialog.setContentView(statsheetView);
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
+            mRecyclerView=rootView.findViewById(R.id.recyclerView);
             postList=new ArrayList<>();
             if(Build.VERSION.SDK_INT<=19){
                 mAdapter_v19=new PostsAdapter_v19(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
@@ -228,7 +229,6 @@ public class FriendProfile extends AppCompatActivity {
                 mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.setAdapter(mAdapter);
             }
-            mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
                     new TextStateDisplay(rootView.getContext(),"No posts found","User hasn't posted any posts yet"));
