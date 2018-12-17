@@ -36,6 +36,8 @@ exports.sendNotification=functions.firestore.document("Users/{user_id}/Notificat
                 from_image:from_image,
                 title:from_name,
                 body:from_message,
+				 doc_id:notification_id,
+                read:read,
                 click_action:"com.amsavarthan.hify.TARGETNOTIFICATION"
               }
              
@@ -43,11 +45,15 @@ exports.sendNotification=functions.firestore.document("Users/{user_id}/Notificat
           
           console.log("token_id: "+token_id+" | from: "+from_name+" | to:"+to_name+" | message:"+from_message);
 
+          
+          if(!read){
+          
             return admin.messaging().sendToDevice(token_id,payload).then(result=>{
 
                 console.log("Notification Sent.");
 
             });
+          }
 
         });
 

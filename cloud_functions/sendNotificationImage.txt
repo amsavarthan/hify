@@ -38,6 +38,8 @@ exports.sendNotificationImage=functions.firestore.document("Users/{user_id}/Noti
                 from_image:from_image,
                 image:image,
                 title:from_name,
+				doc_id:notification_id,
+                read:read,
                 body:"Sent you a image with message '"+from_message+"'",
                 click_action:"com.amsavarthan.hify.TARGETNOTIFICATION_IMAGE"
               }
@@ -46,11 +48,15 @@ exports.sendNotificationImage=functions.firestore.document("Users/{user_id}/Noti
           
           console.log("token_id: "+token_id+" | from: "+from_name+" | to:"+to_name+" | message:"+from_message+" | Sent a image");
 
+          
+          if(!read){
+          
             return admin.messaging().sendToDevice(token_id,payload).then(result=>{
 
                 console.log("Notification Sent.");
 
             });
+          }
 
         });
 

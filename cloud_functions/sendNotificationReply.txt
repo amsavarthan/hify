@@ -37,6 +37,8 @@ exports.sendNotificationReply=functions.firestore.document("Users/{user_id}/Noti
                 from_image:from_image,
                 reply_for:from_reply,
                 title:from_name,
+				doc_id:notification_id,
+                read:read,
                 body:"Reply for: "+from_reply+"\nMessage: "+from_message,
                 click_action:"com.amsavarthan.hify.TARGETNOTIFICATIONREPLY"
               }
@@ -45,11 +47,15 @@ exports.sendNotificationReply=functions.firestore.document("Users/{user_id}/Noti
           
           console.log("token_id: "+token_id+" | from: "+from_name+" | to:"+to_name+" | message:"+from_message+" | reply for: "+from_reply);
 
+          
+          if(!read){
+          
             return admin.messaging().sendToDevice(token_id,payload).then(result=>{
 
                 console.log("Notification Sent.");
 
             });
+          }
 
         });
 
