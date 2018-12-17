@@ -74,6 +74,8 @@ public class FCMService extends FirebaseMessagingService {
         String link=remoteMessage.getData().get("link");
 
         String question_id=remoteMessage.getData().get("question_id");
+		boolean read=remoteMessage.getData().get("read");
+		String doc_id=remoteMessage.getData().get("doc_id");
 
         //Festival
         String festival_name=remoteMessage.getData().get("festival_name");
@@ -175,6 +177,8 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("link", link);
 
         resultIntent.putExtra("question_id",question_id);
+        resultIntent.putExtra("read",read);
+        resultIntent.putExtra("doc_id",doc_id);
 
         resultIntent.putExtra("festival_name",festival_name);
         resultIntent.putExtra("festival_text",festival_text);
@@ -239,6 +243,9 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("link", link);
                     intent.putExtra("channel",channel);
                     intent.putExtra("question_id",question_id);
+
+					resultIntent.putExtra("read",read);
+					resultIntent.putExtra("doc_id",doc_id);
 
                     intent.putExtra("festival_name",festival_name);
                     intent.putExtra("festival_text",festival_text);
