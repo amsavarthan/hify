@@ -21,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,11 +36,9 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.adapters.PostsAdapter_v19;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.ui.activities.MainActivity;
-import com.amsavarthan.hify.ui.activities.account.RegisterActivity;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.amsavarthan.hify.utils.database.UserHelper;
@@ -52,7 +48,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,14 +63,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
 import com.tylersuehr.esr.TextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -162,7 +154,6 @@ public class ProfileFragment extends Fragment {
     public static class PostsFragment extends Fragment {
 
         List<Post> postList;
-        PostsAdapter mAdapter;
         private EmptyStateRecyclerView mRecyclerView;
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
@@ -197,14 +188,14 @@ public class ProfileFragment extends Fragment {
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
-            if(Build.VERSION.SDK_INT>19) {
+            /*if(Build.VERSION.SDK_INT>19) {
                 mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.setAdapter(mAdapter);
-            }else{
+            }else{*/
                 mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
                 mRecyclerView.setAdapter(mAdapter_v19);
-            }
+            //}
             pbar.setVisibility(View.VISIBLE);
            getPosts();
 
@@ -226,11 +217,7 @@ public class ProfileFragment extends Fragment {
                                 for(DocumentChange doc:querySnapshot.getDocumentChanges()){
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
-                                    if(Build.VERSION.SDK_INT>19) {
-                                        mAdapter.notifyDataSetChanged();
-                                    }else{
-                                        mAdapter_v19.notifyDataSetChanged();
-                                    }
+                                    mAdapter_v19.notifyDataSetChanged();
                                     pbar.setVisibility(View.GONE);
                                 }
 
@@ -258,7 +245,6 @@ public class ProfileFragment extends Fragment {
     public static class SavedFragment extends Fragment {
 
         List<Post> postList;
-        PostsAdapter mAdapter;
         private EmptyStateRecyclerView mRecyclerView;
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
@@ -286,14 +272,14 @@ public class ProfileFragment extends Fragment {
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
 
-            if(Build.VERSION.SDK_INT>19) {
+            /*if(Build.VERSION.SDK_INT>19) {
                 mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.setAdapter(mAdapter);
-            }else{
+            }else{*/
                 mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
                 mRecyclerView.setAdapter(mAdapter_v19);
-            }
+            //}
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
                     new TextStateDisplay(rootView.getContext(),"No saved posts found","All your saved posts appear here."));
@@ -330,11 +316,8 @@ public class ProfileFragment extends Fragment {
                                                     if(documentSnapshot.exists()){
                                                         Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                                         postList.add(post);
-                                                        if(Build.VERSION.SDK_INT>19) {
-                                                            mAdapter.notifyDataSetChanged();
-                                                        }else{
-                                                            mAdapter_v19.notifyDataSetChanged();
-                                                        }
+                                                        mAdapter_v19.notifyDataSetChanged();
+
                                                         pbar.setVisibility(View.GONE);
                                                     }else{
                                                         FirebaseFirestore.getInstance().collection("Users")

@@ -3,9 +3,11 @@ package com.amsavarthan.hify.receivers;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
@@ -35,6 +37,29 @@ public class FCMService extends FirebaseMessagingService {
 
     private NotificationUtil notificationUtils;
     private String cDesc;
+
+    @Override
+    public void onNewToken(String refreshedToken) {
+        super.onNewToken(refreshedToken);
+        storeRegIdInPref(refreshedToken);
+        sendRegistrationToServer(refreshedToken);
+
+        Intent registrationComplete = new Intent(Config.REGISTRATION_COMPLETE);
+        registrationComplete.putExtra("token", refreshedToken);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+
+    }
+
+    private void sendRegistrationToServer(final String token) {
+        Log.i(TAG, "sendRegistrationToServer: " + token);
+    }
+
+    private void storeRegIdInPref(String token) {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("regId", token);
+        editor.apply();
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

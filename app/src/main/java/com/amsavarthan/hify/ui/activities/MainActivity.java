@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             Log.i("Network reciever", "OnReceive");
             if (!"android.net.conn.CONNECTIVITY_CHANGE".equals(intent.getAction())) {
                 if (status != NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                    updateToken();
                     performUploadTask();
                     try {
                         Snackbar.make(findViewById(R.id.activity_main), "Syncing...", Snackbar.LENGTH_LONG).show();
@@ -348,6 +349,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             firebaseMessagingService();
             askPermission();
 
+            updateToken();
+
             userId = currentuser.getUid();
             storageReference = FirebaseStorage.getInstance().getReference().child("images").child(currentuser.getUid() + ".jpg");
 
@@ -414,6 +417,31 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             }
 
             setRecentsView();
+        }
+    }
+
+    private void updateToken() {
+
+        final String token_id = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE).getString("regId","");
+        Map<String, Object> tokenMap = new HashMap<>();
+        tokenMap.put("token_id", token_id);
+
+        if(isOnline()) {
+
+            firestore.collection("Users").document(currentuser.getUid()).update(tokenMap)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("TOKEN", token_id);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Error Token", e.getMessage());
+                        }
+                    });
+
         }
     }
 

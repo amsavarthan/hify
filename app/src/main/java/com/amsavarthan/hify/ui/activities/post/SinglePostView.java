@@ -10,25 +10,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter;
+import com.amsavarthan.hify.adapters.PostsAdapter_v19;
 import com.amsavarthan.hify.models.Post;
-import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +31,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class SinglePostView extends AppCompatActivity {
 
     private List<Post> mPostsList;
-    private PostsAdapter mAdapter;
+    private PostsAdapter_v19 mAdapter;
     private View statsheetView;
     private BottomSheetDialog mmBottomSheetDialog;
     private ProgressBar pbar;
@@ -95,9 +87,9 @@ public class SinglePostView extends AppCompatActivity {
             mPostsList = new ArrayList<>();
 
             if(forComment)
-                mAdapter = new PostsAdapter(mPostsList, this,this,mmBottomSheetDialog,statsheetView,true);
+                mAdapter = new PostsAdapter_v19(mPostsList, this,this,mmBottomSheetDialog,statsheetView,true);
             else
-                mAdapter = new PostsAdapter(mPostsList, this,this,mmBottomSheetDialog,statsheetView,false);
+                mAdapter = new PostsAdapter_v19(mPostsList, this,this,mmBottomSheetDialog,statsheetView,false);
 
 
             RecyclerView mRecyclerView=findViewById(R.id.recyclerView);

@@ -6,16 +6,13 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,13 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.adapters.PostsAdapter_v19;
 import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
-import com.amsavarthan.hify.feature_ai.fragment.MyQuestions;
-import com.amsavarthan.hify.models.Friends;
 import com.amsavarthan.hify.models.Post;
-import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.javiersantos.bottomdialogs.BottomDialog;
@@ -51,11 +44,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tylersuehr.esr.EmptyStateRecyclerView;
 import com.tylersuehr.esr.TextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -190,7 +180,6 @@ public class FriendProfile extends AppCompatActivity {
     public static class PostsFragment extends Fragment {
 
         List<Post> postList;
-        PostsAdapter mAdapter;
         PostsAdapter_v19 mAdapter_v19;
         private EmptyStateRecyclerView mRecyclerView;
         String id;
@@ -222,13 +211,13 @@ public class FriendProfile extends AppCompatActivity {
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
             postList=new ArrayList<>();
-            if(Build.VERSION.SDK_INT<=19){
+            //if(Build.VERSION.SDK_INT<=19){
                 mAdapter_v19=new PostsAdapter_v19(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
                 mRecyclerView.setAdapter(mAdapter_v19);
-            }else {
+            /*}else {
                 mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
                 mRecyclerView.setAdapter(mAdapter);
-            }
+            }*/
 
             mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
                     new TextStateDisplay(rootView.getContext(),"No posts found","User hasn't posted any posts yet"));
@@ -264,11 +253,7 @@ public class FriendProfile extends AppCompatActivity {
 
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
-                                    if(Build.VERSION.SDK_INT>19) {
-                                        mAdapter.notifyDataSetChanged();
-                                    }else{
-                                        mAdapter_v19.notifyDataSetChanged();
-                                    }
+                                    mAdapter_v19.notifyDataSetChanged();
                                     pbar.setVisibility(View.GONE);
 
                                 }

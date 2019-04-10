@@ -7,19 +7,18 @@
     android:background="#FFF"
     tools:ignore="MissingPrefix">
 
-    <com.tylersuehr.esr.EmptyStateRecyclerView
-        android:id="@+id/posts_recyclerview"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/pbar"
-        android:indeterminate="true"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_gravity="center"
-        android:layout_width="170dp"
-        android:layout_height="wrap_content" />
+        <com.tylersuehr.esr.EmptyStateRecyclerView
+            android:id="@+id/posts_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.v7.widget.CardView
         android:id="@+id/friend_req_alert"

@@ -26,6 +26,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.utils.AnimationUtil;
+import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.database.UserHelper;
 import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -118,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (task.getResult().getUser().isEmailVerified()) {
 
-                            final String token_id = FirebaseInstanceId.getInstance().getToken();
+                            final String token_id = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE).getString("regId","");
                             Log.i("TOKEN",token_id);
                             final String current_id = task.getResult().getUser().getUid();
 
