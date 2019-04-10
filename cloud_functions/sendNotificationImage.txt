@@ -49,7 +49,7 @@ exports.sendNotificationImage=functions.firestore.document("Users/{user_id}/Noti
           console.log("token_id: "+token_id+" | from: "+from_name+" | to:"+to_name+" | message:"+from_message+" | Sent a image");
 
           
-          if(!read){
+          if(read=="false"){
           
             return admin.messaging().sendToDevice(token_id,payload).then(result=>{
 

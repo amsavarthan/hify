@@ -6,13 +6,12 @@ package com.amsavarthan.hify.models;
 
 public class Message extends MessageId {
 
-    private String from, message,userimage,username,timestamp,notification_id,image;
-    private boolean read;
+    private String from,read, message,userimage,username,timestamp,notification_id,image;
     public Message() {
     }
 
 
-    public Message(String from, String message, String userimage, String username, String timestamp, String notification_id, String image, boolean read) {
+    public Message(String from, String message, String userimage, String username, String timestamp, String notification_id, String image, String read) {
         this.from = from;
         this.message = message;
         this.userimage = userimage;
@@ -79,11 +78,11 @@ public class Message extends MessageId {
         this.message = message;
     }
 
-    public boolean isRead() {
+    public String getRead() {
         return read;
     }
 
-    public void setRead(boolean read) {
+    public void setRead(String read) {
         this.read = read;
     }
 }

@@ -68,7 +68,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
     public void onBindViewHolder(@NonNull final MessageImageAdapter.ViewHolder holder, int position) {
 
         try {
-            if (messageList.get(position).isRead()) {
+            if (messageList.get(position).getRead()=="true") {
                 holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
                 holder.read_icon.setVisibility(View.VISIBLE);
                 holder.read_icon.setAlpha(0.0f);
@@ -118,13 +118,13 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
             public void onClick(View view) {
                 Intent intent=new Intent(context, NotificationImage.class);
                 intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
-                intent.putExtra("read", messageList.get(holder.getAdapterPosition()).isRead());
+                intent.putExtra("read", messageList.get(holder.getAdapterPosition()).getRead());
                 intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
                 intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
                 intent.putExtra("image", messageList.get(holder.getAdapterPosition()).getImage());
                 context.startActivity(intent);
 
-                messageList.get(holder.getAdapterPosition()).setRead(true);
+                messageList.get(holder.getAdapterPosition()).setRead("true");
                 holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
                 holder.read_icon.setVisibility(View.VISIBLE);
                 holder.read_icon.setAlpha(0.0f);

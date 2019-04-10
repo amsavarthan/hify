@@ -166,7 +166,7 @@ public class SendingActivity extends AppCompatActivity {
                 notificationMessage.put("from",current_id);
                 notificationMessage.put("notification_id", String.valueOf(System.currentTimeMillis()));
                 notificationMessage.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                notificationMessage.put("read",false);
+                notificationMessage.put("read","false");
 
                 mFirestore.collection("Users/"+user_id+"/Notifications").add(notificationMessage).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -219,7 +219,7 @@ public class SendingActivity extends AppCompatActivity {
                                     notificationMessage.put("from",current_id);
                                     notificationMessage.put("notification_id", String.valueOf(System.currentTimeMillis()));
                                     notificationMessage.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                                    notificationMessage.put("read",false);
+                                    notificationMessage.put("read","false");
 
                                     mFirestore.collection("Users/"+user_id+"/Notifications_image").add(notificationMessage).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override

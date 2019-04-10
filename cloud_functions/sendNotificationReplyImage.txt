@@ -51,7 +51,7 @@ exports.sendNotificationReplyImage=functions.firestore.document("Users/{user_id}
           console.log("token_id: "+token_id+" | from: "+from_name+" | to:"+to_name+" | message:"+from_message+" | reply for: "+from_reply);
 
            
-          if(!read){
+          if(read=="false"){
           
             return admin.messaging().sendToDevice(token_id,payload).then(result=>{
 

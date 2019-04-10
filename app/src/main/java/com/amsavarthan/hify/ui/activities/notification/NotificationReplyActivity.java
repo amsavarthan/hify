@@ -179,12 +179,12 @@ public class NotificationReplyActivity extends AppCompatActivity {
 
     private void updateReadStatus() {
 
-        boolean read=getIntent().getBooleanExtra("read",false);
-        if(!read){
+        String read=getIntent().getStringExtra("read");
+        if(read=="false"){
             Map<String,Object> readMap=new HashMap<>();
-            readMap.put("read",true);
+            readMap.put("read","true");
 
-            mFirestore.collection("Users/" + current_id + "/Notifications_reply")
+            mFirestore.collection("Users").document(current_id).collection("Notifications_reply")
                     .document(getIntent().getStringExtra("doc_id")).update(readMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
