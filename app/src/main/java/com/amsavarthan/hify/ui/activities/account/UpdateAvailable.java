@@ -38,8 +38,10 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class UpdateAvailable extends AppCompatActivity {
 
@@ -84,19 +86,22 @@ public class UpdateAvailable extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_update_available);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
+        setContentView(R.layout.activity_update_available);
 
         textview=findViewById(R.id.textView);
         button=findViewById(R.id.button);
@@ -162,7 +167,7 @@ public class UpdateAvailable extends AppCompatActivity {
                                     .withTitle("Storage permission")
                                     .withMessage("Storage permission is needed for downloading update.")
                                     .withButtonText(android.R.string.ok)
-                                    .withIcon(R.mipmap.logo)
+                                    .withIcon(R.mipmap.logo_hify)
                                     .build();
                         }
                     }

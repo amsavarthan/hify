@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
@@ -36,17 +37,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String TAG = LoginActivity.class.getSimpleName();
     public static Activity activity;
     private EditText email,password;
     private Button login,register;
@@ -62,19 +69,23 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
+        setContentView(R.layout.activity_login);
 
         activity = this;
         mAuth=FirebaseAuth.getInstance();
@@ -109,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         final String email_, pass_;
         email_ = email.getText().toString();
         pass_ = password.getText().toString();
+
         if (!TextUtils.isEmpty(email_) && !TextUtils.isEmpty(pass_)) {
             mDialog.show();
 
@@ -117,159 +129,97 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull final Task<AuthResult> task) {
                     if (task.isSuccessful()) {
 
+                        Log.i(TAG, "Login Successful, continue to email verified");
+
                         if (task.getResult().getUser().isEmailVerified()) {
 
-                            final String token_id = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE).getString("regId","");
-                            Log.i("TOKEN",token_id);
-                            final String current_id = task.getResult().getUser().getUid();
-
-                            mFirestore.collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            Log.i(TAG, "Email is verified Successful, continue to get token");
+                            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                                 @Override
-                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                    if(!override) {
-                                        if (documentSnapshot.getString("token_id").equals(token_id) || documentSnapshot.getString("token_id").equals("")) {
+                                public void onComplete(@NonNull Task<InstanceIdResult> taskInstanceToken) {
+                                    if (!taskInstanceToken.isSuccessful()) {
+                                        Log.w(TAG, "getInstanceId failed", taskInstanceToken.getException());
+                                        return;
+                                    }
 
-                                            Map<String, Object> tokenMap = new HashMap<>();
-                                            tokenMap.put("token_id", token_id);
+                                    // TODO Get new Instance ID token
+                                    final String token_id = taskInstanceToken.getResult().getToken();
 
-                                            mFirestore.collection("Users").document(current_id).update(tokenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
+                                    Log.i(TAG, "Get Token Listener, Token ID (token_id): " + token_id);
 
-                                                    FirebaseFirestore.getInstance().collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                        @Override
-                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    final String current_id = task.getResult().getUser().getUid();
 
-                                                            userHelper.insertContact(
-                                                                    documentSnapshot.getString("username")
-                                                                    , documentSnapshot.getString("name")
-                                                                    , documentSnapshot.getString("email")
-                                                                    , documentSnapshot.getString("image")
-                                                                    , pass_
-                                                                    , documentSnapshot.getString("location")
-                                                                    , documentSnapshot.getString("bio")
-                                                            );
 
-                                                            mDialog.dismiss();
-                                                            MainActivity.startActivity(LoginActivity.this);
-                                                            finish();
+                                    mFirestore.collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                // TODO How to update only one field that is list of string.
+                                                //https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
 
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error", ".." + e.getMessage());
-                                                        }
-                                                    });
+                                                final Map<String, Object> tokenMap = new HashMap<>();
+                                                tokenMap.put("token_ids", FieldValue.arrayUnion(token_id));
 
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    mDialog.dismiss();
-                                                    Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                        } else {
-                                            mDialog.dismiss();
-                                            new BottomDialog.Builder(LoginActivity.this)
-                                                    .setTitle("Information")
-                                                    .setContent("This account is being used in another device, please logout from that device and try again.")
-                                                    .setPositiveText("Ok")
-                                                    .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                                    .setNegativeText("Override")
-                                                    .setNegativeTextColor(Color.parseColor("#FF2525"))
-                                                    .setCancelable(true)
-                                                    .onPositive(new BottomDialog.ButtonCallback() {
-                                                        @Override
-                                                        public void onClick(@NonNull BottomDialog dialog) {
-                                                            dialog.dismiss();
-                                                        }
-                                                    })
-                                                    .onNegative(new BottomDialog.ButtonCallback() {
-                                                        @Override
-                                                        public void onClick(@NonNull BottomDialog bottomDialog) {
+                                                mFirestore.collection("Users")
+                                                        .document(current_id)
+                                                        .update(tokenMap)
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
 
-                                                            bottomDialog.dismiss();
-                                                            new MaterialDialog.Builder(LoginActivity.this)
-                                                                    .title("Just before you override")
-                                                                    .content("By clicking Proceed you are overriding the account in such a way that any messages sent to this account will be shown through notification only in this device.")
-                                                                    .positiveText("Proceed")
-                                                                    .negativeText("Cancel")
-                                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                                        @Override
-                                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                                FirebaseFirestore.getInstance().collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                                    @Override
+                                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                                                                            performLogin(true);
+                                                                        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE);
+                                                                        SharedPreferences.Editor editor = pref.edit();
+                                                                        editor.putString("regId", token_id);
+                                                                        editor.apply();
 
-                                                                        }
-                                                                    })
-                                                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                                                        @Override
-                                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                            dialog.dismiss();
-                                                                        }
-                                                                    }).show();
+                                                                        String username = documentSnapshot.getString("username");
+                                                                        String name = documentSnapshot.getString("name");
+                                                                        String email = documentSnapshot.getString("email");
+                                                                        String image = documentSnapshot.getString("image");
+                                                                        String password = pass_;
+                                                                        String location = documentSnapshot.getString("location");
+                                                                        String bio = documentSnapshot.getString("bio");
 
-                                                        }
-                                                    })
-                                                    .show();
+                                                                        userHelper.insertContact(username, name, email, image, password, location, bio);
 
-                                            if (mAuth.getCurrentUser() != null) {
-                                                mAuth.signOut();
-                                            }
+                                                                        mDialog.dismiss();
+                                                                        MainActivity.startActivity(LoginActivity.this);
+                                                                        finish();
 
-                                        }
-                                    }else{
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Log.e("Error", ".." + e.getMessage());
+                                                                        mDialog.dismiss();
+                                                                    }
+                                                                });
 
-                                        Map<String, Object> tokenMap = new HashMap<>();
-                                        tokenMap.put("token_id", token_id);
-
-                                        mFirestore.collection("Users").document(current_id).update(tokenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-
-                                                FirebaseFirestore.getInstance().collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                                                        userHelper.insertContact(
-                                                                documentSnapshot.getString("username")
-                                                                , documentSnapshot.getString("name")
-                                                                , documentSnapshot.getString("email")
-                                                                , documentSnapshot.getString("image")
-                                                                , pass_
-                                                                , documentSnapshot.getString("location")
-                                                                , documentSnapshot.getString("bio")
-                                                        );
-
-                                                        mDialog.dismiss();
-                                                        MainActivity.startActivity(LoginActivity.this);
-                                                        finish();
-
-                                                    }
-                                                }).addOnFailureListener(new OnFailureListener() {
+                                                            }
+                                                        }).addOnFailureListener(new OnFailureListener() {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
-                                                        Log.e("Error", ".." + e.getMessage());
+                                                        mDialog.dismiss();
+                                                        Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
 
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                mDialog.dismiss();
-                                                Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
+                                        }
 
-                                    }
+
+                                    });
+
                                 }
+
                             });
 
 
-                        } else{
+                        }
+
+                        else{
 
                             mDialog.dismiss();
                             new BottomDialog.Builder(LoginActivity.this)
@@ -281,22 +231,22 @@ public class LoginActivity extends AppCompatActivity {
                                     .onPositive(new BottomDialog.ButtonCallback() {
                                         @Override
                                         public void onClick(@NonNull final BottomDialog dialog) {
-                                          task.getResult()
-                                                  .getUser()
-                                                  .sendEmailVerification()
-                                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                      @Override
-                                                      public void onSuccess(Void aVoid) {
-                                                          dialog.dismiss();
-                                                          Toast.makeText(LoginActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
-                                                      }
-                                                  })
-                                                  .addOnFailureListener(new OnFailureListener() {
-                                                      @Override
-                                                      public void onFailure(@NonNull Exception e) {
-                                                          Log.e("Error",e.getMessage());
-                                                      }
-                                                  });
+                                            task.getResult()
+                                                    .getUser()
+                                                    .sendEmailVerification()
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            dialog.dismiss();
+                                                            Toast.makeText(LoginActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.e("Error",e.getMessage());
+                                                        }
+                                                    });
                                         }
                                     })
                                     .setNegativeText("Ok")
@@ -346,6 +296,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
+
 
     @Override
     public void finish() {

@@ -1,5 +1,6 @@
 package com.amsavarthan.hify.ui.activities.account;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -30,23 +31,34 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
+
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -60,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
     private CircleImageView profile_image;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
+    private static final String TAG = RegisterActivity.class.getSimpleName();
 
     public static void startActivity(Activity activity, Context context, View view) {
         Intent intent = new Intent(context, RegisterActivity.class);
@@ -69,19 +82,50 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
+    }
+
+
+    private void askPermission() {
+
+        Dexter.withActivity(this)
+                .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if(report.isAnyPermissionPermanentlyDenied()){
+                            Toast.makeText(RegisterActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+
+                    }
+                }).check();
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
         setContentView(R.layout.activity_register);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+        askPermission();
 
         mAuth=FirebaseAuth.getInstance();
         storageReference= FirebaseStorage.getInstance().getReference().child("images");
@@ -241,43 +285,45 @@ public class RegisterActivity extends AppCompatActivity {
                                                         public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
                                                             if (task.isSuccessful()) {
 
-                                                               user_profile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                                   @Override
-                                                                   public void onSuccess(Uri uri) {
+                                                                user_profile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                    @Override
+                                                                    public void onSuccess(final Uri uri) {
 
-                                                                       String token_id = FirebaseInstanceId.getInstance().getToken();
+                                                                        // TODO https://firebase.google.com/docs/cloud-messaging/android/client#retrieve-the-current-registration-token.
 
-                                                                       Map<String, Object> userMap = new HashMap<>();
-                                                                       userMap.put("id", userUid);
-                                                                       userMap.put("name", name_);
-                                                                       userMap.put("image", uri.toString());
-                                                                       userMap.put("email", email_);
-                                                                       userMap.put("bio",getString(R.string.default_bio));
-                                                                       userMap.put("username", username_);
-                                                                       userMap.put("location", location_);
-                                                                       userMap.put("token_id", "");
+                                                                        Map<String, Object> userMap = new HashMap<>();
+                                                                        userMap.put("id", userUid);
+                                                                        userMap.put("name", name_);
+                                                                        userMap.put("image", uri.toString());
+                                                                        userMap.put("email", email_);
+                                                                        userMap.put("bio",getString(R.string.default_bio));
+                                                                        userMap.put("username", username_);
+                                                                        userMap.put("location", location_);
 
-                                                                       firebaseFirestore.collection("Users").document(userUid).set(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                           @Override
-                                                                           public void onSuccess(Void aVoid) {
-                                                                               mDialog.dismiss();
-                                                                               Toast.makeText(RegisterActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
-                                                                               finish();
-                                                                           }
-                                                                       }).addOnFailureListener(new OnFailureListener() {
-                                                                           @Override
-                                                                           public void onFailure(@NonNull Exception e) {
-                                                                               mDialog.dismiss();
-                                                                               Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                                           }
-                                                                       });
+                                                                        firebaseFirestore.collection("Users").document(userUid).set(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
 
-                                                                   }
-                                                               }).addOnFailureListener(new OnFailureListener() {
-                                                                           @Override
-                                                                           public void onFailure(@NonNull Exception e) {
-                                                                               mDialog.dismiss();
-                                                                           }
+                                                                                mDialog.dismiss();
+                                                                                Toast.makeText(RegisterActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                                                                                finish();
+
+                                                                            }
+                                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                mDialog.dismiss();
+                                                                                Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+
+
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        mDialog.dismiss();
+                                                                    }
                                                                 });
 
 
@@ -328,7 +374,7 @@ public class RegisterActivity extends AppCompatActivity {
                 options.setCompressionQuality(100);
                 options.setShowCropGrid(true);
 
-                UCrop.of(imageUri, Uri.fromFile(new File(getCacheDir(), "hify_user_profile_picture.png")))
+                UCrop.of(imageUri, Uri.fromFile(new File(getCacheDir(), "sparks_user_profile_picture.png")))
                         .withAspectRatio(1, 1)
                         .withOptions(options)
                         .start(this);

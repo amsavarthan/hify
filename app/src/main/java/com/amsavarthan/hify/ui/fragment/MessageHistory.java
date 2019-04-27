@@ -4,9 +4,11 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,9 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +58,15 @@ public class MessageHistory extends Fragment {
     private MessageTextReplyAdapter messageTextReplyAdapter;
     private FirebaseFirestore mFirestore;
     private FirebaseAuth mAuth;
-    private EmptyStateRecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private TextView tab_1,tab_2,tab_3,tab_4;
-    private ProgressBar pbar;
+    private SwipeRefreshLayout refreshLayout;
+    private String selected;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.send_message_fragment, container, false);
+        mView = inflater.inflate(R.layout.fragment_messages_history, container, false);
         return mView;
     }
 
@@ -83,85 +84,104 @@ public class MessageHistory extends Fragment {
         messageTextReplyAdapter=new MessageTextReplyAdapter(messageReplies,mView.getContext());
 
         mRecyclerView = mView.findViewById(R.id.messageList);
-        pbar=mView.findViewById(R.id.pbar);
         tab_1=mView.findViewById(R.id.text);
         tab_2=mView.findViewById(R.id.text_reply);
         tab_3=mView.findViewById(R.id.image);
         tab_4=mView.findViewById(R.id.image_reply);
+        refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
+        selected="null";
 
         tab_1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messages.clear();
-                pbar.setVisibility(View.VISIBLE);
-                mRecyclerView.setAdapter(messageTextAdapter);
-                mRecyclerView.clearStateDisplays();
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                if(!selected.equals("text")) {
+                    messages.clear();
+                    messageTextAdapter.notifyDataSetChanged();
+                    mRecyclerView.setAdapter(messageTextAdapter);
+                    getTextMessage();
 
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"No messages found",""));
-
-                getTextMessage();
+                    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            messages.clear();
+                            messageTextAdapter.notifyDataSetChanged();
+                            getTextMessage();
+                        }
+                    });
+                    selected="text";
+                }
             }
         });
 
         tab_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messageReplies.clear();
-                pbar.setVisibility(View.VISIBLE);
-                mRecyclerView.setAdapter(messageTextReplyAdapter);
-                mRecyclerView.clearStateDisplays();
+                if(!selected.equals("reply")) {
+                    messageReplies.clear();
+                    messageTextReplyAdapter.notifyDataSetChanged();
+                    mRecyclerView.setAdapter(messageTextReplyAdapter);
+                    getTextReplyMessage();
 
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            messageReplies.clear();
+                            messageTextReplyAdapter.notifyDataSetChanged();
+                            getTextReplyMessage();
+                        }
+                    });
+                    selected="reply";
+                }
 
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"No messages found",""));
-
-                getTextReplyMessage();
             }
         });
 
         tab_3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messages.clear();
-                pbar.setVisibility(View.VISIBLE);
-                mRecyclerView.setAdapter(messageImageAdapter);
-                mRecyclerView.clearStateDisplays();
+                if(!selected.equals("image")) {
+                    messages.clear();
+                    messageImageAdapter.notifyDataSetChanged();
+                    mRecyclerView.setAdapter(messageImageAdapter);
+                    getImageMessage();
 
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"No messages found",""));
-
-                getImageMessage();
+                    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            messages.clear();
+                            messageImageAdapter.notifyDataSetChanged();
+                            getImageMessage();
+                        }
+                    });
+                    selected="image";
+                }
             }
         });
 
         tab_4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                messageReplies.clear();
-                pbar.setVisibility(View.VISIBLE);
-                mRecyclerView.setAdapter(messageImageReplyAdapter);
-                mRecyclerView.clearStateDisplays();
+                if(!selected.equals("img_reply")) {
+                    messageReplies.clear();
+                    messageImageReplyAdapter.notifyDataSetChanged();
+                    mRecyclerView.setAdapter(messageImageReplyAdapter);
+                    getImageReplyMessage();
 
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-                mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                        new TextStateDisplay(view.getContext(),"No messages found",""));
-
-                getImageReplyMessage();
+                    refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            messageReplies.clear();
+                            messageImageReplyAdapter.notifyDataSetChanged();
+                            getImageReplyMessage();
+                        }
+                    });
+                    selected="img_reply";
+                }
             }
         });
 
@@ -171,6 +191,8 @@ public class MessageHistory extends Fragment {
 
     public void getTextMessage(){
 
+        refreshLayout.setRefreshing(true);
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications")
@@ -180,30 +202,35 @@ public class MessageHistory extends Fragment {
                     public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
 
                         if(e!=null){
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                            refreshLayout.setRefreshing(false);
+                            Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                             Log.w("error","listen",e);
                             return;
                         }
 
                         if(!queryDocumentSnapshots.isEmpty()){
 
-                            for(DocumentChange doc:queryDocumentSnapshots.getDocumentChanges()){
+                            for(DocumentChange doc:queryDocumentSnapshots.getDocumentChanges()) {
 
-                                if(doc.getType()== DocumentChange.Type.ADDED){
+                                if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                    Message message=doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
+                                    Message message = doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
                                     messages.add(message);
                                     messageTextAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(GONE);
+                                    refreshLayout.setRefreshing(false);
 
                                 }
 
+                            }
 
+                            if(messages.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
-                            pbar.setVisibility(GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -213,19 +240,16 @@ public class MessageHistory extends Fragment {
 
     public void getTextReplyMessage(){
 
+        refreshLayout.setRefreshing(true);
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-
-                        if(e!=null){
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                            Log.w("error","listen",e);
-                            return;
-                        }
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         if(!queryDocumentSnapshots.isEmpty()){
 
@@ -236,19 +260,31 @@ public class MessageHistory extends Fragment {
                                     MessageReply messageReply=doc.getDocument().toObject(MessageReply.class).withId(doc.getDocument().getId());
                                     messageReplies.add(messageReply);
                                     messageTextReplyAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(GONE);
-
+                                    refreshLayout.setRefreshing(false);
                                 }
 
 
                             }
 
+                            if(messageReplies.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
+
                         }else {
-                            pbar.setVisibility(GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
 
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("error","listen",e);
                     }
                 });
 
@@ -256,41 +292,47 @@ public class MessageHistory extends Fragment {
 
     public void getImageMessage(){
 
+        refreshLayout.setRefreshing(true);
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_image")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-
-                        if(e!=null){
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                            Log.w("error","listen",e);
-                            return;
-                        }
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         if(!queryDocumentSnapshots.isEmpty()){
 
                             for(DocumentChange doc:queryDocumentSnapshots.getDocumentChanges()){
 
-                                if(doc.getType()== DocumentChange.Type.ADDED){
+                                if(doc.getType()== DocumentChange.Type.ADDED) {
 
-                                    Message message=doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
+                                    Message message = doc.getDocument().toObject(Message.class).withId(doc.getDocument().getId());
                                     messages.add(message);
                                     messageImageAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(GONE);
+                                    refreshLayout.setRefreshing(false);
                                 }
 
-
+                            }
+                            if(messages.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
-                            pbar.setVisibility(GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
-
-
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("error","listen",e);
                     }
                 });
 
@@ -298,19 +340,16 @@ public class MessageHistory extends Fragment {
 
     public void getImageReplyMessage(){
 
+        refreshLayout.setRefreshing(true);
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply_image")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-
-                        if(e!=null){
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                            Log.w("error","listen",e);
-                            return;
-                        }
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         if(!queryDocumentSnapshots.isEmpty()){
 
@@ -321,21 +360,33 @@ public class MessageHistory extends Fragment {
                                     MessageReply messageReply=doc.getDocument().toObject(MessageReply.class).withId(doc.getDocument().getId());
                                     messageReplies.add(messageReply);
                                     messageImageReplyAdapter.notifyDataSetChanged();
-
+                                    refreshLayout.setRefreshing(false);
                                 }
 
 
                             }
+                            if(messageReplies.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
 
                         }else {
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
-                            pbar.setVisibility(GONE);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("error","listen",e);
 
                     }
                 });
-
 
     }
 

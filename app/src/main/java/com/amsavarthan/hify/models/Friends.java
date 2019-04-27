@@ -1,31 +1,26 @@
 package com.amsavarthan.hify.models;
 
+import java.util.List;
+
 /**
  * Created by amsavarthan on 22/2/18.
  */
 
 public class Friends extends UserId {
 
-    private String name,username, image, email, token_id;
+    private String name,username, image, email;
+    private List<String> token_ids;
 
     public Friends() {
 
     }
 
-    public Friends(String name, String username, String image, String email, String token_id) {
+    public Friends(String name, String username, String image, String email, List<String> token_ids) {
         this.name = name;
         this.username = username;
         this.image = image;
         this.email = email;
-        this.token_id = token_id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        this.token_ids = token_ids;
     }
 
     public String getName() {
@@ -34,6 +29,14 @@ public class Friends extends UserId {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getImage() {
@@ -52,11 +55,12 @@ public class Friends extends UserId {
         this.email = email;
     }
 
-    public String getToken_id() {
-        return token_id;
+    public List<String> getToken_ids() {
+        return token_ids;
     }
 
-    public void setToken_id(String token_id) {
-        this.token_id = token_id;
+    public void setToken_ids(List<String> token_ids) {
+        this.token_ids = token_ids;
     }
+
 }

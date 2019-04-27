@@ -10,17 +10,18 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.app.Fragment;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +38,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter_v19;
+import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
@@ -61,8 +63,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -154,11 +154,14 @@ public class ProfileFragment extends Fragment {
     public static class PostsFragment extends Fragment {
 
         List<Post> postList;
-        private EmptyStateRecyclerView mRecyclerView;
+        private RecyclerView mRecyclerView;
         private View statsheetView;
+        private SwipeRefreshLayout refreshLayout;
+        private TextView title,text;
         private BottomSheetDialog mmBottomSheetDialog;
-        private ProgressBar pbar;
-        private PostsAdapter_v19 mAdapter_v19;
+        private PostsAdapter mAdapter_v19;
+        private ImageView image;
+        private View rootView;
 
         public PostsFragment() {
         }
@@ -166,44 +169,57 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            return rootView;
+        }
+
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
 
             statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
             mmBottomSheetDialog.setContentView(statsheetView);
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
-            pbar=rootView.findViewById(R.id.pbar);
+            refreshLayout=rootView.findViewById(R.id.refreshLayout);
 
             postList=new ArrayList<>();
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new TextStateDisplay(rootView.getContext(),"No posts found","Add some posts to see them here."));
+            title=rootView.findViewById(R.id.default_title);
+            text=rootView.findViewById(R.id.default_text);
+            image=rootView.findViewById(R.id.imageview);
 
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
+            image.setImageDrawable(getResources().getDrawable(R.drawable.ic_photo_camera_black_24dp));
+            title.setText("No posts found");
+            text.setText("Add some posts to see them here");
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
-            /*if(Build.VERSION.SDK_INT>19) {
-                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-                mRecyclerView.setAdapter(mAdapter);
-            }else{*/
-                mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-                mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
-                mRecyclerView.setAdapter(mAdapter_v19);
-            //}
-            pbar.setVisibility(View.VISIBLE);
-           getPosts();
 
-            return rootView;
+            mAdapter_v19 = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+            mRecyclerView.setAdapter(mAdapter_v19);
+
+            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    postList.clear();
+                    mAdapter_v19.notifyDataSetChanged();
+                    getPosts();
+                }
+            });
+            getPosts();
+
         }
 
         private void getPosts() {
 
+            refreshLayout.setRefreshing(true);
+            rootView.findViewById(R.id.default_item).setVisibility(View.GONE);
             FirebaseFirestore.getInstance().collection("Posts")
                     .whereEqualTo("userId",FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -218,13 +234,17 @@ public class ProfileFragment extends Fragment {
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
                                     mAdapter_v19.notifyDataSetChanged();
-                                    pbar.setVisibility(View.GONE);
+                                    refreshLayout.setRefreshing(false);
                                 }
 
+                                if(postList.isEmpty()){
+                                    refreshLayout.setRefreshing(false);
+                                    rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                }
 
                             }else{
-                                pbar.setVisibility(View.GONE);
-                                mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                refreshLayout.setRefreshing(false);
+                                rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }
@@ -232,8 +252,8 @@ public class ProfileFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            pbar.setVisibility(View.GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                            refreshLayout.setRefreshing(false);
+                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -245,11 +265,14 @@ public class ProfileFragment extends Fragment {
     public static class SavedFragment extends Fragment {
 
         List<Post> postList;
-        private EmptyStateRecyclerView mRecyclerView;
+        private RecyclerView mRecyclerView;
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
-        private ProgressBar pbar;
-        private PostsAdapter_v19 mAdapter_v19;
+        private SwipeRefreshLayout refreshLayout;
+        private PostsAdapter mAdapter_v19;
+        private ImageView image;
+        private TextView title,text;
+        private View rootView;
 
         public SavedFragment() {
         }
@@ -257,7 +280,13 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            return rootView;
+        }
+
+        @Override
+        public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
 
             postList=new ArrayList<>();
 
@@ -265,35 +294,44 @@ public class ProfileFragment extends Fragment {
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
             mmBottomSheetDialog.setContentView(statsheetView);
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
-            pbar=rootView.findViewById(R.id.pbar);
+            refreshLayout=rootView.findViewById(R.id.refreshLayout);
+
+            title=rootView.findViewById(R.id.default_title);
+            text=rootView.findViewById(R.id.default_text);
+            image=rootView.findViewById(R.id.imageview);
+
+            image.setImageDrawable(getResources().getDrawable(R.drawable.ic_bookmark_black_24dp));
+            title.setText("No saved posts found");
+            text.setText("All your saved posts appear here");
 
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
 
-            /*if(Build.VERSION.SDK_INT>19) {
-                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-                mRecyclerView.setAdapter(mAdapter);
-            }else{*/
-                mAdapter_v19 = new PostsAdapter_v19(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-                mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
-                mRecyclerView.setAdapter(mAdapter_v19);
-            //}
+            mAdapter_v19 = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
+            mRecyclerView.setAdapter(mAdapter_v19);
 
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new TextStateDisplay(rootView.getContext(),"No saved posts found","All your saved posts appear here."));
+            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
 
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
+                    postList.clear();
+                    mAdapter_v19.notifyDataSetChanged();
+                    getPosts();
 
-            pbar.setVisibility(View.VISIBLE);
+                }
+            });
+
             getPosts();
 
-            return rootView;
         }
 
         private void getPosts() {
+
+            rootView.findViewById(R.id.default_item).setVisibility(View.GONE);
+            refreshLayout.setRefreshing(true);
 
             FirebaseFirestore.getInstance().collection("Users")
                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -317,8 +355,7 @@ public class ProfileFragment extends Fragment {
                                                         Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                                         postList.add(post);
                                                         mAdapter_v19.notifyDataSetChanged();
-
-                                                        pbar.setVisibility(View.GONE);
+                                                        refreshLayout.setRefreshing(false);
                                                     }else{
                                                         FirebaseFirestore.getInstance().collection("Users")
                                                                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -328,12 +365,18 @@ public class ProfileFragment extends Fragment {
                                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                     @Override
                                                                     public void onSuccess(Void aVoid) {
+                                                                        refreshLayout.setRefreshing(false);
+                                                                        if(postList.isEmpty()) {
+                                                                            rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                                                        }
                                                                         Log.e("Saved_users","Post not available");
                                                                     }
                                                                 })
                                                                 .addOnFailureListener(new OnFailureListener() {
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
+                                                                        refreshLayout.setRefreshing(false);
+                                                                        Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                                                                         Log.e("Error",e.getMessage());
                                                                     }
                                                                 });
@@ -343,16 +386,16 @@ public class ProfileFragment extends Fragment {
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    pbar.setVisibility(View.GONE);
-                                                    mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                                                    refreshLayout.setRefreshing(false);
+                                                    Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                                                     Log.e("Error",e.getMessage());
                                                 }
                                             });
 
                                 }
                             }else{
-                                pbar.setVisibility(View.GONE);
-                                mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                refreshLayout.setRefreshing(false);
+                                rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }
@@ -360,8 +403,8 @@ public class ProfileFragment extends Fragment {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            pbar.setVisibility(View.GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                            refreshLayout.setRefreshing(false);
+                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                             Log.e("Error",e.getMessage());
                         }
                     });

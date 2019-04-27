@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,9 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +48,8 @@ public class Friends extends Fragment {
     private ViewFriendAdapter usersAdapter;
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
-    private EmptyStateRecyclerView mRecyclerView;
-    private ProgressBar pbar;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout refreshLayout;
 
     @Nullable
     @Override
@@ -61,6 +60,10 @@ public class Friends extends Fragment {
 
     public void startListening() {
         usersList.clear();
+        usersAdapter.notifyDataSetChanged();
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        refreshLayout.setRefreshing(true);
+
         firestore.collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("Friends")
@@ -76,12 +79,18 @@ public class Friends extends Fragment {
                                     ViewFriends users = doc.getDocument().toObject(ViewFriends.class);
                                     usersList.add(users);
                                     usersAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(View.GONE);
+                                    refreshLayout.setRefreshing(false);
                                 }
                             }
+
+                            if(usersList.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
+
                         }else{
-                            pbar.setVisibility(View.GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -90,8 +99,8 @@ public class Friends extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        pbar.setVisibility(View.GONE);
-                        mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                         Log.w("Error", "listen:error", e);
 
                     }
@@ -107,7 +116,7 @@ public class Friends extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView =  mView.findViewById(R.id.recyclerView);
-        pbar=mView.findViewById(R.id.pbar);
+        refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         usersList = new ArrayList<>();
         usersAdapter = new ViewFriendAdapter(usersList, view.getContext());
@@ -130,13 +139,13 @@ public class Friends extends Fragment {
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(usersAdapter);
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No friends found","Add some friends to manage them here."));
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startListening();
+            }
+        });
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-        pbar.setVisibility(View.VISIBLE);
         startListening();
 
     }

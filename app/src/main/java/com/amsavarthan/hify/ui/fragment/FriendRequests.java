@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,8 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,47 +44,59 @@ public class FriendRequests extends Fragment {
     private FriendRequestAdapter requestAdapter;
     private FirebaseFirestore mFirestore;
     private FirebaseAuth mAuth;
-    private Query mRequestQuery;
-    private EmptyStateRecyclerView mRequestView;
-    private ProgressBar pbar;
+    private RecyclerView mRequestView;
+    private SwipeRefreshLayout refreshLayout;
 
     public void getUsers() {
         requestList.clear();
+        requestAdapter.notifyDataSetChanged();
+
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        refreshLayout.setRefreshing(true);
 
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Friend_Requests")
-                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-
-                        if(e!=null){
-                            pbar.setVisibility(View.GONE);
-                            mRequestView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                            Log.w("Error", "listen:error", e);
-                        }
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
                         if(!queryDocumentSnapshots.isEmpty()) {
 
                             for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
 
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
-
                                     FriendRequest friendRequest = doc.getDocument().toObject(FriendRequest.class).withId(doc.getDocument().getId());
                                     requestList.add(friendRequest);
                                     requestAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(View.GONE);
+                                    refreshLayout.setRefreshing(false);
                                 }
 
                             }
+
+                            if(requestList.isEmpty()) {
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
+
                         }else{
-                            pbar.setVisibility(View.GONE);
-                            mRequestView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
-                });
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("Error", "listen:error", e);
+
+                    }
+                });
     }
 
     @Nullable
@@ -102,7 +114,7 @@ public class FriendRequests extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRequestView = mView.findViewById(R.id.recyclerView);
-        pbar=mView.findViewById(R.id.pbar);
+        refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         requestList = new ArrayList<>();
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
@@ -113,16 +125,13 @@ public class FriendRequests extends Fragment {
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);
 
-        mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No friend requests","People who have sent you friend request will be shown here."));
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getUsers();
+            }
+        });
 
-        mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
-                new TextStateDisplay(view.getContext(),"There are some friend request","We are getting information of those users.."));
-
-        mRequestView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-        pbar.setVisibility(View.VISIBLE);
         getUsers();
 
     }

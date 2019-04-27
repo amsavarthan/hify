@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
@@ -19,12 +21,14 @@ import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
 import com.amsavarthan.hify.ui.activities.notification.NotificationReplyActivity;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
+import com.amsavarthan.hify.ui.activities.post.SinglePostView;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.NotificationUtil;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -36,22 +40,27 @@ public class FCMService extends FirebaseMessagingService {
     private static final String TAG = FCMService.class.getSimpleName();
 
     private NotificationUtil notificationUtils;
-    private String cDesc;
+
 
     @Override
-    public void onNewToken(String refreshedToken) {
-        super.onNewToken(refreshedToken);
-        storeRegIdInPref(refreshedToken);
-        sendRegistrationToServer(refreshedToken);
+    public void onNewToken(String token) {
+        super.onNewToken(token);
+        Log.d("NEW_TOKEN",token);
+
+        //String refreshedToken = FirebaseInstanceId.getInstance().getToken(); // Deprecated
+        storeRegIdInPref(token);
+        sendRegistrationToServer(token);
 
         Intent registrationComplete = new Intent(Config.REGISTRATION_COMPLETE);
-        registrationComplete.putExtra("token", refreshedToken);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+        registrationComplete.putExtra("token", token);
 
+        // TODO Need to get array list from shared preferences and add token to list of tokens?
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
+
     private void sendRegistrationToServer(final String token) {
-        Log.i(TAG, "sendRegistrationToServer: " + token);
+        Log.i(TAG, "sendRegistrationToServer:" + token);
     }
 
     private void storeRegIdInPref(String token) {
@@ -68,51 +77,56 @@ public class FCMService extends FirebaseMessagingService {
 
     private void handleDataMessage(RemoteMessage remoteMessage) {
 
-        final String title = remoteMessage.getData().get("title");
-        final String body = remoteMessage.getData().get("body");
-        String click_action = remoteMessage.getData().get("click_action");
-        String message = remoteMessage.getData().get("message");
-        String from_name = remoteMessage.getData().get("from_name");
-        String from_image = remoteMessage.getData().get("from_image");
-        String from_id = remoteMessage.getData().get("from_id");
+
+        //Map<String, String> Friend_tokens = remoteMessage.getData("friend_tokesn");
+        final Map<String, String> data = remoteMessage.getData();
+
+        final String title    = remoteMessage.getData().get("title");
+        final String body     = remoteMessage.getData().get("body");
+        String click_action   = remoteMessage.getData().get("click_action");
+        String message        = remoteMessage.getData().get("message");
+        String from_name      = remoteMessage.getData().get("from_name");
+        String from_image     = remoteMessage.getData().get("from_image");
+        String from_id        = remoteMessage.getData().get("from_id");
         final String imageUrl = remoteMessage.getData().get("image");
-        String reply_for = remoteMessage.getData().get("reply_for");
-        long id = System.currentTimeMillis();
-        String timeStamp = String.valueOf(remoteMessage.getData().get("timestamp"));
+        String reply_for      = remoteMessage.getData().get("reply_for");
+        long id               = System.currentTimeMillis();
+        String timeStamp      = String.valueOf(remoteMessage.getData().get("timestamp"));
 
         //Friend Request Message data
-        String friend_id = remoteMessage.getData().get("friend_id");
-        String friend_name = remoteMessage.getData().get("friend_name");
+        String friend_id    = remoteMessage.getData().get("friend_id");
+        String friend_name  = remoteMessage.getData().get("friend_name");
         String friend_email = remoteMessage.getData().get("friend_email");
         String friend_image = remoteMessage.getData().get("friend_image");
-        String friend_token = remoteMessage.getData().get("friend_token");
+
+        //String friend_tokens = remoteMessage.getData().get("friend_tokens");
 
         //CommentData and Like Data
-        String post_id=remoteMessage.getData().get("post_id");
-        String admin_id=remoteMessage.getData().get("admin_id");
-        String post_desc=remoteMessage.getData().get("post_desc");
-        String channel=remoteMessage.getData().get("channel");
+        String post_id   = remoteMessage.getData().get("post_id");
+        String admin_id  = remoteMessage.getData().get("admin_id");
+        String post_desc = remoteMessage.getData().get("post_desc");
+        String channel   = remoteMessage.getData().get("channel");
 
         //UpdateData
-        String version=remoteMessage.getData().get("version");
-        String improvements=remoteMessage.getData().get("improvements");
-        String link=remoteMessage.getData().get("link");
+        String version      = remoteMessage.getData().get("version");
+        String improvements = remoteMessage.getData().get("improvements");
+        String link         = remoteMessage.getData().get("link");
 
         String question_id=remoteMessage.getData().get("question_id");
-		boolean read= Boolean.parseBoolean(remoteMessage.getData().get("read"));
-		String doc_id=remoteMessage.getData().get("doc_id");
-
-        //Festival
-        String festival_name=remoteMessage.getData().get("festival_name");
-        String festival_text=remoteMessage.getData().get("festival_text");
-        String send_text=remoteMessage.getData().get("send_text");
-        String dev_id=remoteMessage.getData().get("dev_id");
-        String reason=remoteMessage.getData().get("reason");
 
         final Intent resultIntent;
 
         switch (click_action) {
             case "com.amsavarthan.hify.TARGETNOTIFICATION":
+
+                if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+                    // do stuff that is allowed on main thread
+                    Toast.makeText(getApplicationContext(),"New Message Ready",Toast.LENGTH_LONG).show(); // MainActivity.context
+                    Log.d("onMessageReceived", "onMessageReceived: " + click_action);
+                    //MainActivity.setChatUnreadCount(MainActivity.chatUnreadCount++);
+                } else {
+                    // do stuff that is allowed on background thread
+                }
 
                 resultIntent = new Intent(getApplicationContext(), NotificationActivity.class);
 
@@ -134,22 +148,38 @@ public class FCMService extends FirebaseMessagingService {
                 break;
             case "com.amsavarthan.hify.TARGET_FRIENDREQUEST":
 
+                Log.d("TARGET_FRIENDREQUEST", "onMessageReceived: " + click_action);
+                //MainActivity.setManageFriendsUnreadCount(MainActivity.manageFriendsUnreadCount++);
                 resultIntent = new Intent(getApplicationContext(), FriendProfile.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_ACCEPTED":
 
+                Log.d("TARGET_ACCEPTED", "onMessageReceived: " + click_action);
+                //MainActivity.setManageFriendsUnreadCount(MainActivity.manageFriendsUnreadCount++);
                 resultIntent = new Intent(getApplicationContext(), FriendProfile.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_DECLINED":
 
+                Log.d("TARGET_DECLINED", "onMessageReceived: " + click_action);
                 resultIntent = new Intent(getApplicationContext(), FriendProfile.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_COMMENT":
 
-                resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forComment");
+                if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+                    // do stuff that is allowed on main thread
+                    Toast.makeText(getApplicationContext(),"New Message Ready",Toast.LENGTH_LONG).show(); // MainActivity.context
+                }
+                else {
+                    // do stuff that is allowed on background thread
+                }
+
+                //MainActivity.setDashboardUnreadCount(MainActivity.dashboardUnreadCount++);
+                Log.d("TARGET_COMMENT", "onMessageReceived: " + click_action);
+                //TODO B4 resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forComment"); // WHY EVEN DO THIS?
+                resultIntent = new Intent(getApplicationContext(), CommentsActivity.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_UPDATE":
@@ -159,16 +189,17 @@ public class FCMService extends FirebaseMessagingService {
                 break;
             case "com.amsavarthan.hify.TARGET_LIKE":
 
-                resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forLike");
+                Log.d("TARGET_LIKE", "onMessageReceived: " + click_action);
+                //TODO B4 resultIntent = new Intent(getApplicationContext(), MainActivity.class).putExtra("openFragment","forLike"); // WHY EVEN DO THIS?
+                resultIntent = new Intent(getApplicationContext(), SinglePostView.class);
 
                 break;
             case "com.amsavarthan.hify.TARGET_FORUM":
 
+                Log.d("TARGET_FORUM", "onMessageReceived: " + click_action);
+                //MainActivity.setForumUnreadCount(MainActivity.forumUnreadCount++);
                 resultIntent = new Intent(getApplicationContext(), AnswersActivity.class);
-                break;
-            case "com.amsavarthan.hify.TARGET_FESTIVAL":
 
-                resultIntent = new Intent(getApplicationContext(), FestivalActivity.class);
                 break;
             default:
 
@@ -193,7 +224,7 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("f_name", friend_name);
         resultIntent.putExtra("f_email", friend_email);
         resultIntent.putExtra("f_image", friend_image);
-        resultIntent.putExtra("f_token", friend_token);
+        //resultIntent.putExtra("f_token", friend_token);
 
         resultIntent.putExtra("user_id", admin_id);
         resultIntent.putExtra("post_id", post_id);
@@ -205,45 +236,60 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("link", link);
 
         resultIntent.putExtra("question_id",question_id);
-        resultIntent.putExtra("read",read);
-        resultIntent.putExtra("doc_id",doc_id);
 
-        resultIntent.putExtra("festival_name",festival_name);
-        resultIntent.putExtra("festival_text",festival_text);
-        resultIntent.putExtra("send_text",send_text);
-        resultIntent.putExtra("dev_id",dev_id);
-        resultIntent.putExtra("reason",reason);
-
-        cDesc="Used to show "+channel+" Messages";
 
         try {
-            boolean foreground=new ForegroundCheckTask().execute(getApplicationContext()).get();
+
+            Log.d("FCM_LOGIC", "BEFORE BOOLEAN FOREGROUND: ");
+
+            boolean foreground = new ForegroundCheckTask().execute(getApplicationContext()).get();
+
+            Log.d("FCM_LOGIC", "FOREGROUND: " + foreground);
 
             if(!foreground){
 
+                Log.d("FCM_LOGIC", "AFTER if(!foreground)");
                 // check for image attachment
                 if (TextUtils.isEmpty(imageUrl)) {
 
+                    Log.d("FCM_LOGIC", "AFTER if(TextUtils.isEmpty(imageUrl))");
+
                     if (!TextUtils.isEmpty(from_image)) {
-                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(!TextUtils.isEmpty(from_image)) ");
+                        showNotificationMessage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent);
                     } else {
-                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(!TextUtils.isEmpty(from_image)) ELSE ");
+                        showNotificationMessage((int) id, timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent);
                     }
 
                 } else {
+
+                    Log.d("FCM_LOGIC", "AFTER if(TextUtils.isEmpty(imageUrl)) ELSE ");
                     // image is present, show notification with image
                     if (!TextUtils.isEmpty(from_image)) {
-                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ");
+                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                     } else {
-                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ELSE ");
+                        showNotificationMessageWithBigImage((int) id, timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                     }
                 }
 
             }else{
 
-                boolean active= getSharedPreferences("fcm_activity",MODE_PRIVATE).getBoolean("active",true);
+
+                Log.d("FCM_LOGIC", "AFTER if(!foreground) ELSE");
+
+                boolean active = getSharedPreferences("fcm_activity",MODE_PRIVATE).getBoolean("active",true);
 
                 if(active) {
+
+                    Log.d("FCM_LOGIC", "AFTER if(active) ");
+
                     Intent intent = new Intent(Config.PUSH_NOTIFICATION);
 
                     intent.putExtra("title", title);
@@ -262,7 +308,7 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("f_name", friend_name);
                     intent.putExtra("f_email", friend_email);
                     intent.putExtra("f_image", friend_image);
-                    intent.putExtra("f_token", friend_token);
+                    //intent.putExtra("f_token", friend_token);
 
                     intent.putExtra("user_id", admin_id);
                     intent.putExtra("post_id", post_id);
@@ -275,38 +321,47 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("channel",channel);
                     intent.putExtra("question_id",question_id);
 
-                    intent.putExtra("read",read);
-                    intent.putExtra("doc_id",doc_id);
-
-                    intent.putExtra("festival_name",festival_name);
-                    intent.putExtra("festival_text",festival_text);
-                    intent.putExtra("send_text",send_text);
-                    intent.putExtra("dev_id",dev_id);
-                    intent.putExtra("reason",reason);
-
                     if (title.toLowerCase().contains("update")) {
-                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessage if(title.toLowerCase().contains(updatePer)) ");
+                        showNotificationMessage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                     } else {
-                        showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+
+                        Log.d("FCM_LOGIC", "showNotificationMessage if(title.toLowerCase().contains(updatePer)) ELSE ");
+                        showNotificationMessage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                     }
                 }else{
 
+                    Log.d("FCM_LOGIC", "AFTER if(active) ELSE");
+
                     if (TextUtils.isEmpty(imageUrl)) {
 
+                        Log.d("FCM_LOGIC", "AFTER if(TextUtils.isEmpty(imageUrl)) ");
+
                         if (!TextUtils.isEmpty(from_image)) {
-                            showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent);
+
+                            Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(!TextUtils.isEmpty(from_image)) ");
+                            showNotificationMessage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent);
                         } else {
-                            showNotificationMessage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent);
+
+                            Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(TextUtils.isEmpty(from_image)) ELSE ");
+                            showNotificationMessage((int) id, timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent);
                         }
 
                     } else {
+
+                        Log.d("FCM_LOGIC", "AFTER if(TextUtils.isEmpty(imageUrl)) ELSE ");
                         // image is present, show notification with image
                         if (!TextUtils.isEmpty(from_image)) {
-                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+
+                            Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ");
+                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                         } else {
-                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, channel, cDesc, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
+
+                            Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ELSE ");
+                            showNotificationMessageWithBigImage((int) id, timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl);
                         }
                     }
 
@@ -325,16 +380,16 @@ public class FCMService extends FirebaseMessagingService {
 
     }
 
-    private void showNotificationMessage(int id, String timeStamp, String click_action, String channelName, String channelDesc, String user_image, Context context, String title, String message, Intent intent) {
+    private void showNotificationMessage(int id, String timeStamp, String click_action, String user_image, Context context, String title, String message, Intent intent) {
         notificationUtils = new NotificationUtil(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(id, timeStamp, click_action, channelName, channelDesc, user_image, title, message, intent, null);
+        notificationUtils.showNotificationMessage(id, timeStamp, click_action, user_image, title, message, intent, null);
     }
 
-    private void showNotificationMessageWithBigImage(int id, String timeStamp, String click_action, String channelName, String channelDesc, String user_image, Context context, String title, String message, Intent intent, String imageUrl) {
+    private void showNotificationMessageWithBigImage(int id, String timeStamp, String click_action, String user_image, Context context, String title, String message, Intent intent, String imageUrl) {
         notificationUtils = new NotificationUtil(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(id, timeStamp, click_action, channelName, channelDesc, user_image, title, message, intent, imageUrl);
+        notificationUtils.showNotificationMessage(id, timeStamp, click_action, user_image, title, message, intent, imageUrl);
     }
 
     class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {

@@ -32,8 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class AddQuestion extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -46,7 +48,7 @@ public class AddQuestion extends AppCompatActivity implements AdapterView.OnItem
 
     @Override
     protected void attachBaseContext(Context base) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(base));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(base));
     }
 
     @Override
@@ -59,15 +61,16 @@ public class AddQuestion extends AppCompatActivity implements AdapterView.OnItem
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
-
-
         super.onCreate(savedInstanceState);
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
         setContentView(R.layout.activity_add_question);
 
         Toolbar toolbar=findViewById(R.id.main_toolbar);

@@ -3,16 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".feature_ai.fragment.AllQuestions">
-
-    <ProgressBar
-        android:id="@+id/progressbar"
-        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
-        android:indeterminate="true"
-        android:layout_gravity="center"
-        android:layout_width="170dp"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -46,7 +39,6 @@
 
                 <TextView
                     android:id="@+id/all"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -58,7 +50,6 @@
 
                 <TextView
                     android:id="@+id/accountancy"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -70,7 +61,6 @@
 
                 <TextView
                     android:id="@+id/astronomy"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -82,7 +72,6 @@
 
                 <TextView
                     android:id="@+id/biology"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
@@ -94,7 +83,6 @@
 
                 <TextView
                     android:id="@+id/business_maths"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:textColor="@color/white"
                     android:layout_height="wrap_content"
@@ -106,7 +94,6 @@
 
                 <TextView
                     android:id="@+id/computer_science"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
@@ -118,7 +105,6 @@
 
                 <TextView
                     android:id="@+id/commerce"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
@@ -130,7 +116,6 @@
 
                 <TextView
                     android:id="@+id/chemistry"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
@@ -142,7 +127,6 @@
 
                 <TextView
                     android:id="@+id/economics"
-                    android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -154,7 +138,6 @@
 
                 <TextView
                     android:id="@+id/geography"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -166,7 +149,6 @@
 
                 <TextView
                     android:id="@+id/history"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -178,7 +160,6 @@
 
                 <TextView
                     android:id="@+id/physics"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/round_background"
@@ -190,7 +171,6 @@
 
                 <TextView
                     android:id="@+id/p_science"
-                    android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"
                     android:textColor="@color/white"
                     android:layout_height="wrap_content"
@@ -202,7 +182,6 @@
 
                 <TextView
                     android:id="@+id/maths"
-                    android:layout_marginStart="10dp"
                     android:textColor="@color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -218,11 +197,64 @@
 
         </HorizontalScrollView>
 
-        <com.tylersuehr.esr.EmptyStateRecyclerView
-            android:layout_below="@+id/tabs"
-            android:id="@+id/recyclerView"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/refreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+                <LinearLayout
+                    android:id="@+id/default_item"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    >
+
+                    <ImageView
+                        android:tint="#FFCA28"
+                        android:layout_marginBottom="5dp"
+                        app:srcCompat="@drawable/ic_question_answer_black_24dp"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp" />
+
+                    <TextView
+                        android:id="@+id/default_title"
+                        fontPath="fonts/GoogleSans_Bold.ttf"
+                        android:textSize="19sp"
+                        android:gravity="center"
+                        android:textColor="#313131"
+                        android:text="No questions yet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:ignore="MissingPrefix" />
+
+                    <TextView
+                        android:id="@+id/default_text"
+                        android:gravity="center"
+                        android:text="All your question appear here"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        />
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
 
     </LinearLayout>

@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.List;
 public class AllQuestions extends Fragment{
 
 
-    private EmptyStateRecyclerView recyclerView;
+    private RecyclerView recyclerView;
     private Context context;
     private FirebaseFirestore mFirestore;
     private FirebaseUser mCurrentUser;
@@ -47,6 +47,7 @@ public class AllQuestions extends Fragment{
     private List<AllQuestionsModel> allQuestionsModelList =new ArrayList<>();
     private View view;
     private TextView et0,et1,et2,et3,et4,et5,et6,et7,et8,et9,et10,et11,et12,et13;
+    private SwipeRefreshLayout refreshLayout;
 
     public AllQuestions() {
     }
@@ -84,21 +85,24 @@ public class AllQuestions extends Fragment{
 
             mFirestore = FirebaseFirestore.getInstance();
             adapter = new QuestionAdapter(allQuestionsModelList);
+            refreshLayout=view.findViewById(R.id.refreshLayout);
 
             recyclerView = view.findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
-            view.findViewById(R.id.progressbar).setVisibility(View.VISIBLE);
-
-            TextStateDisplay error_style = new TextStateDisplay(context, "Sorry for the inconvenience", "Something went wrong :(");
-            TextStateDisplay empty_style = new TextStateDisplay(context, "It's Empty", "No questions found");
-
-            recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR, error_style);
-            recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY, empty_style);
 
             allQuestionsModelList.clear();
             recyclerView.setAdapter(adapter);
+
+            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    allQuestionsModelList.clear();
+                    adapter.notifyDataSetChanged();
+                    getQuestions();
+                }
+            });
 
             setUpOnClick();
             getQuestions();
@@ -109,13 +113,13 @@ public class AllQuestions extends Fragment{
 
     private void getQuestions() {
 
+        view.findViewById(R.id.default_item).setVisibility(View.GONE);
+        refreshLayout.setRefreshing(true);
         Query firstQuery = mFirestore.collection("Questions")
                 .orderBy("timestamp", Query.Direction.DESCENDING);
         firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-
-
 
                 if (!documentSnapshots.isEmpty()) {
 
@@ -127,7 +131,7 @@ public class AllQuestions extends Fragment{
                                 AllQuestionsModel question = doc.getDocument().toObject(AllQuestionsModel.class).withId(doc.getDocument().getId());
                                 allQuestionsModelList.add(question);
                                 adapter.notifyDataSetChanged();
-                                view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                                refreshLayout.setRefreshing(false);
                             }
 
                         }
@@ -135,13 +139,13 @@ public class AllQuestions extends Fragment{
                     }
 
                     if(allQuestionsModelList.isEmpty()){
-                        Toast.makeText(context, "No questions found", Toast.LENGTH_SHORT).show();
-                        view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                        view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                        refreshLayout.setRefreshing(false);
                     }
 
                 } else {
-                    Toast.makeText(context, "No questions found", Toast.LENGTH_SHORT).show();
-                    view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                    view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                    refreshLayout.setRefreshing(false);
                 }
 
             }
@@ -159,19 +163,12 @@ public class AllQuestions extends Fragment{
 
     public void filterResult(String subject){
 
-        recyclerView.clearStateDisplays();
-
-        TextStateDisplay error_style = new TextStateDisplay(context, "Sorry for the inconvenience", "Something went wrong :(");
-        TextStateDisplay empty_style = new TextStateDisplay(context, "It's Empty", "No questions found");
-
-        recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR, error_style);
-        recyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY, empty_style);
-
-        allQuestionsModelList.clear();
-        adapter.notifyDataSetChanged();
         if(subject.equals("All")){
             getQuestions();
         }else{
+
+            refreshLayout.setRefreshing(true);
+            view.findViewById(R.id.default_item).setVisibility(View.GONE);
 
             Query firstQuery = mFirestore.collection("Questions")
                     .whereEqualTo("subject",subject)
@@ -192,7 +189,7 @@ public class AllQuestions extends Fragment{
                                         AllQuestionsModel question = doc.getDocument().toObject(AllQuestionsModel.class).withId(doc.getDocument().getId());
                                         allQuestionsModelList.add(question);
                                         adapter.notifyDataSetChanged();
-                                        view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                                        refreshLayout.setRefreshing(false);
                                     }
 
                                 }
@@ -201,25 +198,27 @@ public class AllQuestions extends Fragment{
 
                             }
                             if(allQuestionsModelList.isEmpty()){
-                                Toast.makeText(context, "No questions found", Toast.LENGTH_SHORT).show();
-                                view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                                view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                refreshLayout.setRefreshing(false);
                             }
 
                         } else {
-                            Toast.makeText(context, "No questions found", Toast.LENGTH_SHORT).show();
-                            view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            refreshLayout.setRefreshing(false);
                         }
                     }catch (NullPointerException eee){
-                        Toast.makeText(context, "No questions found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Some technical error occurred", Toast.LENGTH_SHORT).show();
                         adapter.notifyDataSetChanged();
                         if(allQuestionsModelList.isEmpty()){
-                            view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            refreshLayout.setRefreshing(false);
                         }
                     } catch (Exception ee){
-                        recyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
                         ee.printStackTrace();
+                        Toast.makeText(context, "Some technical error occurred", Toast.LENGTH_SHORT).show();
                         if(allQuestionsModelList.isEmpty()){
-                            view.findViewById(R.id.progressbar).setVisibility(View.GONE);
+                            refreshLayout.setRefreshing(false);
+                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
                     }
 
@@ -238,98 +237,237 @@ public class AllQuestions extends Fragment{
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 getQuestions();
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        getQuestions();
+                    }
+                });
             }
         });
         et1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Accountancy");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Accountancy");
+                    }
+                });
             }
         });
         et2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Astronomy");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Astronomy");
+                    }
+                });
             }
         });
         et3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Biology");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Biology");
+                    }
+                });
             }
         });
         et4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Business Maths");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Business Maths");
+                    }
+                });
             }
         });
         et5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Computer Science");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Computer Science");
+                    }
+                });
             }
         });
         et6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Commerce");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Commerce");
+                    }
+                });
             }
         });
         et7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Chemistry");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Chemistry");
+                    }
+                });
             }
         });
         et8.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Economics");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Economics");
+                    }
+                });
             }
         });
         et9.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Geography");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Geography");
+                    }
+                });
             }
         });
         et10.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("History");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("History");
+                    }
+                });
             }
         });
         et11.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Physics");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Physics");
+                    }
+                });
             }
         });
         et12.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Political Science");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Political Science");
+                    }
+                });
             }
         });
         et13.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allQuestionsModelList.clear();
+                adapter.notifyDataSetChanged();
                 filterResult("Maths");
+
+                refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        allQuestionsModelList.clear();
+                        adapter.notifyDataSetChanged();
+                        filterResult("Maths");
+                    }
+                });
             }
         });
 

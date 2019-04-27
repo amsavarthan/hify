@@ -18,6 +18,7 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_search"
+        android:visible="false"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="Search Anything"
         app:showAsAction="always"

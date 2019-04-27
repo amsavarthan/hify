@@ -5,86 +5,65 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimaryy"
-    tools:context="com.amsavarthan.hify.ui.activities.friends.FriendsViewForMessage">
+    >
 
-    <HorizontalScrollView
-        android:scrollbars="none"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/navigator"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:padding="10dp"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:padding="10dp"
-                android:text="Message Type:"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/messageList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
-            <TextView
-                android:layout_marginStart="10dp"
-                android:background="@drawable/round_background"
-                android:padding="10dp"
-                android:id="@+id/text"
-                android:textColor="#FFF"
-                android:text=" Text messages "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:id="@+id/default_item"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                >
 
-            <TextView
-                android:layout_marginStart="10dp"
-                android:background="@drawable/round_background"
-                android:padding="10dp"
-                android:id="@+id/text_reply"
-                android:textColor="#FFF"
-                android:text=" Text messages replies "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <ImageView
+                    android:tint="#FF5722"
+                    android:layout_marginBottom="5dp"
+                    app:srcCompat="@drawable/ic_sentiment_dissatisfied_black_24dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp" />
 
-            <TextView
-                android:layout_marginStart="10dp"
-                android:background="@drawable/round_background"
-                android:padding="10dp"
-                android:id="@+id/image"
-                android:textColor="#FFF"
-                android:text=" Image messages "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/default_title"
+                    fontPath="fonts/GoogleSans_Bold.ttf"
+                    android:textSize="19sp"
+                    android:gravity="center"
+                    android:textColor="#313131"
+                    android:text="No friends found"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:ignore="MissingPrefix" />
 
-            <TextView
-                android:layout_marginStart="10dp"
-                android:background="@drawable/round_background"
-                android:padding="10dp"
-                android:id="@+id/image_reply"
-                android:textColor="#FFF"
-                android:text=" Image messages replies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/default_text"
+                    android:gravity="center"
+                    android:text="Add some friends to send them messages"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
 
+            </LinearLayout>
 
-        </LinearLayout>
+        </FrameLayout>
 
-    </HorizontalScrollView>
-
-    <com.tylersuehr.esr.EmptyStateRecyclerView
-        android:layout_below="@+id/navigator"
-        android:id="@+id/messageList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-       />
-
-    <ProgressBar
-        android:layout_centerInParent="true"
-        android:id="@+id/pbar"
-        android:indeterminate="true"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_gravity="center"
-        android:layout_width="170dp"
-        android:layout_height="wrap_content" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

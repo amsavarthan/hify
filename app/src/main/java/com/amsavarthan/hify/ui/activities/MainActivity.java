@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -90,7 +91,9 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -101,8 +104,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.tapadoo.alerter.Alerter;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
@@ -115,8 +116,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
+
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -178,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     public static Toolbar toolbar;
     private MenuItem add_post,refresh;
     private boolean mState=true;
-    private EmptyStateRecyclerView recentsRecyclerView;
+    private RecyclerView recentsRecyclerView;
     ArrayList<Recents> recentsList;
     RecentsAdapter recentsAdapter;
     private FrameLayout search_container;
@@ -216,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -312,8 +316,17 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
+
+        setContentView(R.layout.activity_main);
         activity=this;
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -323,11 +336,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
         }
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
 
         userHelper = new UserHelper(this);
         firestore = FirebaseFirestore.getInstance();
@@ -424,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         final String token_id = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE).getString("regId","");
         Map<String, Object> tokenMap = new HashMap<>();
-        tokenMap.put("token_id", token_id);
+        tokenMap.put("token_ids", FieldValue.arrayUnion(token_id));
 
         if(isOnline()) {
 
@@ -829,7 +837,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     }
 
-
     public void logout() {
         performUploadTask();
         final ProgressDialog mDialog = new ProgressDialog(this);
@@ -839,8 +846,10 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         mDialog.setCanceledOnTouchOutside(false);
         mDialog.show();
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, MODE_PRIVATE);
+
         Map<String, Object> tokenRemove = new HashMap<>();
-        tokenRemove.put("token_id", "");
+        tokenRemove.put("token_ids", FieldValue.arrayRemove(pref.getString("regId","")));
 
         firestore.collection("Users").document(userId).update(tokenRemove).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -855,10 +864,11 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                Toast.makeText(MainActivity.this, "Error logging out", Toast.LENGTH_SHORT).show();
+                mDialog.dismiss();
                 Log.e("Logout Error", e.getMessage());
             }
         });
-
 
     }
 
@@ -1073,7 +1083,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("question_id", question_id);
         resultIntent.putExtra("question_timestamp", question_timestamp);
 
-        /*Alerter.create(MainActivity.this)
+        Alerter.create(MainActivity.this)
                 .setTitle(title)
                 .setText(body)
                 .enableSwipeToDismiss()
@@ -1089,7 +1099,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     public void onClick(View view) {
                         startActivity(resultIntent);
                     }
-                }).show();*/
+                }).show();
 
 
     }

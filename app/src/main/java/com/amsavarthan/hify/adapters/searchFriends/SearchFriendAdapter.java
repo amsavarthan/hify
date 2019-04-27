@@ -157,8 +157,8 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
     public int getItemCount() {
         return usersList.size();
     }
-	
-	@Override
+
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -226,13 +226,13 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
                         final String email=documentSnapshot.getString("email");
 
-                        userMap.put("name", documentSnapshot.getString("name"));
-                        userMap.put("id", documentSnapshot.getString("id"));
+                        userMap.put("name",  documentSnapshot.getString("name"));
+                        userMap.put("id",    documentSnapshot.getString("id"));
                         userMap.put("email", email);
                         userMap.put("image", documentSnapshot.getString("image"));
-                        userMap.put("token", documentSnapshot.getString("token_id"));
+                        userMap.put("tokens", documentSnapshot.get("token_ids"));
                         userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
-                        userMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
+                        userMap.put("timestamp",       String.valueOf(System.currentTimeMillis()));
 
                         //Add to user
                         FirebaseFirestore.getInstance()
@@ -293,14 +293,14 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
             super(itemView);
 
             mView = itemView;
-            image = (CircleImageView) mView.findViewById(R.id.image);
-            name = (TextView) mView.findViewById(R.id.name);
-            username=(TextView)mView.findViewById(R.id.username);
-            viewBackground = (RelativeLayout) mView.findViewById(R.id.view_background);
-            viewForeground = (RelativeLayout) mView.findViewById(R.id.view_foreground);
-            listenerText = (TextView) mView.findViewById(R.id.view_foreground_text);
-            exist_icon = (ImageView) mView.findViewById(R.id.exist_icon);
-            friend_icon = (ImageView) mView.findViewById(R.id.friend_icon);
+            image = mView.findViewById(R.id.image);
+            name =  mView.findViewById(R.id.name);
+            username= mView.findViewById(R.id.username);
+            viewBackground = mView.findViewById(R.id.view_background);
+            viewForeground = mView.findViewById(R.id.view_foreground);
+            listenerText =  mView.findViewById(R.id.view_foreground_text);
+            exist_icon = mView.findViewById(R.id.exist_icon);
+            friend_icon = mView.findViewById(R.id.friend_icon);
 
         }
     }

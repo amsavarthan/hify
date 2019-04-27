@@ -125,47 +125,47 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
-                    holder.exist_icon.setVisibility(View.GONE);
-                    holder.friend_icon.setVisibility(View.VISIBLE);
-                    holder.friend_icon.setAlpha(0.0f);
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            holder.exist_icon.setVisibility(View.GONE);
+                            holder.friend_icon.setVisibility(View.VISIBLE);
+                            holder.friend_icon.setAlpha(0.0f);
 
-                    holder.friend_icon.animate()
-                            .setDuration(200)
-                            .alpha(1.0f)
-                            .start();
-                } else {
-                    try {
-                        FirebaseFirestore.getInstance()
-                                .collection("Users")
-                                .document(usersList.get(holder.getAdapterPosition()).userId)
-                                .collection("Friend_Requests")
-                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                if (documentSnapshot.exists()) {
-                                    holder.friend_icon.setVisibility(View.GONE);
-                                    holder.exist_icon.setVisibility(View.VISIBLE);
-                                    holder.exist_icon.setAlpha(0.0f);
+                            holder.friend_icon.animate()
+                                    .setDuration(200)
+                                    .alpha(1.0f)
+                                    .start();
+                        } else {
+                            try {
+                                FirebaseFirestore.getInstance()
+                                        .collection("Users")
+                                        .document(usersList.get(holder.getAdapterPosition()).userId)
+                                        .collection("Friend_Requests")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                        if (documentSnapshot.exists()) {
+                                            holder.friend_icon.setVisibility(View.GONE);
+                                            holder.exist_icon.setVisibility(View.VISIBLE);
+                                            holder.exist_icon.setAlpha(0.0f);
 
-                                    holder.exist_icon.animate()
-                                            .alpha(1.0f)
-                                            .start();
-                                } else {
-                                    holder.exist_icon.setVisibility(View.GONE);
-                                    holder.friend_icon.setVisibility(View.GONE);
-                                }
+                                            holder.exist_icon.animate()
+                                                    .alpha(1.0f)
+                                                    .start();
+                                        } else {
+                                            holder.exist_icon.setVisibility(View.GONE);
+                                            holder.friend_icon.setVisibility(View.GONE);
+                                        }
+                                    }
+                                });
+                            }catch(Exception e){
+                                e.printStackTrace();
                             }
-                        });
-                    }catch(Exception e){
-                        e.printStackTrace();
+                        }
                     }
-                }
-            }
-        });
+                });
 
     }
 
@@ -173,8 +173,8 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
     public int getItemCount() {
         return usersList.size();
     }
-	
-	@Override
+
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -271,95 +271,95 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                final String email=documentSnapshot.getString("email");
-
-                userMap.put("name", documentSnapshot.getString("name"));
-                userMap.put("id", documentSnapshot.getString("id"));
-                userMap.put("email", email);
-                userMap.put("image", documentSnapshot.getString("image"));
-                userMap.put("token", documentSnapshot.getString("token_id"));
-                userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
-                userMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-
-                //Add to user
-                FirebaseFirestore.getInstance()
-                        .collection("Users")
-                        .document(deletedItem.userId)
-                        .collection("Friend_Requests")
-                        .document(documentSnapshot.getString("id"))
-                        .set(userMap)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        //Add for notification data
+                        final String email=documentSnapshot.getString("email");
+
+                        userMap.put("name",  documentSnapshot.getString("name"));
+                        userMap.put("id",    documentSnapshot.getString("id"));
+                        userMap.put("email", email);
+                        userMap.put("image", documentSnapshot.getString("image"));
+                        userMap.put("tokens", documentSnapshot.get("token_ids"));
+                        userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
+                        userMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
+
+                        //Add to user
                         FirebaseFirestore.getInstance()
-                                .collection("Notifications")
+                                .collection("Users")
                                 .document(deletedItem.userId)
                                 .collection("Friend_Requests")
-                                .document(email)
+                                .document(documentSnapshot.getString("id"))
                                 .set(userMap)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
 
-                                holder.friend_icon.setVisibility(View.GONE);
-                                holder.exist_icon.setVisibility(View.VISIBLE);
-                                holder.exist_icon.setAlpha(0.0f);
+                                        //Add for notification data
+                                        FirebaseFirestore.getInstance()
+                                                .collection("Notifications")
+                                                .document(deletedItem.userId)
+                                                .collection("Friend_Requests")
+                                                .document(email)
+                                                .set(userMap)
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
 
-                                holder.exist_icon.animate()
-                                        .setDuration(200)
-                                        .alpha(1.0f)
-                                        .start();
-                                Snackbar.make(view, "Friend request sent to " + deletedItem.getName(), Snackbar.LENGTH_LONG).show();
-                                notifyDataSetChanged();
-                                notifyItemChanged(holder.getAdapterPosition());
+                                                        holder.friend_icon.setVisibility(View.GONE);
+                                                        holder.exist_icon.setVisibility(View.VISIBLE);
+                                                        holder.exist_icon.setAlpha(0.0f);
 
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
+                                                        holder.exist_icon.animate()
+                                                                .setDuration(200)
+                                                                .alpha(1.0f)
+                                                                .start();
+                                                        Snackbar.make(view, "Friend request sent to " + deletedItem.getName(), Snackbar.LENGTH_LONG).show();
+                                                        notifyDataSetChanged();
+                                                        notifyItemChanged(holder.getAdapterPosition());
+
+                                                    }
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e("Error",e.getMessage());
+                                            }
+                                        });
+
+
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.e("Error",e.getMessage());
                             }
                         });
 
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error",e.getMessage());
                     }
                 });
-
-            }
-        });
 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView image;
-        View mView;
-        TextView name, listenerText,username;
-        RelativeLayout viewBackground, viewForeground;
-        ImageView exist_icon,friend_icon;
+        View            mView;
+        TextView        name, listenerText,username;
+        RelativeLayout  viewBackground, viewForeground;
+        ImageView       exist_icon,friend_icon;
 
         ViewHolder(View itemView) {
             super(itemView);
 
-            mView=itemView;
-            image=(CircleImageView)mView.findViewById(R.id.image);
-            name=(TextView)mView.findViewById(R.id.name);
-            username=(TextView)mView.findViewById(R.id.username);
-            viewBackground = (RelativeLayout) mView.findViewById(R.id.view_background);
-            viewForeground = (RelativeLayout) mView.findViewById(R.id.view_foreground);
-            listenerText = (TextView) mView.findViewById(R.id.view_foreground_text);
-            exist_icon = (ImageView) mView.findViewById(R.id.exist_icon);
-            friend_icon = (ImageView) mView.findViewById(R.id.friend_icon);
+            mView =itemView;
+            image = mView.findViewById(R.id.image);
+            name = mView.findViewById(R.id.name);
+            username = mView.findViewById(R.id.username);
+            viewBackground = mView.findViewById(R.id.view_background);
+            viewForeground = mView.findViewById(R.id.view_foreground);
+            listenerText = mView.findViewById(R.id.view_foreground_text);
+            exist_icon   = mView.findViewById(R.id.exist_icon);
+            friend_icon  = mView.findViewById(R.id.friend_icon);
 
 
         }

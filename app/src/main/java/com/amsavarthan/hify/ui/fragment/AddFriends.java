@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,9 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +54,8 @@ public class AddFriends extends Fragment {
     private AddFriendAdapter usersAdapter;
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
-    private EmptyStateRecyclerView mRecyclerView;
-    private ProgressBar pbar;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout refreshLayout;
 
     @Nullable
     @Override
@@ -73,7 +72,7 @@ public class AddFriends extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView = mView.findViewById(R.id.recyclerView);
-        pbar=mView.findViewById(R.id.pbar);
+        refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerViewTouchHelper(0, ItemTouchHelper.LEFT, new RecyclerViewTouchHelper.RecyclerItemTouchHelperListener() {
             @Override
@@ -106,62 +105,66 @@ public class AddFriends extends Fragment {
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(usersAdapter);
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No more users found","You are friends with all the users."));
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getAllUsers();
+            }
+        });
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
-                new TextStateDisplay(view.getContext(),"We found some users","We are getting information of those users.."));
-
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-        pbar.setVisibility(View.VISIBLE);
         getAllUsers();
 
     }
 
     public void getAllUsers() {
         usersList.clear();
-        
-		//getting all users
-		
-		firestore.collection("Users")
-                                            .get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+        usersAdapter.notifyDataSetChanged();
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        refreshLayout.setRefreshing(true);
 
-                                                    if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
+        firestore.collection("Users")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                                        for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-                                                            if (doc.getType() == DocumentChange.Type.ADDED) {
+                        if (!queryDocumentSnapshots.getDocuments().isEmpty()) {
 
-                                                                if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
-                                                                       Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
-                                                                        usersList.add(friends);
-                                                                        usersAdapter.notifyDataSetChanged();
-                                                                        pbar.setVisibility(GONE);
+                            for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
+                                if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                                                }
+                                    if (!doc.getDocument().getId().equals(mAuth.getCurrentUser().getUid())) {
+                                        Friends friends = doc.getDocument().toObject(Friends.class).withId(doc.getDocument().getString("id"));
+                                        usersList.add(friends);
+                                        usersAdapter.notifyDataSetChanged();
+                                        refreshLayout.setRefreshing(false);
+                                    }
 
-                                                            }
-                                                        }
+                                }
+                            }
 
-                                                    }else{
-                                                        pbar.setVisibility(GONE);
-                                                        mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
-                                                    }
+                            if(usersList.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
 
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
-                                                    pbar.setVisibility(GONE);
-                                                    Log.w("Error", "listen:error", e);
-                                                }
-                                            });
+                        }else{
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("Error", "listen:error", e);
+
+                    }
+                });
 
 
 

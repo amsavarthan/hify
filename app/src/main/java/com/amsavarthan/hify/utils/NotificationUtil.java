@@ -10,15 +10,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.amsavarthan.hify.R;
+import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
@@ -33,7 +35,9 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
+
+import static android.media.RingtoneManager.getDefaultUri;
+import static java.lang.System.currentTimeMillis;
 
 /**
  * Created by amsavarthan on 10/3/18.
@@ -42,6 +46,7 @@ import java.util.regex.Pattern;
 public class NotificationUtil {
 
     private static String TAG = NotificationUtil.class.getSimpleName();
+    private static String TAGPush = "Push Notification";
 
     private Context mContext;
 
@@ -70,15 +75,15 @@ public class NotificationUtil {
         return 0;
     }
 
-    public void showNotificationMessage(int id, String timeStamp, String click_action, String channelName, String channelDesc, String user_image, String title, String message, Intent intent) {
-        showNotificationMessage(id, timeStamp, click_action, channelName, channelDesc, user_image, title, message, intent, null);
+    public void showNotificationMessage(int id, String timeStamp, String click_action, String user_image, String title, String message, Intent intent) {
+        showNotificationMessage(id, timeStamp, click_action, user_image, title, message, intent, null);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setupChannels(NotificationManager notificationManager, String channelName, String channelDesc) {
+    @RequiresApi(api =   Build.VERSION_CODES.O)
+    private void setupChannels(NotificationManager notificationManager) {
         NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
-        adminChannel.setDescription(channelDesc);
+        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, Config.ADMIN_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+        adminChannel.setDescription(Config.ADMIN_CHANNEL_DESCPT);
         adminChannel.enableLights(true);
         adminChannel.setLightColor(Color.BLUE);
         adminChannel.canShowBadge();
@@ -89,7 +94,7 @@ public class NotificationUtil {
         }
     }
 
-    public void showNotificationMessage(int id, String timeStamp, String click_action, String channelName, String channelDesc, final String user_image, final String title, final String message, Intent intent, String imageUrl) {
+    public void showNotificationMessage(int id, String timeStamp, String click_action, final String user_image, final String title, final String message, Intent intent, String imageUrl) {
 
         // Check for empty push message
         if (TextUtils.isEmpty(message))
@@ -98,13 +103,15 @@ public class NotificationUtil {
         // notification icon
         final int icon = R.mipmap.ic_launcher;
 
+        int requestID = (int) System.currentTimeMillis();
+
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         final PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         mContext,
-                        0,
+                        requestID,
                         intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT //PendingIntent.FLAG_CANCEL_CURRENT
                 );
 
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
@@ -116,43 +123,54 @@ public class NotificationUtil {
 
                 Bitmap bitmap = getBitmapFromURL(imageUrl);
 
-
                 if (bitmap != null) {
-                    showBigNotification(id, timeStamp, click_action, channelName, channelDesc, user_image, bitmap, mBuilder, icon, title, message, resultPendingIntent);
+                    showBigNotification(id, timeStamp, click_action, user_image, bitmap, mBuilder, icon, title, message, resultPendingIntent);
                 } else {
-                    showSmallNotification(id, timeStamp, click_action, channelName, channelDesc, user_image, mBuilder, icon, title, message, resultPendingIntent);
+                    showSmallNotification(id, timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent);
                 }
 
             } else {
-                showSmallNotification(id, timeStamp, click_action, channelName, channelDesc, user_image, mBuilder, icon, title, message, resultPendingIntent);
+                showSmallNotification(id, timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent);
             }
         } catch (Exception e) {
-            Log.e("showNotificationMessage", e.getMessage());
+            Log.e("showNotificationMessage", e.getMessage() == null ? "" : e.getMessage());
         }
-
-
     }
+
+
 
     public Intent getIntent(String click_action) {
 
         Intent resultIntent;
 
         switch (click_action) {
-            case "com.amsavarthan.hify.TARGETNOTIFICATION":
+            case "com.app.ej.ms.TARGETNOTIFICATION":
                 resultIntent = new Intent(mContext, NotificationActivity.class);
                 break;
-            case "com.amsavarthan.hify.TARGETNOTIFICATIONREPLY":
+            case "com.app.ej.ms.TARGETNOTIFICATIONREPLY":
                 resultIntent = new Intent(mContext, NotificationReplyActivity.class);
                 break;
-            case "com.amsavarthan.hify.TARGETNOTIFICATION_IMAGE":
+            case "com.app.ej.ms.TARGETNOTIFICATION_IMAGE":
                 resultIntent = new Intent(mContext, NotificationImage.class);
                 break;
-            case "com.amsavarthan.hify.TARGETNOTIFICATIONREPLY_IMAGE":
+            case "com.app.ej.ms.TARGETNOTIFICATIONREPLY_IMAGE":
                 resultIntent = new Intent(mContext, NotificationImageReply.class);
                 break;
-            case "com.amsavarthan.hify.TARGET_FRIENDREQUEST":
+            case "com.app.ej.ms.TARGET_FRIENDREQUEST":
                 resultIntent = new Intent(mContext, FriendProfile.class);
                 break;
+            case "com.app.ej.ms.TARGET_ACCEPTED":
+                resultIntent = new Intent(mContext, FriendProfile.class);
+                break;
+            case "com.app.ej.ms.TARGET_LIKE":
+                resultIntent = new Intent(mContext, MainActivity.class).putExtra("openFragment","forLike");
+                break;
+            case "com.app.ej.ms.TARGET_COMMENT":
+                resultIntent = new Intent(mContext, MainActivity.class).putExtra("openFragment","forComment");
+                break;
+            case "com.app.ej.ms.TARGET_FORUM":
+                resultIntent = new Intent(mContext, AnswersActivity.class);
+                break; //TARGET_COMMENT
             default:
                 resultIntent = new Intent(mContext, MainActivity.class);
                 break;
@@ -161,22 +179,27 @@ public class NotificationUtil {
 
     }
 
-    private void showSmallNotification(int id, String timeStamp, String click_action, String channelName, String channelDesc, String user_image, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+    private void showSmallNotification(int id, String timeStamp, String click_action, String user_image, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
+
+        Log.d(TAGPush, "showSmallNotification Push Notification. Click_action: " + click_action);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            setupChannels(notificationManager);
+        }
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
         bigTextStyle.setBigContentTitle(title);
         bigTextStyle.bigText(message);
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupChannels(notificationManager, channelName, channelDesc);
-        }
-
         Notification notification;
-        notification = mBuilder.setSmallIcon(icon).setTicker(title).setWhen(0)
+
+        notification = mBuilder
                 .setAutoCancel(true)
                 .setContentTitle(title)
+                .setTicker(title)
                 .setContentIntent(resultPendingIntent)
                 .setColorized(true)
                 .setWhen(getTimeMilliSec(timeStamp))
@@ -186,44 +209,48 @@ public class NotificationUtil {
                 .setStyle(bigTextStyle)
                 //.addPerson(user_image)
                 //.setLargeIcon(getBitmapFromURL(user_image))
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(icon)
                 .setContentText(message)
                 .build();
 
-        notificationManager.notify(id, notification);
+        notificationManagerCompat.notify(id, notification);
     }
 
-    private void showBigNotification(int id, String timeStamp, String click_action, String channelName, String channelDesc, String user_image, Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
+    private void showBigNotification(int id, String timeStamp, String click_action, String user_image, Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
 
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        Log.d(TAGPush, "showBigNotification Push Notification. Click_action: " + click_action);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            setupChannels(notificationManager);
+        }
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
 
         NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
         bigPictureStyle.setBigContentTitle(title);
         bigPictureStyle.bigPicture(bitmap);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setupChannels(notificationManager, channelName, channelDesc);
-        }
-
         Notification notification;
 
-        notification = mBuilder.setSmallIcon(icon).setTicker(title).setWhen(0)
+        notification = mBuilder
                 .setAutoCancel(true)
                 .setContentTitle(title)
+                .setTicker(title)
                 .setContentIntent(resultPendingIntent)
                 .setColorized(true)
                 .setShowWhen(true)
-                .setSound(Uri.parse("android.resource://"+mContext.getPackageName()+"/"+R.raw.hify_sound))
+                .setSound(Uri.parse("android.resource://" + mContext.getPackageName() + "/" + R.raw.hify_sound))
                 .setWhen(getTimeMilliSec(timeStamp))
                 .setColor(Color.parseColor("#2591FC"))
-                .setStyle(bigPictureStyle)
+                .setStyle(bigPictureStyle) //bigPictureStyle
                 //.setLargeIcon(getBitmapFromURL(user_image))
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(icon)
                 //.addPerson(user_image)
                 .setContentText(message)
                 .build();
 
-        notificationManager.notify(id, notification);
+        notificationManagerCompat.notify(id, notification);
     }
 
     private Bitmap getBitmapFromURL(String strURL) {

@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -60,7 +59,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.rd.PageIndicatorView;
+import com.itsronald.widget.ViewPagerIndicator;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ import me.grantland.widget.AutofitTextView;
  * Created by amsavarthan on 22/2/18.
  */
 
-public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.ViewHolder> {
+public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
     private List<Post> postList;
     private Context context;
@@ -90,7 +89,7 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
     private View statsheetView;
     private boolean forComment;
 
-    public PostsAdapter_v19(List<Post> postList, Context context, Activity activity, BottomSheetDialog mmBottomSheetDialog, View statsheetView, boolean forComment) {
+    public PostsAdapter(List<Post> postList, Context context, Activity activity, BottomSheetDialog mmBottomSheetDialog, View statsheetView, boolean forComment) {
         this.postList = postList;
         this.activity=activity;
         this.context = context;
@@ -112,7 +111,7 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_feed_post_v19, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_feed_post, parent, false);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
@@ -609,8 +608,7 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
-            holder.indicator.setViewPager(holder.pager);
-            holder.indicator_holder.setVisibility(View.GONE);
+            holder.indicator.setVisibility(View.GONE);
             photosAdapter.notifyDataSetChanged();
 
             holder.pager_layout.setVisibility(View.VISIBLE);
@@ -635,7 +633,6 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
-            holder.indicator.setViewPager(holder.pager);
             photosAdapter.notifyDataSetChanged();
 
             holder.pager_layout.setVisibility(View.VISIBLE);
@@ -1239,7 +1236,7 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
         private AutofitTextView post_text;
         private ImageView delete;
         private ViewPager pager;
-        private PageIndicatorView indicator;
+        private ViewPagerIndicator indicator;
         private View vBgLike;
         private ImageView ivLike;
 
@@ -1257,7 +1254,6 @@ public class PostsAdapter_v19 extends RecyclerView.Adapter<PostsAdapter_v19.View
             post_desc = mView.findViewById(R.id.post_desc);
             post_text = mView.findViewById(R.id.post_text);
             indicator=mView.findViewById(R.id.indicator);
-            indicator_holder=mView.findViewById(R.id.indicator_holder);
             pager=mView.findViewById(R.id.pager);
             pager_layout=mView.findViewById(R.id.pager_layout);
             comment_btn = mView.findViewById(R.id.comment_button);

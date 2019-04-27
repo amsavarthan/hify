@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter_v19;
+import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,13 +25,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class SinglePostView extends AppCompatActivity {
 
     private List<Post> mPostsList;
-    private PostsAdapter_v19 mAdapter;
+    private PostsAdapter mAdapter;
     private View statsheetView;
     private BottomSheetDialog mmBottomSheetDialog;
     private ProgressBar pbar;
@@ -41,7 +43,7 @@ public class SinglePostView extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -54,13 +56,17 @@ public class SinglePostView extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_post_view);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
+        setContentView(R.layout.activity_single_post_view);
 
         String post_id=getIntent().getStringExtra("post_id");
 
@@ -87,9 +93,9 @@ public class SinglePostView extends AppCompatActivity {
             mPostsList = new ArrayList<>();
 
             if(forComment)
-                mAdapter = new PostsAdapter_v19(mPostsList, this,this,mmBottomSheetDialog,statsheetView,true);
+                mAdapter = new PostsAdapter(mPostsList, this,this,mmBottomSheetDialog,statsheetView,true);
             else
-                mAdapter = new PostsAdapter_v19(mPostsList, this,this,mmBottomSheetDialog,statsheetView,false);
+                mAdapter = new PostsAdapter(mPostsList, this,this,mmBottomSheetDialog,statsheetView,false);
 
 
             RecyclerView mRecyclerView=findViewById(R.id.recyclerView);

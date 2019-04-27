@@ -4,14 +4,17 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.UsersAdapter;
@@ -23,9 +26,6 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.ImageTextStateDisplay;
-import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ public class SendMessage extends Fragment {
     private UsersAdapter usersAdapter;
     private FirebaseFirestore firestore;
     private FirebaseAuth mAuth;
-    private EmptyStateRecyclerView mRecyclerView;
-    private ProgressBar pbar;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout refreshLayout;
 
     @Nullable
     @Override
@@ -58,8 +58,7 @@ public class SendMessage extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         mRecyclerView = mView.findViewById(R.id.messageList);
-        pbar=mView.findViewById(R.id.pbar);
-        mView.findViewById(R.id.navigator).setVisibility(View.GONE);
+        refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         usersList = new ArrayList<>();
         usersAdapter = new UsersAdapter(usersList, view.getContext());
@@ -69,22 +68,24 @@ public class SendMessage extends Fragment {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         mRecyclerView.setAdapter(usersAdapter);
 
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No friends found","Add some friends to send them flash messages."));
-
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_LOADING,
-                new TextStateDisplay(view.getContext(),"We found some of your friends","We are getting information of your friends.."));
-
-        mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
-
-        pbar.setVisibility(View.VISIBLE);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                usersList.clear();
+                usersAdapter.notifyDataSetChanged();
+                startListening();
+            }
+        });
+        usersList.clear();
+        usersAdapter.notifyDataSetChanged();
         startListening();
 
     }
 
     public void startListening() {
-        usersList.clear();
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        refreshLayout.setRefreshing(true);
+
         firestore.collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("Friends")
@@ -100,12 +101,18 @@ public class SendMessage extends Fragment {
                                     Users users = doc.getDocument().toObject(Users.class).withId(doc.getDocument().getId());
                                     usersList.add(users);
                                     usersAdapter.notifyDataSetChanged();
-                                    pbar.setVisibility(View.GONE);
+                                    refreshLayout.setRefreshing(false);
                                 }
                             }
+
+                            if(usersList.isEmpty()){
+                                refreshLayout.setRefreshing(false);
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            }
+
                         }else{
-                            pbar.setVisibility(View.GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            refreshLayout.setRefreshing(false);
                         }
 
                     }
@@ -114,8 +121,8 @@ public class SendMessage extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        pbar.setVisibility(View.GONE);
-                        mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        refreshLayout.setRefreshing(false);
                         Log.w("Error", "listen:error", e);
 
                     }

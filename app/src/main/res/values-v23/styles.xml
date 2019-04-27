@@ -21,6 +21,13 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="SplashAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimaryy</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkk</item>
+        <item name="colorAccent">@color/colorAccentt</item>
+        <item name="android:windowBackground">@drawable/splash_window_bg</item>
+    </style>
+
     <style name="LoginAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="android:windowBackground">@color/colorPrimaryy</item>

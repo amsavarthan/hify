@@ -1,7 +1,6 @@
 package com.amsavarthan.hify.ui.fragment;
 
 import android.app.Fragment;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,16 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter_v19;
+import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
 import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,8 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +51,7 @@ public class Dashboard extends Fragment {
     private FirebaseFirestore mFirestore;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
-    private EmptyStateRecyclerView mPostsRecyclerView;
+    private RecyclerView mPostsRecyclerView;
     private View mView;
     private List<String> mFriendIdList=new ArrayList<>();
     private View statsheetView;
@@ -64,7 +61,7 @@ public class Dashboard extends Fragment {
     private TextView request_alert_text;
     private DocumentSnapshot lastVisible;
     private boolean isFirstPageFirstLoad=true;
-    private PostsAdapter_v19 mAdapter_v19;
+    private PostsAdapter mAdapter_v19;
 
     @Nullable
     @Override
@@ -100,29 +97,12 @@ public class Dashboard extends Fragment {
         mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
 
         mPostsList = new ArrayList<>();
-        //if(Build.VERSION.SDK_INT<=19) {
 
-            mAdapter_v19 = new PostsAdapter_v19(mPostsList, view.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-            mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mPostsRecyclerView.setHasFixedSize(true);
-            mPostsRecyclerView.setAdapter(mAdapter_v19);
-
-        /*}else{
-
-            mAdapter = new PostsAdapter(mPostsList, view.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-            mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mPostsRecyclerView.setHasFixedSize(true);
-            mPostsRecyclerView.setAdapter(mAdapter);
-
-        }*/
-
-        mPostsRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                new TextStateDisplay(view.getContext(),"No posts found","Your friends haven't added any posts or you don't have any friends."));
-
-        mPostsRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                new TextStateDisplay(view.getContext(),"Sorry for inconvenience","Something went wrong :("));
+        mAdapter_v19 = new PostsAdapter(mPostsList, view.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
+        mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mPostsRecyclerView.setHasFixedSize(true);
+        mPostsRecyclerView.setAdapter(mAdapter_v19);
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -197,6 +177,7 @@ public class Dashboard extends Fragment {
 
     public void getAllPosts() {
 
+        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         mFirestore.collection("Posts")
@@ -234,12 +215,12 @@ public class Dashboard extends Fragment {
                                                         }
 
                                                         if (mPostsList.isEmpty()) {
-                                                            refreshLayout.setRefreshing(false);
+                                                           getCurrentUsersPosts();
                                                         }
 
                                                     } else {
 
-                                                        refreshLayout.setRefreshing(false);
+                                                       getCurrentUsersPosts();
 
                                                     }
 
@@ -249,7 +230,7 @@ public class Dashboard extends Fragment {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     refreshLayout.setRefreshing(false);
-                                                    mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                                                    Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                                                     Log.w("Error", "listen:error", e);
                                                 }
                                             });
@@ -257,8 +238,11 @@ public class Dashboard extends Fragment {
                                 }
                             }
 
+
                         }else{
                             refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+
                         }
 
                     }
@@ -267,10 +251,58 @@ public class Dashboard extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        mPostsRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                         Log.w("Error", "listen:error", e);
                     }
                 });
+
+    }
+
+    private void getCurrentUsersPosts() {
+
+        mFirestore.collection("Posts")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        if(queryDocumentSnapshots.isEmpty()){
+
+                            refreshLayout.setRefreshing(false);
+                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+
+                        }else{
+
+                            for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+                                if (documentChange.getDocument().getString("userId").equals(mAuth.getCurrentUser().getUid())) {
+
+                                    Post post = documentChange.getDocument().toObject(Post.class).withId(documentChange.getDocument().getId());
+                                    mPostsList.add(post);
+                                    refreshLayout.setRefreshing(false);
+                                    mAdapter_v19.notifyDataSetChanged();
+
+                                }
+                            }
+
+                            if (mPostsList.isEmpty()) {
+                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                refreshLayout.setRefreshing(false);
+                            }
+
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        refreshLayout.setRefreshing(false);
+                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Log.w("Error", "listen:error", e);
+                    }
+                });
+
 
     }
 

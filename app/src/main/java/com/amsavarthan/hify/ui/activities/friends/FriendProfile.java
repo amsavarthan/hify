@@ -6,14 +6,16 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,7 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter_v19;
+import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
 import com.amsavarthan.hify.models.Post;
 import com.bumptech.glide.Glide;
@@ -42,8 +44,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tylersuehr.esr.EmptyStateRecyclerView;
-import com.tylersuehr.esr.TextStateDisplay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,8 +52,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+import io.github.inflationx.calligraphy3.CalligraphyConfig;
+import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
+import io.github.inflationx.viewpump.ViewPump;
+import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class FriendProfile extends AppCompatActivity {
 
@@ -71,7 +73,7 @@ public class FriendProfile extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -83,13 +85,17 @@ public class FriendProfile extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend_profile);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/bold.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+
+        ViewPump.init(ViewPump.builder()
+                .addInterceptor(new CalligraphyInterceptor(
+                        new CalligraphyConfig.Builder()
+                                .setDefaultFontPath("fonts/bold.ttf")
+                                .setFontAttrId(R.attr.fontPath)
+                                .build()))
+                .build());
+
+        setContentView(R.layout.activity_friend_profile);
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Profile");
@@ -180,12 +186,13 @@ public class FriendProfile extends AppCompatActivity {
     public static class PostsFragment extends Fragment {
 
         List<Post> postList;
-        PostsAdapter_v19 mAdapter_v19;
-        private EmptyStateRecyclerView mRecyclerView;
+        PostsAdapter mAdapter;
+        private RecyclerView mRecyclerView;
         String id;
         private View statsheetView;
         private BottomSheetDialog mmBottomSheetDialog;
-        private ProgressBar pbar;
+        private SwipeRefreshLayout refreshLayout;
+        private View rootView;
 
         public PostsFragment() {
         }
@@ -193,8 +200,13 @@ public class FriendProfile extends AppCompatActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            return rootView;
+        }
 
+        @Override
+        public void onViewCreated(View view,@Nullable Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
             Bundle bundle = this.getArguments();
             if (bundle != null) {
                 id = bundle.getString("id");
@@ -203,40 +215,39 @@ public class FriendProfile extends AppCompatActivity {
                 getActivity().finish();
             }
 
-            pbar=rootView.findViewById(R.id.pbar);
+            refreshLayout=rootView.findViewById(R.id.refreshLayout);
             statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
             mmBottomSheetDialog = new BottomSheetDialog(rootView.getContext());
             mmBottomSheetDialog.setContentView(statsheetView);
             mmBottomSheetDialog.setCanceledOnTouchOutside(true);
 
-            mRecyclerView=rootView.findViewById(R.id.recyclerView);
             postList=new ArrayList<>();
-            //if(Build.VERSION.SDK_INT<=19){
-                mAdapter_v19=new PostsAdapter_v19(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
-                mRecyclerView.setAdapter(mAdapter_v19);
-            /*}else {
-                mAdapter = new PostsAdapter(postList, rootView.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-                mRecyclerView.setAdapter(mAdapter);
-            }*/
+            mAdapter=new PostsAdapter(postList, rootView.getContext(),getActivity(),mmBottomSheetDialog,statsheetView,false);
 
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_EMPTY,
-                    new TextStateDisplay(rootView.getContext(),"No posts found","User hasn't posted any posts yet"));
-
-            mRecyclerView.setStateDisplay(EmptyStateRecyclerView.STATE_ERROR,
-                    new TextStateDisplay(rootView.getContext(),"Sorry for inconvenience","Something went wrong :("));
+            mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            //mRecyclerView.addItemDecoration(new DividerItemDecoration(rootView.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
             mRecyclerView.setHasFixedSize(true);
+            mRecyclerView.setAdapter(mAdapter);
 
-            pbar.setVisibility(View.VISIBLE);
+            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    postList.clear();
+                    mAdapter.notifyDataSetChanged();
+                    getPosts(id);
+                }
+            });
+
             getPosts(id);
 
-            return rootView;
         }
 
         private void getPosts(String id) {
+
+            rootView.findViewById(R.id.default_item).setVisibility(View.GONE);
+            refreshLayout.setRefreshing(true);
 
             FirebaseFirestore.getInstance()
                     .collection("Posts")
@@ -253,15 +264,19 @@ public class FriendProfile extends AppCompatActivity {
 
                                     Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
                                     postList.add(post);
-                                    mAdapter_v19.notifyDataSetChanged();
-                                    pbar.setVisibility(View.GONE);
+                                    mAdapter.notifyDataSetChanged();
+                                    refreshLayout.setRefreshing(false);
 
                                 }
 
+                                if(postList.isEmpty()){
+                                    refreshLayout.setRefreshing(false);
+                                    rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                }
 
                             }else{
-                                pbar.setVisibility(View.GONE);
-                                mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_EMPTY);
+                                refreshLayout.setRefreshing(false);
+                                rootView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }
@@ -269,8 +284,8 @@ public class FriendProfile extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            pbar.setVisibility(View.GONE);
-                            mRecyclerView.invokeState(EmptyStateRecyclerView.STATE_ERROR);
+                            refreshLayout.setRefreshing(false);
+                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -284,11 +299,11 @@ public class FriendProfile extends AppCompatActivity {
 
         private FirebaseFirestore mFirestore;
         private FirebaseUser currentUser;
-        private String id,friend_name, friend_email, friend_image, friend_token;;
-
-        private TextView name,username,email,location,post,friend,bio,created,req_sent;
+        private String id, friend_name, friend_email, friend_image, friend_token;
+        private List<String> friend_tokens;
+        private TextView name, username, email, location, post, friend, bio, created, req_sent;
         private CircleImageView profile_pic;
-        private Button add_friend,remove_friend,accept,decline;
+        private Button add_friend, remove_friend, accept, decline;
         private LinearLayout req_layout;
         private View rootView;
         private ProgressDialog mDialog;
@@ -312,21 +327,21 @@ public class FriendProfile extends AppCompatActivity {
             mFirestore = FirebaseFirestore.getInstance();
             currentUser=FirebaseAuth.getInstance().getCurrentUser();
 
-            profile_pic=rootView.findViewById(R.id.profile_pic);
-            name=rootView.findViewById(R.id.name);
-            username=rootView.findViewById(R.id.username);
-            email=rootView.findViewById(R.id.email);
-            location=rootView.findViewById(R.id.location);
-            post=rootView.findViewById(R.id.posts);
-            friend=rootView.findViewById(R.id.friends);
-            bio=rootView.findViewById(R.id.bio);
-            req_sent=rootView.findViewById(R.id.friend_sent);
+            profile_pic   = rootView.findViewById(R.id.profile_pic);
+            name          = rootView.findViewById(R.id.name);
+            username      = rootView.findViewById(R.id.username);
+            email         = rootView.findViewById(R.id.email);
+            location      = rootView.findViewById(R.id.location);
+            post          = rootView.findViewById(R.id.posts);
+            friend        = rootView.findViewById(R.id.friends);
+            bio           = rootView.findViewById(R.id.bio);
+            req_sent      = rootView.findViewById(R.id.friend_sent);
 
-            add_friend=rootView.findViewById(R.id.friend_no);
-            remove_friend=rootView.findViewById(R.id.friend_yes);
-            req_layout=rootView.findViewById(R.id.friend_req);
-            accept=rootView.findViewById(R.id.accept);
-            decline=rootView.findViewById(R.id.decline);
+            add_friend    = rootView.findViewById(R.id.friend_no);
+            remove_friend = rootView.findViewById(R.id.friend_yes);
+            req_layout    = rootView.findViewById(R.id.friend_req);
+            accept        = rootView.findViewById(R.id.accept);
+            decline       = rootView.findViewById(R.id.decline);
 
             email.setVisibility(View.GONE);
 
@@ -343,10 +358,11 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                            friend_name=documentSnapshot.getString("name");
-                            friend_email=documentSnapshot.getString("email");
-                            friend_image=documentSnapshot.getString("image");
-                            friend_token=documentSnapshot.getString("token");
+                            friend_name  = documentSnapshot.getString("name");
+                            friend_email = documentSnapshot.getString("email");
+                            friend_image = documentSnapshot.getString("image");
+                            //friend_token = documentSnapshot.getString("token");
+                            friend_tokens = (List<String>) documentSnapshot.get("tokens");
 
                             username.setText(String.format(Locale.ENGLISH,"@%s", documentSnapshot.getString("username")));
                             name.setText(friend_name);
@@ -413,7 +429,7 @@ public class FriendProfile extends AppCompatActivity {
                                                     req_sent.setAlpha(0.0f);
 
                                                     req_sent.animate()
-                                                            .setDuration(500)
+                                                            .setDuration(200)
                                                             .alpha(1.0f)
                                                             .start();
                                                 }
@@ -471,7 +487,7 @@ public class FriendProfile extends AppCompatActivity {
             req_layout.setVisibility(View.VISIBLE);
             req_layout.setAlpha(0.0f);
             req_layout.animate()
-                    .setDuration(500)
+                    .setDuration(200)
                     .alpha(1.0f)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
@@ -542,7 +558,7 @@ public class FriendProfile extends AppCompatActivity {
             add_friend.setVisibility(View.VISIBLE);
             add_friend.setAlpha(0.0f);
             add_friend.animate()
-                    .setDuration(500)
+                    .setDuration(200)
                     .alpha(1.0f)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
@@ -575,8 +591,6 @@ public class FriendProfile extends AppCompatActivity {
                             });
                         }
                     }).start();
-
-
         }
 
         private void showRemoveButton() {
@@ -584,7 +598,7 @@ public class FriendProfile extends AppCompatActivity {
             remove_friend.setVisibility(View.VISIBLE);
             remove_friend.setAlpha(0.0f);
             remove_friend.animate()
-                    .setDuration(500)
+                    .setDuration(200)
                     .alpha(1.0f)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
@@ -640,9 +654,21 @@ public class FriendProfile extends AppCompatActivity {
                             friendInfo.put("email", friend_email);
                             friendInfo.put("id", id);
                             friendInfo.put("image", friend_image);
-                            friendInfo.put("token_id", friend_token);
+                            //    friendInfo.put("token_id", friend_token);
+                            // TODO We are looking for the array of friend's tokens
+
+
+
+                            friendInfo.put("token_ids", friend_tokens);
                             friendInfo.put("notification_id", String.valueOf(System.currentTimeMillis()));
                             friendInfo.put("timestamp", String.valueOf(System.currentTimeMillis()));
+
+
+
+
+
+
+
 
                             //Add data friend to current user
                             mFirestore.collection("Users/" + currentUser.getUid() + "/Friends/")
@@ -664,7 +690,15 @@ public class FriendProfile extends AppCompatActivity {
                                                             final String email_c = documentSnapshot.getString("email");
                                                             final String id_c = documentSnapshot.getId();
                                                             String image_c = documentSnapshot.getString("image");
-                                                            String token_c = documentSnapshot.getString("token_id");
+                                                            //String token_c = documentSnapshot.getString("token_id");
+                                                            //String token_c = documentSnapshot.getString("token_id");
+                                                            List<String> tokens_c = (List<String>) documentSnapshot.get("token_ids");
+
+
+
+
+
+
 
 
                                                             final Map<String, Object> currentuserInfo = new HashMap<>();
@@ -672,7 +706,7 @@ public class FriendProfile extends AppCompatActivity {
                                                             currentuserInfo.put("email", email_c);
                                                             currentuserInfo.put("id", id_c);
                                                             currentuserInfo.put("image", image_c);
-                                                            currentuserInfo.put("token_id", token_c);
+                                                            currentuserInfo.put("token_ids", tokens_c);
                                                             currentuserInfo.put("notification_id", String.valueOf(System.currentTimeMillis()));
                                                             currentuserInfo.put("timestamp", String.valueOf(System.currentTimeMillis()));
 
@@ -683,6 +717,13 @@ public class FriendProfile extends AppCompatActivity {
                                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
+
+
+
+
+
+
+
 
 
                                                                             mFirestore.collection("Notifications")
@@ -699,7 +740,7 @@ public class FriendProfile extends AppCompatActivity {
 
                                                                                             req_layout.animate()
                                                                                                     .alpha(0.0f)
-                                                                                                    .setDuration(500)
+                                                                                                    .setDuration(200)
                                                                                                     .setListener(new AnimatorListenerAdapter() {
                                                                                                         @Override
                                                                                                         public void onAnimationEnd(Animator animation) {
@@ -770,7 +811,7 @@ public class FriendProfile extends AppCompatActivity {
 
                         req_layout.animate()
                                 .alpha(0.0f)
-                                .setDuration(500)
+                                .setDuration(200)
                                 .setListener(new AnimatorListenerAdapter() {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
@@ -823,7 +864,7 @@ public class FriendProfile extends AppCompatActivity {
 
                                                     add_friend.animate()
                                                             .alpha(0.0f)
-                                                            .setDuration(500)
+                                                            .setDuration(200)
                                                             .setListener(new AnimatorListenerAdapter() {
                                                                 @Override
                                                                 public void onAnimationEnd(Animator animation) {
@@ -833,7 +874,7 @@ public class FriendProfile extends AppCompatActivity {
                                                                     req_sent.setAlpha(0.0f);
 
                                                                     req_sent.animate()
-                                                                            .setDuration(500)
+                                                                            .setDuration(200)
                                                                             .alpha(1.0f)
                                                                             .start();
                                                                 }
@@ -851,6 +892,8 @@ public class FriendProfile extends AppCompatActivity {
                     });
 
         }
+
+
 
         private void executeFriendReq() {
 
@@ -870,7 +913,7 @@ public class FriendProfile extends AppCompatActivity {
                             userMap.put("id", documentSnapshot.getString("id"));
                             userMap.put("email", email);
                             userMap.put("image", documentSnapshot.getString("image"));
-                            userMap.put("token", documentSnapshot.getString("token_id"));
+                            userMap.put("tokens", documentSnapshot.get("token_ids"));
                             userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
                             userMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
 
@@ -900,7 +943,7 @@ public class FriendProfile extends AppCompatActivity {
 
                                                             add_friend.animate()
                                                                     .alpha(0.0f)
-                                                                    .setDuration(500)
+                                                                    .setDuration(200)
                                                                     .setListener(new AnimatorListenerAdapter() {
                                                                         @Override
                                                                         public void onAnimationEnd(Animator animation) {
@@ -910,7 +953,7 @@ public class FriendProfile extends AppCompatActivity {
                                                                             req_sent.setAlpha(0.0f);
 
                                                                             req_sent.animate()
-                                                                                    .setDuration(500)
+                                                                                    .setDuration(200)
                                                                                     .alpha(1.0f)
                                                                                     .start();
                                                                         }
@@ -958,7 +1001,7 @@ public class FriendProfile extends AppCompatActivity {
 
                                     remove_friend.animate()
                                             .alpha(0.0f)
-                                            .setDuration(500)
+                                            .setDuration(200)
                                             .setListener(new AnimatorListenerAdapter() {
                                                 @Override
                                                 public void onAnimationEnd(Animator animation) {
