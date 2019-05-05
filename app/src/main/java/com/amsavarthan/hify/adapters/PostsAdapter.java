@@ -4,23 +4,27 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
+
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,7 +41,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -52,6 +59,8 @@ import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -59,16 +68,36 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.itsronald.widget.ViewPagerIndicator;
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
+import com.watermark.androidwm_light.WatermarkBuilder;
+import com.watermark.androidwm_light.bean.WatermarkImage;
+import com.watermark.androidwm_light.bean.WatermarkPosition;
+import com.watermark.androidwm_light.bean.WatermarkText;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import me.grantland.widget.AutofitTextView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**
@@ -292,7 +321,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                                                });
                                                    }
 
-                                                   Toast.makeText(context, "Post deleted", Toast.LENGTH_SHORT).show();
+                                                   Toasty.success(context, "Post deleted", Toasty.LENGTH_SHORT,true).show();
                                                    postList.remove(holder.getAdapterPosition());
                                                    notifyItemRemoved(holder.getAdapterPosition());
                                                    notifyDataSetChanged();
@@ -468,12 +497,36 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private Uri getBitmapUri(Bitmap bitmap, ViewHolder holder, String name) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+    private Uri getBitmapUri(Bitmap bitmap, String name) {
 
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, postList.get(holder.getAdapterPosition()).postId, "Post by " + name);
-        return Uri.parse(path);
+        try {
+
+            OutputStream outputStream=null;
+            File dir=new File(Environment.getExternalStorageDirectory().toString()+"/Pictures/Hify/");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file=new File(dir,"HIFY_POST_"+System.currentTimeMillis()+".png");
+            if(file.exists()){
+                file.delete();
+            }else{
+                file.createNewFile();
+            }
+
+            outputStream = new FileOutputStream(file);
+            BufferedOutputStream outputStream1=new BufferedOutputStream(outputStream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream1);
+            outputStream1.flush();
+            outputStream1.close();
+            return Uri.parse(file.getAbsolutePath());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toasty.error(context,"Sharing failed",Toasty.LENGTH_SHORT,true).show();
+            return null;
+        }
     }
 
     private Bitmap getBitmap(FrameLayout view) {
@@ -488,9 +541,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
         view.draw(canvas);
 
-        return bitmap;
-    }
+        WatermarkText watermarkText=new WatermarkText("Hify")
+                .setPosition(new WatermarkPosition(0.5,0.5,30))
+                .setTextColor(Color.WHITE)
+                .setTextFont(R.font.bold)
+                .setTextAlpha(100)
+                .setTextSize(20);
 
+        Bitmap watermarked_bitmap= WatermarkBuilder.create(context,bitmap)
+                .loadWatermarkText(watermarkText)
+                .setTileMode(true)
+                .getWatermark()
+                .getOutputImage();
+
+        return watermarked_bitmap;
+    }
 
     private void setupViews(final ViewHolder holder) {
 
@@ -532,41 +597,25 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         .document(postList.get(holder.getAdapterPosition()).postId)
                         .collection("Liked_Users")
                         .get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                                smile.setText(String.format(context.getString(R.string.s_people_have_smiled_for_this_post),queryDocumentSnapshots.size()));
+                            smile.setText(String.format(context.getString(R.string.s_people_have_smiled_for_this_post),queryDocumentSnapshots.size()));
 
-                                FirebaseFirestore.getInstance().collection("Posts")
-                                        .document(postList.get(holder.getAdapterPosition()).postId)
-                                        .collection("Saved_Users")
-                                        .get()
-                                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            FirebaseFirestore.getInstance().collection("Posts")
+                                    .document(postList.get(holder.getAdapterPosition()).postId)
+                                    .collection("Saved_Users")
+                                    .get()
+                                    .addOnSuccessListener(queryDocumentSnapshots1 -> {
 
-                                                save.setText(String.format(context.getString(R.string.s_people_have_saved_this_post),queryDocumentSnapshots.size()));
-                                                pbar.setVisibility(View.GONE);
-                                                main.setVisibility(View.VISIBLE);
+                                        save.setText(String.format(context.getString(R.string.s_people_have_saved_this_post), queryDocumentSnapshots1.size()));
+                                        pbar.setVisibility(View.GONE);
+                                        main.setVisibility(View.VISIBLE);
 
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        });
+                                    })
+                                    .addOnFailureListener(e -> e.printStackTrace());
 
-                            }
                         })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
+                        .addOnFailureListener(e -> e.printStackTrace());
 
             }
         });
@@ -579,23 +628,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.post_text.setVisibility(View.VISIBLE);
             holder.post_text.setText(postList.get(pos).getDescription());
 
-            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
-                @Override
-                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
-                    if (postList.get(holder.getAdapterPosition()).getImage_count()==0) {
+            holder.share_btn.setOnFavoriteAnimationEndListener((buttonView, favorite) -> {
 
-                        Intent intent = new Intent(Intent.ACTION_SEND)
-                                .setType("image/*");
-                        intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), holder, "hify_user_" + postList.get(holder.getAdapterPosition()).getUserId()));
-                        try {
-                            context.startActivity(Intent.createChooser(intent, "Share using..."));
-                        } catch (ActivityNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        holder.share_btn.setVisibility(View.GONE);
-                    }
+                Intent intent = new Intent(Intent.ACTION_SEND)
+                        .setType("image/*");
+                intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), postList.get(holder.getAdapterPosition()).getName()));
+                try {
+                    context.startActivity(Intent.createChooser(intent, "Share using..."));
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
                 }
 
             });
@@ -608,7 +649,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
-            holder.indicator.setVisibility(View.GONE);
+            holder.indicator_holder.setVisibility(View.GONE);
             photosAdapter.notifyDataSetChanged();
 
             holder.pager_layout.setVisibility(View.VISIBLE);
@@ -617,13 +658,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             String desc = "<b>" + postList.get(pos).getUsername() + "</b> : " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
-            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
-                @Override
-                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
-                    Toast.makeText(context, "Long press the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
-                }
-
-            });
+            holder.share_btn.setOnFavoriteAnimationEndListener((buttonView, favorite) ->
+                    new DownloadTask(context,holder).execute(stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0())));
 
 
         }else if(postList.get(pos).getImage_count()>0) {
@@ -634,23 +670,114 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
             holder.pager.setAdapter(photosAdapter);
             photosAdapter.notifyDataSetChanged();
+            holder.indicator2.setDotsClickable(true);
+            holder.indicator2.setViewPager(holder.pager);
+
+            //autoStartSlide(holder,multipleImages.size());
 
             holder.pager_layout.setVisibility(View.VISIBLE);
+            holder.indicator_holder.setVisibility(View.VISIBLE);
             holder.post_text.setVisibility(View.GONE);
             holder.post_desc.setVisibility(View.VISIBLE);
             String desc = "<b>" + postList.get(pos).getUsername() + "</b> : " + postList.get(pos).getDescription();
             holder.post_desc.setText(Html.fromHtml(desc));
 
-            holder.share_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
-                @Override
-                public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
-                    Toast.makeText(context, "Click the image to view it, then save it for sharing :)", Toast.LENGTH_SHORT).show();
-                }
-
-            });
-
+            holder.share_btn.setOnFavoriteAnimationEndListener((buttonView, favorite) ->
+                    new DownloadTask(context,holder).execute(stringToURL(multipleImages.get(holder.pager.getCurrentItem()).getUrl())));
 
         }
+    }
+
+
+    /*private void shareImages(ViewHolder holder,int type) {
+
+        switch (type){
+
+            case 0:
+                Intent intent = new Intent(Intent.ACTION_SEND)
+                        .setType("image/*");
+                intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), postList.get(holder.getAdapterPosition()).getName()));
+                try {
+                    context.startActivity(Intent.createChooser(intent, "Share using..."));
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
+                }
+                return;
+            case 1:
+                new DownloadTask(context,holder).execute(stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()));
+                return;
+            case 2:
+                new DownloadTask(context,holder).execute(stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()));
+                return;
+            case 3:
+                new DownloadTask(context,holder).execute(
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()));
+                return;
+            case 4:
+                new DownloadTask(context,holder).execute(
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()));
+                return;
+            case 5:
+                new DownloadTask(context,holder).execute(
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()));
+                return;
+            case 6:
+                new DownloadTask(context,holder).execute(
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_5()));
+                return;
+            case 7:
+                new DownloadTask(context,holder).execute(
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_5()),
+                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_6()));
+                return;
+
+        }
+
+    }*/
+
+
+    private void autoStartSlide(final ViewHolder holder,final int LAST) {
+
+
+        final Handler handler=new Handler();
+        final Runnable slide=new Runnable() {
+            @Override
+            public void run() {
+                if(holder.pager.getCurrentItem()==LAST){
+                    holder.pager.setCurrentItem(0,true);
+                    return;
+                }
+                holder.pager.setCurrentItem(holder.pager.getCurrentItem()+1,true);
+            }
+        };
+        Timer slideTimer=new Timer();
+        slideTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(slide);
+            }
+        },3000,3000);
+
     }
 
     private void enableDoubleTap(final ViewHolder holder) {
@@ -697,7 +824,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         url4=postList.get(pos).getImage_url_4();
         url5=postList.get(pos).getImage_url_5();
         url6=postList.get(pos).getImage_url_6();
-
 
         if(!TextUtils.isEmpty(url0)){
             MultipleImage image=new MultipleImage(url0);
@@ -1236,9 +1362,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         private AutofitTextView post_text;
         private ImageView delete;
         private ViewPager pager;
-        private ViewPagerIndicator indicator;
         private View vBgLike;
         private ImageView ivLike;
+        private DotsIndicator indicator2;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -1253,7 +1379,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             timestamp = mView.findViewById(R.id.post_timestamp);
             post_desc = mView.findViewById(R.id.post_desc);
             post_text = mView.findViewById(R.id.post_text);
-            indicator=mView.findViewById(R.id.indicator);
             pager=mView.findViewById(R.id.pager);
             pager_layout=mView.findViewById(R.id.pager_layout);
             comment_btn = mView.findViewById(R.id.comment_button);
@@ -1261,11 +1386,116 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             delete = mView.findViewById(R.id.delete_button);
             sav_button = mView.findViewById(R.id.save_button);
             mImageholder = mView.findViewById(R.id.image_holder);
-
-
-
+            indicator2 = mView.findViewById(R.id.indicator);
+            indicator_holder = mView.findViewById(R.id.indicator_holder);
 
         }
     }
+
+    @SuppressLint("StaticFieldLeak")
+    private class DownloadTask extends AsyncTask<URL,Integer,List<Bitmap>> {
+
+        ProgressDialog mProgressDialog;
+        ViewHolder holder;
+        Context context;
+
+        public DownloadTask(Context context,ViewHolder holder) {
+            this.context = context;
+            this.holder = holder;
+        }
+
+        protected void onPreExecute(){
+            mProgressDialog=new ProgressDialog(context);
+            mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setTitle("Please wait");
+            mProgressDialog.setMessage("We are processing the image for sharing...");
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+            mProgressDialog.setProgress(0);
+        }
+
+        protected List<Bitmap> doInBackground(URL...urls){
+            int count = urls.length;
+            HttpURLConnection connection = null;
+            List<Bitmap> bitmaps = new ArrayList<>();
+
+            for(int i=0;i<count;i++){
+                URL currentURL = urls[i];
+                try{
+                    connection = (HttpURLConnection) currentURL.openConnection();
+                    connection.connect();
+                    InputStream inputStream = connection.getInputStream();
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+                    Bitmap bmp = BitmapFactory.decodeStream(bufferedInputStream);
+                    bitmaps.add(bmp);
+                    publishProgress((int) (((i+1) / (float) count) * 100));
+                    if(isCancelled()){
+                        break;
+                    }
+
+                }catch(IOException e){
+                    e.printStackTrace();
+                }finally{
+                    connection.disconnect();
+                }
+            }
+            return bitmaps;
+        }
+
+        protected void onProgressUpdate(Integer... progress){
+            mProgressDialog.setProgress(progress[0]);
+        }
+
+        // On AsyncTask cancelled
+        protected void onCancelled(){
+        }
+
+        protected void onPostExecute(List<Bitmap> result){
+            mProgressDialog.dismiss();
+            for(int i=0;i<result.size();i++){
+                Bitmap bitmap = result.get(i);
+
+                WatermarkText watermarkText=new WatermarkText("Hify")
+                        .setPosition(new WatermarkPosition(0.5,0.5,30))
+                        .setTextColor(Color.WHITE)
+                        .setTextFont(R.font.bold)
+                        .setTextAlpha(150)
+                        .setTextSize(20);
+
+                Bitmap watermarked_bitmap= WatermarkBuilder.create(context,bitmap)
+                        .loadWatermarkText(watermarkText)
+                        .setTileMode(true)
+                        .getWatermark()
+                        .getOutputImage();
+
+                Uri imageInternalUri = getBitmapUri(watermarked_bitmap,postList.get(holder.getAdapterPosition()).getName());
+
+                try {
+                    Intent intent = new Intent(Intent.ACTION_SEND)
+                            .setType("image/*");
+                    intent.putExtra(Intent.EXTRA_STREAM, imageInternalUri);
+                    context.startActivity(Intent.createChooser(intent, "Share using..."));
+                } catch (Exception e) {
+                    Toasty.error(context,"Sharing failed", Toasty.LENGTH_SHORT,true).show();
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }
+
+    private URL stringToURL(String urlString){
+        try{
+            URL url = new URL(urlString);
+            return url;
+        }catch(MalformedURLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
 
 }

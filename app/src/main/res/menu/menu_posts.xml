@@ -2,6 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_notifications"
+        android:icon="@drawable/alerter_ic_notifications"
+        android:title="Notifications"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_new"
         android:icon="@drawable/ic_add_black"
         android:title="Add Post"
@@ -12,15 +17,10 @@
         android:title="Add Question"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_refresh"
-        android:icon="@drawable/ic_refresh_black_24dp"
-        android:title="Refresh Feed"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/action_search"
         android:visible="false"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="Search Anything"
         app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
 </menu>

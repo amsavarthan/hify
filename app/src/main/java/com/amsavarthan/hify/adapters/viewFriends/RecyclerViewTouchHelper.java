@@ -1,9 +1,10 @@
 package com.amsavarthan.hify.adapters.viewFriends;
 
 import android.graphics.Canvas;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
+
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by amsavarthan on 8/3/18.
@@ -27,7 +28,6 @@ public class RecyclerViewTouchHelper extends ItemTouchHelper.SimpleCallback {
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (viewHolder != null) {
             final View foregroundView = ((ViewFriendAdapter.ViewHolder) viewHolder).viewForeground;
-
             getDefaultUIUtil().onSelected(foregroundView);
         }
     }

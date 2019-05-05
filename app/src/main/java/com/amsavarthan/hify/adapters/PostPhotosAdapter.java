@@ -12,9 +12,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
+
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -23,9 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.MultipleImage;
@@ -201,9 +199,9 @@ public class PostPhotosAdapter extends PagerAdapter {
                 @Override
                 public void onLongPress(MotionEvent e) {
                     super.onLongPress(e);
-                    Intent intent=new Intent(context,ImagePreviewSave.class)
+                    Intent intent=new Intent(context, ImagePreview.class)
                             .putExtra("uri","")
-                            .putExtra("sender_name","Posts")
+                            //.putExtra("sender_name","Posts")
                             .putExtra("url",IMAGES.get(position).getUrl());
                     context.startActivity(intent);
                 }

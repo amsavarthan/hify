@@ -65,4 +65,7 @@
     <string name="ai_name">I am not named yet but i know that i am an Artificial Intelligence</string>
     <string name="ai_author_name">I was created by Amsavarthan Lv</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

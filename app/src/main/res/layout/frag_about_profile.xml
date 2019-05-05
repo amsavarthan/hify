@@ -80,7 +80,7 @@
                 android:textColor="#212121"
                 />
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
                 app:cardUseCompatPadding="true"
@@ -159,9 +159,9 @@
 
                 </FrameLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/bio_card"
                 app:cardUseCompatPadding="true"
                 android:layout_margin="10dp"
@@ -195,9 +195,9 @@
                 </LinearLayout>
 
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/account_card"
                 app:cardUseCompatPadding="true"
                 android:layout_margin="10dp"
@@ -246,7 +246,7 @@
 
                 </LinearLayout>
 
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
 
         </RelativeLayout>

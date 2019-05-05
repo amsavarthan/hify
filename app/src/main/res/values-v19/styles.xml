@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="HifyWeatherTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="HifyWeatherTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -12,14 +12,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="android:windowBackground">@color/colorPrimaryy</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkk</item>
         <item name="colorAccent">@color/colorAccentt</item>
     </style>
 
-    <style name="LoginAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="LoginAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="android:windowBackground">@color/colorPrimaryy</item>
         <item name="android:windowTranslucentNavigation">true</item>
@@ -28,14 +28,14 @@
         <item name="colorAccent">@color/colorAccentt</item>
     </style>
 
-    <style name="SplashAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="SplashAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkk</item>
         <item name="colorAccent">@color/colorAccentt</item>
         <item name="android:windowBackground">@drawable/splash_window_bg</item>
     </style>
 
-    <style name="UpdateAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="UpdateAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="android:windowBackground">@color/colorPrimaryy</item>
         <item name="android:windowTranslucentStatus">true</item>

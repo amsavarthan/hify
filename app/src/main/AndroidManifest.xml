@@ -17,7 +17,6 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
-        android:name="android.support.multidex.MultiDexApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
@@ -67,7 +66,10 @@
             android:name=".ui.activities.friends.SendActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-
+        <activity
+            android:name=".ui.activities.notification.Notifications"
+            android:screenOrientation="portrait"
+            />
         <service
             android:name=".receivers.FCMService"
             android:exported="true"

@@ -7,14 +7,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -22,20 +14,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.UploadListAdapter;
-import com.amsavarthan.hify.models.MultipleImage;
+import com.amsavarthan.hify.adapters.PagerPhotosAdapter;
+import com.amsavarthan.hify.models.Images;
 import com.amsavarthan.hify.utils.AnimationUtil;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -44,25 +40,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.nguyenhoanglam.imagepicker.model.Config;
-import com.nguyenhoanglam.imagepicker.model.Image;
-import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
-import static com.amsavarthan.hify.adapters.UploadListAdapter.uploadedImagesUrl;
+import static android.view.View.GONE;
 
 public class PostImage extends AppCompatActivity {
 
@@ -72,18 +67,15 @@ public class PostImage extends AppCompatActivity {
     private EditText mEditText;
     private Map<String, Object> postMap;
     private ProgressDialog mDialog;
-    private ArrayList<Image> imagesList;
+    List<Images> imagesList;
     private Compressor compressor;
-    private LinearLayout empty_holder;
-    private List<String> fileNameList;
-    private List<String> fileUriList;
-    private List<String> fileDoneList;
     public static boolean canUpload=false;
-
-    private UploadListAdapter uploadListAdapter;
+    ViewPager pager;
+    PagerPhotosAdapter adapter;
     private StorageReference mStorage;
-    private RecyclerView mUploadList;
-    private RelativeLayout pager_layout;
+    private DotsIndicator indicator;
+    private RelativeLayout indicator_holder;
+    private int selectedIndex;
 
 
     public static void startActivity(Context context) {
@@ -111,8 +103,23 @@ public class PostImage extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+
         onBackPressed();
+
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        new MaterialDialog.Builder(this)
+                .title("Discard")
+                .content("Are you sure do you want to go back?")
+                .positiveText("Yes")
+                .canceledOnTouchOutside(false)
+                .cancelable(false)
+                .onPositive((dialog, which) -> finish())
+                .negativeText("No")
+                .show();
     }
 
     @Override
@@ -128,6 +135,12 @@ public class PostImage extends AppCompatActivity {
                 .build());
         setContentView(R.layout.activity_post_image);
 
+        imagesList=getIntent().getParcelableArrayListExtra("imagesList");
+
+        if(imagesList.isEmpty()){
+            finish();
+        }
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("New Image Post");
@@ -142,98 +155,35 @@ public class PostImage extends AppCompatActivity {
 
         postMap = new HashMap<>();
 
+        pager=findViewById(R.id.pager);
+        indicator=findViewById(R.id.indicator);
+        indicator_holder=findViewById(R.id.indicator_holder);
+
+        indicator.setDotsClickable(true);
+        adapter=new PagerPhotosAdapter(this,imagesList);
+        pager.setAdapter(adapter);
+
+        if(imagesList.size()>1){
+            indicator_holder.setVisibility(View.VISIBLE);
+            indicator.setViewPager(pager);
+        }else{
+            indicator_holder.setVisibility(GONE);
+        }
+
         mFirestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-        pager_layout=findViewById(R.id.pager_layout);
-
-        fileNameList = new ArrayList<>();
-        fileDoneList = new ArrayList<>();
-        fileUriList = new ArrayList<>();
-
-        uploadListAdapter = new UploadListAdapter(fileUriList,fileNameList, fileDoneList);
-
-        //RecyclerView
-        mUploadList=findViewById(R.id.recyclerView);
-        mUploadList.setItemAnimator(new DefaultItemAnimator());
-        mUploadList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
-        mUploadList.setLayoutManager(new LinearLayoutManager(this));
-        mUploadList.setHasFixedSize(true);
-        mUploadList.setAdapter(uploadListAdapter);
 
         mEditText = findViewById(R.id.text);
-        empty_holder=findViewById(R.id.empty_holder);
 
         compressor=new Compressor(this)
                 .setQuality(75)
                 .setCompressFormat(Bitmap.CompressFormat.PNG)
                 .setMaxHeight(350);
 
-        pager_layout.setVisibility(View.GONE);
-        empty_holder.setVisibility(View.VISIBLE);
-
 
         mDialog = new ProgressDialog(this);
         mStorage=FirebaseStorage.getInstance().getReference();
-    }
-
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == Config.RC_PICK_IMAGES ) {
-            if (resultCode == RESULT_OK && data != null) {
-                imagesList = data.getParcelableArrayListExtra(Config.EXTRA_IMAGES);
-                if(!imagesList.isEmpty()){
-
-                    empty_holder.setVisibility(View.GONE);
-
-                    pager_layout.setVisibility(View.VISIBLE);
-                    pager_layout.setAlpha(0.0f);
-
-                    pager_layout.animate()
-                            .setDuration(300)
-                            .alpha(1.0f)
-                            .start();
-
-
-                    for(int i=0;i<imagesList.size();i++) {
-
-                        Uri fileUri = Uri.fromFile(new File(imagesList.get(i).getPath()));
-                        String fileName = imagesList.get(i).getName();
-
-                        fileNameList.add(fileName);
-                        fileUriList.add(fileUri.toString());
-                        fileDoneList.add("uploading");
-                        uploadListAdapter.notifyDataSetChanged();
-
-                        final StorageReference fileToUpload = mStorage.child("post_images").child(random() + ".png");
-
-                        final int finalI = i;
-                        fileToUpload.putFile(fileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                               fileToUpload.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                   @Override
-                                   public void onSuccess(Uri uri) {
-                                       fileDoneList.remove(finalI);
-                                       fileDoneList.add(finalI,"done");
-                                       uploadedImagesUrl.add(uri.toString());
-                                       uploadListAdapter.notifyDataSetChanged();
-                                   }
-                               });
-
-                            }
-                        });
-                    }
-
-                }
-
-            }
-        }
 
     }
 
@@ -249,62 +199,12 @@ public class PostImage extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.action_edit:
-
-                new MaterialDialog.Builder(this)
-                        .title("Add Image(s)")
-                        .content("How do you want to add image(s)?")
-                        .positiveText("Camera")
-                        .negativeText("Gallery")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                                startPickImage(false);
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                                startPickImage(true);
-                            }
-                        })
-                        .show();
-
-
-                return true;
-
             case R.id.action_post:
 
-                if (imagesList.isEmpty()) {
-                    new MaterialDialog.Builder(this)
-                            .title("No image(s) selected")
-                            .content("It seems that you haven't selected image(s) for posting, How do you want to insert image(s)?")
-                            .positiveText("Camera")
-                            .negativeText("Gallery")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    dialog.dismiss();
-                                    startPickImage(false);
-                                }
-                            })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    dialog.dismiss();
-                                    startPickImage(true);
-                                }
-                            })
-                            .show();
-                    return true;
-                }
-
-                if (TextUtils.isEmpty(mEditText.getText().toString()) && !imagesList.isEmpty())
+                if (TextUtils.isEmpty(mEditText.getText().toString()))
                     AnimationUtil.shakeView(mEditText, PostImage.this);
                 else
-                    uploadPost();
+                    uploadImages(0);
 
                 return true;
 
@@ -313,58 +213,122 @@ public class PostImage extends AppCompatActivity {
         }
     }
 
-    //region Post
+
+    public void deleteItem(View view) {
+
+        new MaterialDialog.Builder(this)
+                .title("Remove")
+                .content("Are you sure do you want to remove this image?")
+                .positiveText("Yes")
+                .onPositive((dialog, which) -> {
+
+                    if(imagesList.size()==1) {
+                        finish();
+                        return;
+                    }
+
+                    imagesList.remove(pager.getCurrentItem());
+
+                    adapter=new PagerPhotosAdapter(PostImage.this,imagesList);
+                    pager.setAdapter(adapter);
+                    indicator.setViewPager(pager);
+
+                    if(imagesList.size()>1){
+                        indicator_holder.setVisibility(View.VISIBLE);
+                        indicator.setViewPager(pager);
+                    }else{
+                        indicator_holder.setVisibility(GONE);
+                    }
+
+                })
+                .negativeText("No")
+                .show();
+    }
+
+    public void openCropItem(View view) {
+
+        selectedIndex=pager.getCurrentItem();
+        UCrop.Options options = new UCrop.Options();
+        options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+        options.setCompressionQuality(75);
+        options.setShowCropGrid(true);
 
 
-    private void startPickImage(boolean gallery) {
+        UCrop.of(Uri.fromFile(new File(imagesList.get(selectedIndex).getOg_path())), Uri.fromFile(new File(getCacheDir(), imagesList.get(selectedIndex).getName() + "_" + random() + "_edit.png")))
+                .withAspectRatio(1, 1)
+                .withOptions(options)
+                .start(this);
 
-        if(gallery) {
+    }
 
-            ImagePicker.with(this)
-                    .setToolbarColor("#FFFFFF")
-                    .setStatusBarColor("#CCCCCC")
-                    .setToolbarTextColor("#212121")
-                    .setToolbarIconColor("#212121")
-                    .setProgressBarColor("#5093FF")
-                    .setBackgroundColor("#FFFFFF")
-                    .setCameraOnly(false)
-                    .setMultipleMode(true)
-                    .setFolderMode(true)
-                    .setShowCamera(false)
-                    .setFolderTitle("Albums")
-                    .setImageTitle("Photos")
-                    .setDoneTitle("Done")
-                    .setLimitMessage("You have reached selection limit")
-                    .setMaxSize(7)
-                    .setSavePath("Hify")
-                    .setAlwaysShowDoneButton(true)
-                    .setKeepScreenOn(true)
-                    .start();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        }else{
+        if(requestCode==UCrop.REQUEST_CROP && resultCode==RESULT_OK){
 
-            ImagePicker.with(this)
-                    .setToolbarColor("#FFFFFF")
-                    .setStatusBarColor("#CCCCCC")
-                    .setToolbarTextColor("#212121")
-                    .setToolbarIconColor("#212121")
-                    .setProgressBarColor("#5093FF")
-                    .setBackgroundColor("#FFFFFF")
-                    .setCameraOnly(true)
-                    .setMultipleMode(true)
-                    .setDoneTitle("Done")
-                    .setLimitMessage("You have reached capture limit")
-                    .setMaxSize(7)
-                    .setSavePath("Hify")
-                    .setKeepScreenOn(true)
-                    .start();
+            long old_id=imagesList.get(selectedIndex).getId();
+            String old_name=imagesList.get(selectedIndex).getName();
+            String old_path=imagesList.get(selectedIndex).getOg_path();
 
+            imagesList.remove(selectedIndex);
+            imagesList.add(selectedIndex,new Images(old_name,old_path,UCrop.getOutput(data).getPath(),old_id));
+            adapter=new PagerPhotosAdapter(this,imagesList);
+            pager.setAdapter(adapter);
+            indicator.setViewPager(pager);
+            adapter.notifyDataSetChanged();
+            pager.setCurrentItem(selectedIndex,true);
+
+        }else if(resultCode==UCrop.RESULT_ERROR){
+            Throwable throwable=UCrop.getError(data);
+            throwable.printStackTrace();
+            Toast.makeText(this, "Error cropping : "+throwable.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private void uploadPost() {
+    List<String> uploadedImagesUrl=new ArrayList<>();
+    private void uploadImages(final int index) {
 
+        mDialog=new ProgressDialog(this);
+        int img_count=index+1;
+        mDialog.setMessage("Uploading "+img_count+"/"+imagesList.size()+" images...");
+        mDialog.setIndeterminate(true);
+        mDialog.setCancelable(false);
+        mDialog.setCanceledOnTouchOutside(false);
+        if(!mDialog.isShowing()){
+            Toasty.info(this, "Uploading " + img_count + "/" + imagesList.size() + " images...", Toasty.LENGTH_SHORT, true).show();
+            mDialog.show();
+        }
+
+        final StorageReference fileToUpload=mStorage.child("post_images").child("HIFY_"+System.currentTimeMillis()+"_"+imagesList.get(index).getName());
+        fileToUpload.putFile(Uri.fromFile(new File(imagesList.get(index).getPath())))
+                .addOnSuccessListener(taskSnapshot -> fileToUpload.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+
+                            uploadedImagesUrl.add(uri.toString());
+                            int next_index=index+1;
+                            try {
+                                if (!TextUtils.isEmpty(imagesList.get(index + 1).getOg_path())) {
+                                    uploadImages(next_index);
+                                } else {
+                                    canUpload = true;
+                                    mDialog.dismiss();
+                                    uploadPost();
+                                }
+                            }catch (Exception e){
+                                canUpload = true;
+                                mDialog.dismiss();
+                                uploadPost();
+                            }
+
+                        })
+                        .addOnFailureListener(Throwable::printStackTrace))
+                .addOnFailureListener(Throwable::printStackTrace);
+
+    }
+
+    private void uploadPost() {
 
         mDialog=new ProgressDialog(this);
         mDialog.setMessage("Posting...");
@@ -377,82 +341,73 @@ public class PostImage extends AppCompatActivity {
 
                 mDialog.show();
 
-                mFirestore.collection("Users").document(mCurrentUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                mFirestore.collection("Users").document(mCurrentUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
 
-                        postMap.put("userId", documentSnapshot.getString("id"));
-                        postMap.put("username", documentSnapshot.getString("username"));
-                        postMap.put("name", documentSnapshot.getString("name"));
-                        postMap.put("userimage", documentSnapshot.getString("image"));
-                        postMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                        postMap.put("image_count", uploadedImagesUrl.size());
-                        try {
-                            postMap.put("image_url_0", uploadedImagesUrl.get(0));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_1", uploadedImagesUrl.get(1));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_2", uploadedImagesUrl.get(2));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_3", uploadedImagesUrl.get(3));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_4", uploadedImagesUrl.get(4));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_5", uploadedImagesUrl.get(5));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            postMap.put("image_url_6", uploadedImagesUrl.get(6));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        postMap.put("likes", "0");
-                        postMap.put("favourites", "0");
-                        postMap.put("description", mEditText.getText().toString());
-                        postMap.put("color", "0");
-
-                        mFirestore.collection("Posts")
-                                .add(postMap)
-                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        mDialog.dismiss();
-                                        Toast.makeText(PostImage.this, "Post sent", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        mDialog.dismiss();
-                                        Log.e("Error sending post", e.getMessage());
-                                    }
-                                });
-
-
+                    postMap.put("userId", documentSnapshot.getString("id"));
+                    postMap.put("username", documentSnapshot.getString("username"));
+                    postMap.put("name", documentSnapshot.getString("name"));
+                    postMap.put("userimage", documentSnapshot.getString("image"));
+                    postMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
+                    postMap.put("image_count", uploadedImagesUrl.size());
+                    try {
+                        postMap.put("image_url_0", uploadedImagesUrl.get(0));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        mDialog.dismiss();
-                        Log.e("Error getting user", e.getMessage());
+                    try {
+                        postMap.put("image_url_1", uploadedImagesUrl.get(1));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    try {
+                        postMap.put("image_url_2", uploadedImagesUrl.get(2));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        postMap.put("image_url_3", uploadedImagesUrl.get(3));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        postMap.put("image_url_4", uploadedImagesUrl.get(4));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        postMap.put("image_url_5", uploadedImagesUrl.get(5));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        postMap.put("image_url_6", uploadedImagesUrl.get(6));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    postMap.put("likes", "0");
+                    postMap.put("favourites", "0");
+                    postMap.put("description", mEditText.getText().toString());
+                    postMap.put("color", "0");
+
+                    mFirestore.collection("Posts")
+                            .add(postMap)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    mDialog.dismiss();
+                                    Toast.makeText(PostImage.this, "Post sent", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                mDialog.dismiss();
+                                Log.e("Error sending post", e.getMessage());
+                            });
+
+
+                }).addOnFailureListener(e -> {
+                    mDialog.dismiss();
+                    Log.e("Error getting user", e.getMessage());
                 });
 
             } else {
@@ -464,15 +419,5 @@ public class PostImage extends AppCompatActivity {
         }
 
     }
-
-    public void onSelectImage(View view) {
-        startPickImage(true);
-    }
-
-    public void onSelectImageCamera(View view) {
-        startPickImage(false);
-    }
-
-    //endregion
 
 }

@@ -18,21 +18,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -43,6 +43,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import androidx.appcompat.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,11 +58,11 @@ import com.amsavarthan.hify.feature_ai.adapter.RecentsAdapter;
 import com.amsavarthan.hify.feature_ai.models.Recents;
 import com.amsavarthan.hify.feature_ai.utils.RecentsDatabase;
 import com.amsavarthan.hify.models.DrawerItem;
+import com.amsavarthan.hify.models.Images;
 import com.amsavarthan.hify.models.SimpleItem;
 import com.amsavarthan.hify.ui.activities.account.LoginActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
-import com.amsavarthan.hify.ui.activities.lottie.SendingActivity;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
 import com.amsavarthan.hify.ui.activities.post.PostImage;
 import com.amsavarthan.hify.ui.activities.post.PostText;
@@ -75,17 +76,21 @@ import com.amsavarthan.hify.ui.fragment.About;
 import com.amsavarthan.hify.ui.fragment.FlashMessage;
 import com.amsavarthan.hify.ui.fragment.Forum;
 import com.amsavarthan.hify.ui.fragment.FriendsFragment;
+import com.amsavarthan.hify.ui.activities.notification.Notifications;
 import com.amsavarthan.hify.ui.fragment.ProfileFragment;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.NetworkUtil;
 import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -93,7 +98,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -103,6 +107,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.marcoscg.dialogsheet.DialogSheet;
 import com.tapadoo.alerter.Alerter;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -120,6 +125,7 @@ import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
+
 
 
 /**
@@ -180,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     };
     private BottomSheetDialog mBottomSheetDialog;
     public static Toolbar toolbar;
-    private MenuItem add_post,refresh;
+    private MenuItem add_post;
     private boolean mState=true;
     private RecyclerView recentsRecyclerView;
     ArrayList<Recents> recentsList;
@@ -191,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private MenuItem searchViewItem;
     private boolean mStateForum=false;
     private MenuItem add_question;
+    private List<Images> imagesList=new ArrayList<>();
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
@@ -267,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             searchOpen=false;
             if(mState){
                 add_post.setVisible(true);
-                refresh.setVisible(true);
             }
             search_container.animate()
                     .setDuration(100)
@@ -411,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 @Override
                 public void onClick(View view) {
                     mBottomSheetDialog.dismiss();
-                    PostImage.startActivity(MainActivity.this);
+                    startPickImage();
                 }
             });
 
@@ -517,38 +523,21 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
     public void showDialog(){
 
-        new BottomDialog.Builder(this)
+        new DialogSheet(this)
                 .setTitle("Information")
-                .setContent("Email has not been verified, please verify and continue.")
-                .setPositiveText("Send again")
-                .setPositiveBackgroundColorResource(R.color.colorAccentt)
+                .setMessage("Email has not been verified, please verify and continue.")
+                .setPositiveButton("Send again", v -> mAuth.getCurrentUser().sendEmailVerification()
+                        .addOnSuccessListener(aVoid -> Toast.makeText(MainActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
+                .setNegativeButton("Ok", new DialogSheet.OnNegativeClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                })
                 .setCancelable(true)
-                .onPositive(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull final BottomDialog dialog) {
-                        mAuth.getCurrentUser().sendEmailVerification()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        dialog.dismiss();
-                                        Toast.makeText(MainActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error", e.getMessage());
-                                    }
-                                });
-                    }
-                })
-                .setNegativeText("Ok")
-                .onNegative(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull BottomDialog dialog) {
-                        dialog.dismiss();
-                    }
-                })
+                .setRoundedCorners(true)
+                .setColoredNavigationBar(true)
                 .show();
 
     }
@@ -577,7 +566,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     searchOpen=false;
                     if(mState){
                         add_post.setVisible(true);
-                        refresh.setVisible(true);
                     }
                     search_container.animate()
                             .setDuration(100)
@@ -620,7 +608,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     searchOpen=false;
                     if(mState){
                         add_post.setVisible(true);
-                        refresh.setVisible(true);
                     }
                     search_container.animate()
                             .setDuration(100)
@@ -665,7 +652,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                         searchOpen=false;
                         if(mState){
                             add_post.setVisible(true);
-                            refresh.setVisible(true);
                         }
                         search_container.animate()
                                 .setDuration(100)
@@ -713,7 +699,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                         searchOpen=false;
                         if(mState){
                             add_post.setVisible(true);
-                            refresh.setVisible(true);
                         }
                         search_container.animate()
                                 .setDuration(100)
@@ -760,7 +745,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                         searchOpen=false;
                         if(mState){
                             add_post.setVisible(true);
-                            refresh.setVisible(true);
                         }
                         search_container.animate()
                                 .setDuration(100)
@@ -1306,7 +1290,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_posts, menu);
         add_post=menu.findItem(R.id.action_new);
-        refresh=menu.findItem(R.id.action_refresh);
         add_question=menu.findItem(R.id.action_new_question);
 
         if(mStateForum){
@@ -1317,10 +1300,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         if(mState){
             add_post.setVisible(true);
-            refresh.setVisible(true);
         }else{
             add_post.setVisible(false);
-            refresh.setVisible(false);
         }
 
         searchViewItem = menu.findItem(R.id.action_search);
@@ -1337,7 +1318,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 public void onClick(View v) {
                     if(mState){
                         add_post.setVisible(false);
-                        refresh.setVisible(false);
                     }
                     if(mStateForum){
                         add_question.setVisible(false);
@@ -1405,7 +1385,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                         searchOpen=false;
                         if(mState){
                             add_post.setVisible(true);
-                            refresh.setVisible(true);
                         }
                         if(mStateForum){
                             add_question.setVisible(true);
@@ -1437,6 +1416,67 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Config.PICK_IMAGES ) {
+            if (resultCode == RESULT_OK && data != null) {
+                imagesList.clear();
+                List<Image> pickedImages=ImagePicker.getImages(data);
+
+                for(Image image:pickedImages){
+                    imagesList.add(new Images(image.getName(),image.getPath(),image.getPath(),image.getId()));
+                }
+
+                new MaterialDialog.Builder(this)
+                        .title("Confirmation")
+                        .content("Are you sure do you want to continue?")
+                        .positiveText("Yes")
+                        .negativeText("No")
+                        .cancelable(false)
+                        .canceledOnTouchOutside(false)
+                        .neutralText("Cancel")
+                        .onPositive((dialog, which) -> {
+
+                            Intent intent=new Intent(MainActivity.this,PostImage.class);
+                            intent.putParcelableArrayListExtra("imagesList",(ArrayList<? extends Parcelable>) imagesList);
+                            startActivity(intent);
+
+                        })
+                        .onNegative((dialog, which) -> ImagePicker.create(MainActivity.this)
+                                .folderMode(true)
+                                .toolbarFolderTitle("Select Image(s)")
+                                .toolbarImageTitle("Tap to select")
+                                .includeVideo(false)
+                                .multi()
+                                .limit(7)
+                                .showCamera(true)
+                                .enableLog(true)
+                                .imageDirectory("Hify")
+                                .start(Config.PICK_IMAGES)).show();
+
+            }
+        }
+
+    }
+
+    private void startPickImage() {
+
+        ImagePicker.create(this)
+                .folderMode(true)
+                .toolbarFolderTitle("Folder")
+                .toolbarImageTitle("Tap to select")
+                .includeVideo(false)
+                .multi()
+                .limit(7)
+                .showCamera(true)
+                .enableLog(true)
+                .imageDirectory("Hify")
+                .start(Config.PICK_IMAGES);
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -1448,8 +1488,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 }
                 return true;
 
-            case R.id.action_refresh:
-                showFragment(new Dashboard());
+            case R.id.action_notifications:
+                startActivity(new Intent(MainActivity.this, Notifications.class));
                 return true;
             case R.id.action_new_question:
                 startActivity(new Intent(MainActivity.this, AddQuestion.class));

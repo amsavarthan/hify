@@ -1,6 +1,6 @@
 package com.amsavarthan.hify.models;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Created by amsavarthan on 22/2/18.

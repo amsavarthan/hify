@@ -5,19 +5,27 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Person;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.media.RingtoneManager;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
@@ -27,6 +35,7 @@ import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
 import com.amsavarthan.hify.ui.activities.notification.NotificationReplyActivity;
+import com.amsavarthan.hify.utils.database.NotificationsHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,9 +44,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static android.media.RingtoneManager.getDefaultUri;
-import static java.lang.System.currentTimeMillis;
 
 /**
  * Created by amsavarthan on 10/3/18.
@@ -49,6 +55,7 @@ public class NotificationUtil {
     private static String TAGPush = "Push Notification";
 
     private Context mContext;
+    public static boolean read=true;
 
     public NotificationUtil(Context mContext) {
         this.mContext = mContext;
@@ -137,38 +144,36 @@ public class NotificationUtil {
         }
     }
 
-
-
     public Intent getIntent(String click_action) {
 
         Intent resultIntent;
 
         switch (click_action) {
-            case "com.app.ej.ms.TARGETNOTIFICATION":
+            case "com.amsavarthan.hify.TARGETNOTIFICATION":
                 resultIntent = new Intent(mContext, NotificationActivity.class);
                 break;
-            case "com.app.ej.ms.TARGETNOTIFICATIONREPLY":
+            case "com.amsavarthan.hify.TARGETNOTIFICATIONREPLY":
                 resultIntent = new Intent(mContext, NotificationReplyActivity.class);
                 break;
-            case "com.app.ej.ms.TARGETNOTIFICATION_IMAGE":
+            case "com.amsavarthan.hify.TARGETNOTIFICATION_IMAGE":
                 resultIntent = new Intent(mContext, NotificationImage.class);
                 break;
-            case "com.app.ej.ms.TARGETNOTIFICATIONREPLY_IMAGE":
+            case "com.amsavarthan.hify.TARGETNOTIFICATIONREPLY_IMAGE":
                 resultIntent = new Intent(mContext, NotificationImageReply.class);
                 break;
-            case "com.app.ej.ms.TARGET_FRIENDREQUEST":
+            case "com.amsavarthan.hify.TARGET_FRIENDREQUEST":
                 resultIntent = new Intent(mContext, FriendProfile.class);
                 break;
-            case "com.app.ej.ms.TARGET_ACCEPTED":
+            case "com.amsavarthan.hify.TARGET_ACCEPTED":
                 resultIntent = new Intent(mContext, FriendProfile.class);
                 break;
-            case "com.app.ej.ms.TARGET_LIKE":
+            case "com.amsavarthan.hify.TARGET_LIKE":
                 resultIntent = new Intent(mContext, MainActivity.class).putExtra("openFragment","forLike");
                 break;
-            case "com.app.ej.ms.TARGET_COMMENT":
+            case "com.amsavarthan.hify.TARGET_COMMENT":
                 resultIntent = new Intent(mContext, MainActivity.class).putExtra("openFragment","forComment");
                 break;
-            case "com.app.ej.ms.TARGET_FORUM":
+            case "com.amsavarthan.hify.TARGET_FORUM":
                 resultIntent = new Intent(mContext, AnswersActivity.class);
                 break; //TARGET_COMMENT
             default:
@@ -207,11 +212,15 @@ public class NotificationUtil {
                 .setSound(Uri.parse("android.resource://"+mContext.getPackageName()+"/"+R.raw.hify_sound))
                 .setColor(Color.parseColor("#2591FC"))
                 .setStyle(bigTextStyle)
-                //.addPerson(user_image)
-                //.setLargeIcon(getBitmapFromURL(user_image))
+                .setLargeIcon(getCircularBitmap(getBitmapFromURL(user_image)))
                 .setSmallIcon(icon)
                 .setContentText(message)
                 .build();
+
+        NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
+        notificationsHelper.insertContact(user_image,title,message,timeStamp);
+        read=false;
+        notificationsHelper.close();
 
         notificationManagerCompat.notify(id, notification);
     }
@@ -226,12 +235,11 @@ public class NotificationUtil {
         }
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
+        Notification notification;
 
         NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
         bigPictureStyle.setBigContentTitle(title);
         bigPictureStyle.bigPicture(bitmap);
-
-        Notification notification;
 
         notification = mBuilder
                 .setAutoCancel(true)
@@ -244,11 +252,15 @@ public class NotificationUtil {
                 .setWhen(getTimeMilliSec(timeStamp))
                 .setColor(Color.parseColor("#2591FC"))
                 .setStyle(bigPictureStyle) //bigPictureStyle
-                //.setLargeIcon(getBitmapFromURL(user_image))
+                .setLargeIcon(getCircularBitmap(getBitmapFromURL(user_image)))
                 .setSmallIcon(icon)
-                //.addPerson(user_image)
                 .setContentText(message)
                 .build();
+
+        NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
+        notificationsHelper.insertContact(user_image,title,message,timeStamp);
+        read=false;
+        notificationsHelper.close();
 
         notificationManagerCompat.notify(id, notification);
     }
@@ -265,6 +277,26 @@ public class NotificationUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private Bitmap getCircularBitmap(Bitmap bitmap){
+        final Bitmap output=Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(),Bitmap.Config.ARGB_8888);
+        final Canvas canvas=new Canvas(output);
+        final int color=Color.RED;
+        final Paint paint=new Paint();
+        final Rect rect=new Rect(0,0,bitmap.getWidth(),bitmap.getHeight());
+        final RectF rectF=new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0,0,0,0);
+        paint.setColor(color);
+        canvas.drawOval(rectF,paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap,rect,rect,paint);
+        bitmap.recycle();
+        return output;
+
     }
 
 }

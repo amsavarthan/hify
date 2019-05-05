@@ -2,9 +2,10 @@ package com.amsavarthan.hify.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.multidex.MultiDex;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.multidex.MultiDex;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.account.LoginActivity;
@@ -31,11 +32,11 @@ public class Splash extends AppCompatActivity {
             public void run() {
 
                 if(FirebaseAuth.getInstance().getCurrentUser()==null){
-                    finish();
                     startActivity(new Intent(Splash.this, LoginActivity.class));
-                }else{
                     finish();
+                }else{
                     startActivity(new Intent(Splash.this, MainActivity.class));
+                    finish();
                 }
 
             }

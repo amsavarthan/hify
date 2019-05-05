@@ -7,14 +7,14 @@
     android:background="#FFF"
     android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/top"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             app:title="Comment"
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:background="#FFF"
             />
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -65,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_above="@+id/comment_section"
         android:layout_width="match_parent"
@@ -97,13 +97,13 @@
             android:paddingBottom="12dp"
             android:singleLine="true" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            app:icon="@drawable/ic_send_white_24dp"
             android:background="@drawable/input_backgtound"
-            android:drawableStart="@drawable/ic_send_white_24dp"
             android:gravity="center"
             android:paddingStart="20dp"
             android:paddingEnd="10dp"

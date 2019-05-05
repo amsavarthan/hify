@@ -3,13 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.amsavarthan.hify.ui.activities.post.PostText">
 
-    <item
-        android:id="@+id/action_edit"
-        android:title="Add"
-        android:orderInCategory="100"
-        android:visible="false"
-        android:icon="@drawable/ic_add_black"
-        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_post"

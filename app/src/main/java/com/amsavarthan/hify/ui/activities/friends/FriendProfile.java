@@ -6,17 +6,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -28,15 +18,26 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
 import com.amsavarthan.hify.models.Post;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -44,6 +45,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +58,8 @@ import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
+
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class FriendProfile extends AppCompatActivity {
 
@@ -227,7 +231,8 @@ public class FriendProfile extends AppCompatActivity {
             mRecyclerView=rootView.findViewById(R.id.recyclerView);
 
             mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), LinearLayoutManager.VERTICAL, false));
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext(), VERTICAL, false));
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
             mRecyclerView.setHasFixedSize(true);
             mRecyclerView.setAdapter(mAdapter);
 
@@ -494,60 +499,33 @@ public class FriendProfile extends AppCompatActivity {
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
 
-                            accept.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                            accept.setOnClickListener(v -> new DialogSheet(rootView.getContext())
+                                    .setTitle("Accept Friend Request")
+                                    .setMessage("Are you sure do you want to accept " + friend_name + "'s friend request?")
+                                    .setPositiveButton("Yes", v12 -> acceptRequest())
+                                    .setNegativeButton("No", v1 -> {
 
-                                    new BottomDialog.Builder(rootView.getContext())
-                                            .setTitle("Accept Friend Request")
-                                            .setContent("Are you sure do you want to accept " + friend_name + "'s friend request?")
-                                            .setPositiveText("Yes")
-                                            .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                            .setNegativeText("No")
-                                            .onPositive(new BottomDialog.ButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull BottomDialog dialog) {
-                                                    acceptRequest();
-                                                    dialog.dismiss();
-                                                }
-                                            }).onNegative(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull BottomDialog dialog) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
+                                    })
+                                    .setColoredNavigationBar(true)
+                                    .setRoundedCorners(true)
+                                    .setCancelable(true)
+                                    .show());
 
-                                }
-                            });
+                            decline.setOnClickListener(v -> new DialogSheet(rootView.getContext())
+                                    .setTitle("Decline Friend Request")
+                                    .setMessage("Are you sure do you want to decline " + name + "'s friend request?")
+                                    .setPositiveButton("Yes", v13 -> declineRequest())
+                                    .setNegativeButton("No", v14 -> {
 
-                            decline.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                                    })
+                                    .setRoundedCorners(true)
+                                    .setColoredNavigationBar(true)
+                                    .setCancelable(true)
+                                    .show());
 
-                                    new BottomDialog.Builder(rootView.getContext())
-                                            .setTitle("Decline Friend Request")
-                                            .setContent("Are you sure do you want to decline " + name + "'s friend request?")
-                                            .setPositiveText("Yes")
-                                            .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                            .setNegativeText("No")
-                                            .onPositive(new BottomDialog.ButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull BottomDialog dialog) {
-                                                    declineRequest();
-                                                    dialog.dismiss();
-                                                }
-                                            }).onNegative(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull BottomDialog dialog) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
-
-                                }
-                            });
+                       }
 
 
-                        }
                     }).start();
 
 
@@ -564,31 +542,17 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
-                            add_friend.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                            add_friend.setOnClickListener(v -> new DialogSheet(rootView.getContext())
+                                    .setTitle("Add Friend ")
+                                    .setMessage("Are you sure do you want to send friend request to " + friend_name +" ?")
+                                    .setPositiveButton("Yes", v1 -> addFriend())
+                                    .setNegativeButton("No", v12 -> {
 
-                                    new BottomDialog.Builder(rootView.getContext())
-                                            .setTitle("Add Friend ")
-                                            .setContent("Are you sure do you want to send friend request to " + friend_name +" ?")
-                                            .setPositiveText("Yes")
-                                            .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                            .setNegativeText("No")
-                                            .onPositive(new BottomDialog.ButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull BottomDialog dialog) {
-                                                    addFriend();
-                                                    dialog.dismiss();
-                                                }
-                                            }).onNegative(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull BottomDialog dialog) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
-
-                                }
-                            });
+                                    })
+                                    .setColoredNavigationBar(true)
+                                    .setRoundedCorners(true)
+                                    .setCancelable(true)
+                                    .show());
                         }
                     }).start();
         }
@@ -604,31 +568,17 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
-                            remove_friend.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                            remove_friend.setOnClickListener(v -> new DialogSheet(rootView.getContext())
+                                    .setTitle("Remove Friend ")
+                                    .setMessage("Are you sure do you want to remove " + friend_name + " from your friend list?")
+                                    .setPositiveButton("Yes", v12 -> removeFriend())
+                                    .setNegativeButton("No", v1 -> {
 
-                                    new BottomDialog.Builder(rootView.getContext())
-                                            .setTitle("Remove Friend ")
-                                            .setContent("Are you sure do you want to remove " + friend_name + " from your friend list?")
-                                            .setPositiveText("Yes")
-                                            .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                                            .setNegativeText("No")
-                                            .onPositive(new BottomDialog.ButtonCallback() {
-                                                @Override
-                                                public void onClick(@NonNull BottomDialog dialog) {
-                                                    removeFriend();
-                                                    dialog.dismiss();
-                                                }
-                                            }).onNegative(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull BottomDialog dialog) {
-                                            dialog.dismiss();
-                                        }
-                                    }).show();
-
-                                }
-                            });
+                                    })
+                                    .setRoundedCorners(true)
+                                    .setColoredNavigationBar(true)
+                                    .setCancelable(true)
+                                    .show());
                         }
                     }).start();
 
@@ -654,21 +604,9 @@ public class FriendProfile extends AppCompatActivity {
                             friendInfo.put("email", friend_email);
                             friendInfo.put("id", id);
                             friendInfo.put("image", friend_image);
-                            //    friendInfo.put("token_id", friend_token);
-                            // TODO We are looking for the array of friend's tokens
-
-
-
                             friendInfo.put("token_ids", friend_tokens);
                             friendInfo.put("notification_id", String.valueOf(System.currentTimeMillis()));
                             friendInfo.put("timestamp", String.valueOf(System.currentTimeMillis()));
-
-
-
-
-
-
-
 
                             //Add data friend to current user
                             mFirestore.collection("Users/" + currentUser.getUid() + "/Friends/")
@@ -718,15 +656,7 @@ public class FriendProfile extends AppCompatActivity {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
 
-
-
-
-
-
-
-
-
-                                                                            mFirestore.collection("Notifications")
+                                                                               mFirestore.collection("Notifications")
                                                                                     .document(id)
                                                                                     .collection("Accepted_Friend_Requests")
                                                                                     .document(email_c)

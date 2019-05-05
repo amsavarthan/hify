@@ -119,6 +119,7 @@
                         android:layout_marginTop="20dp"
                         android:background="@drawable/border_button"
                         android:onClick="onRegister"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:text="Need a new Account ?"
                         android:textAllCaps="false"
                         android:textColor="#5093FF"

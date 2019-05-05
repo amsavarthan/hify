@@ -2,19 +2,20 @@ package com.amsavarthan.hify.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.FriendRequestAdapter;
@@ -32,6 +33,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -120,7 +123,7 @@ public class FriendRequests extends Fragment {
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
 
         mRequestView.setItemAnimator(new DefaultItemAnimator());
-        mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), VERTICAL, false));
         mRequestView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);

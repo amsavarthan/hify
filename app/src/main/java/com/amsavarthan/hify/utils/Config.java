@@ -1,6 +1,6 @@
 package com.amsavarthan.hify.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.Random;
 
@@ -10,25 +10,19 @@ import java.util.Random;
 
 public class Config {
 
-    // global topic to receive app wide push notifications
     public static final String TOPIC_GLOBAL           = "global";
 
-    // broadcast receiver intent filters
     public static final String REGISTRATION_COMPLETE  = "registrationComplete";
     public static final String PUSH_NOTIFICATION      = "pushNotification";
 
-    // id to handle the notification in the notification tray
-    public static final int NOTIFICATION_ID           = 100;
-    public static final int NOTIFICATION_ID_BIG_IMAGE = 101;
 
     public static final String SHARED_PREF            = "ah_firebase";
 
     public static final String ADMIN_CHANNEL_ID       = "com.amsavarthan.hify";
     public static final String ADMIN_CHANNEL_NAME     = "Sample Channel Name";
     public static final String ADMIN_CHANNEL_DESCPT   = "Sample Channel Description";
-    public static final String KEY_REPLY              = "key_reply";
 
-    public static final String FIREBASE_AUTH_KEY      = "your_firebase_auth_key";
+    public static final int PICK_IMAGES = 102;
 
     @NonNull
     public static String random() {

@@ -1,13 +1,14 @@
 package com.amsavarthan.hify.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.Users;
@@ -43,7 +44,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item_list,parent,false);
+        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user,parent,false);
         return new ViewHolder(view);
     }
 

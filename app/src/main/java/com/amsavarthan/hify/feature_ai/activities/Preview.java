@@ -1,13 +1,12 @@
 package com.amsavarthan.hify.feature_ai.activities;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-
 import com.amsavarthan.hify.R;
 import com.bumptech.glide.Glide;
-
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class Preview extends AppCompatActivity {
 

@@ -5,31 +5,24 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.transition.Fade;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.database.UserHelper;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -41,6 +34,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -222,39 +216,19 @@ public class LoginActivity extends AppCompatActivity {
                         else{
 
                             mDialog.dismiss();
-                            new BottomDialog.Builder(LoginActivity.this)
+                            new DialogSheet(LoginActivity.this)
                                     .setTitle("Information")
-                                    .setContent("Email has not been verified, please verify and continue.")
-                                    .setPositiveText("Send again")
-                                    .setPositiveBackgroundColorResource(R.color.colorAccentt)
                                     .setCancelable(true)
-                                    .onPositive(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull final BottomDialog dialog) {
-                                            task.getResult()
-                                                    .getUser()
-                                                    .sendEmailVerification()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            dialog.dismiss();
-                                                            Toast.makeText(LoginActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error",e.getMessage());
-                                                        }
-                                                    });
-                                        }
-                                    })
-                                    .setNegativeText("Ok")
-                                    .onNegative(new BottomDialog.ButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull BottomDialog dialog) {
-                                            dialog.dismiss();
-                                        }
+                                    .setRoundedCorners(true)
+                                    .setColoredNavigationBar(true)
+                                    .setMessage("Email has not been verified, please verify and continue.")
+                                    .setPositiveButton("Send again", v -> task.getResult()
+                                            .getUser()
+                                            .sendEmailVerification()
+                                            .addOnSuccessListener(aVoid -> Toast.makeText(LoginActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show())
+                                            .addOnFailureListener(e -> Log.e("Error",e.getMessage())))
+                                    .setNegativeButton("Ok", v -> {
+
                                     })
                                     .show();
 

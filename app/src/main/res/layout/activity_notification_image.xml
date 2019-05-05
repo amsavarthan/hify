@@ -10,13 +10,13 @@
     android:background="@color/colorPrimaryy"
     tools:context=".ui.activities.notification.NotificationImage">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/main_toolbar"
             app:title="Message"
             android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:background="#FFF"
             />
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_above="@id/message_layoutt"

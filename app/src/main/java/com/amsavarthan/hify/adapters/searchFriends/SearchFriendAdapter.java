@@ -3,9 +3,6 @@ package com.amsavarthan.hify.adapters.searchFriends;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,17 +11,21 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.Friends;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -170,27 +171,14 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
     public void removeItem(final int position, final Snackbar snackbar, final int deletedIndex, final Friends deletedItem) {
 
-        new BottomDialog.Builder(context)
+        new DialogSheet(context)
                 .setTitle("Add Friend")
-                .setContent("Are you sure do you want to add " + usersList.get(position).getName() + " to your friend list?")
-                .setPositiveText("Yes")
-                .setNegativeText("No")
-                .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                .setCancelable(false)
-                .onPositive(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull BottomDialog dialog) {
-                        addUser(position, deletedIndex, deletedItem);
-                        dialog.dismiss();
-                    }
-                }).onNegative(new BottomDialog.ButtonCallback() {
-            @Override
-            public void onClick(@NonNull BottomDialog dialog) {
-                dialog.dismiss();
-                notifyDataSetChanged();
-            }
-        }).show();
-
+                .setMessage("Are you sure do you want to add " + usersList.get(position).getName() + " to your friend list?")
+                .setPositiveButton("Yes", v -> addUser(position, deletedIndex, deletedItem))
+                .setNegativeButton("No", v -> notifyDataSetChanged())
+                .setColoredNavigationBar(true)
+                .setRoundedCorners(true)
+                .show();
 
     }
 
@@ -198,17 +186,14 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
         FirebaseFirestore.getInstance().collection("Users").document(usersList.get(position).userId)
                 .collection("Friend_Requests").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (!documentSnapshot.exists()) {
-                    executeFriendReq(deletedIndex, deletedItem);
-                } else {
-                    Snackbar.make(view, "Friend request has been sent already", Snackbar.LENGTH_LONG).show();
-                    notifyDataSetChanged();
-                }
-            }
-        });
+                .get().addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        executeFriendReq(deletedIndex, deletedItem);
+                    } else {
+                        Snackbar.make(view, "Friend request has been sent already", Snackbar.LENGTH_LONG).show();
+                        notifyDataSetChanged();
+                    }
+                });
 
     }
 

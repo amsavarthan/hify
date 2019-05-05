@@ -2,8 +2,6 @@ package com.amsavarthan.hify.adapters.viewFriends;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +10,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.ViewFriends;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +27,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
         return new ViewHolder(view);
     }
 
-	@Override
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -68,7 +69,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
     public int getItemViewType(int position) {
         return position;
     }
-	
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
@@ -98,7 +99,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
                             try {
                                 if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
                                         !documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername()) &&
-                                !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                                        !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
                                     Map<String, Object> user = new HashMap<>();
                                     user.put("name", documentSnapshot.getString("name"));
@@ -319,38 +320,21 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
             Log.w("error","fastscrolled",ex);
         }
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendProfile.startActivity(context, usersList.get(holder.getAdapterPosition()).getId());
-            }
-        });
+        holder.mView.setOnClickListener(view -> FriendProfile.startActivity(context, usersList.get(holder.getAdapterPosition()).getId()));
 
     }
 
 
     public void removeItem(final int position) {
 
-        new BottomDialog.Builder(context)
+        new DialogSheet(context)
                 .setTitle("Unfriend " + usersList.get(position).getName())
-                .setContent("Are you sure do you want to remove " + usersList.get(position).getName() + " from your friend list?")
-                .setPositiveText("Yes")
-                .setPositiveBackgroundColorResource(R.color.colorAccentt)
-                .setNegativeText("No")
-                .setCancelable(false)
-                .onPositive(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull BottomDialog dialog) {
-                        removeUser(position);
-                        dialog.dismiss();
-                    }
-                }).onNegative(new BottomDialog.ButtonCallback() {
-            @Override
-            public void onClick(@NonNull BottomDialog dialog) {
-                dialog.dismiss();
-                notifyDataSetChanged();
-            }
-        }).show();
+                .setMessage("Are you sure do you want to remove " + usersList.get(position).getName() + " from your friend list?")
+                .setPositiveButton("Yes", v -> removeUser(position))
+                .setNegativeButton("No", v -> notifyDataSetChanged())
+                .setRoundedCorners(true)
+                .setColoredNavigationBar(true)
+                .show();
 
     }
 
@@ -358,32 +342,17 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
     private void removeUser(final int position) {
 
         FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .collection("Friends").document(usersList.get(position).getId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-
-                FirebaseFirestore.getInstance()
+                .collection("Friends").document(usersList.get(position).getId()).delete().addOnSuccessListener(aVoid -> FirebaseFirestore.getInstance()
                         .collection("Users")
                         .document(usersList.get(position).getId())
                         .collection("Friends")
                         .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .delete()
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        usersList.remove(position);
-                        notifyItemRemoved(position);
-                        notifyDataSetChanged();
-                    }
-                });
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                        .addOnSuccessListener(aVoid1 -> {
+                            usersList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyDataSetChanged();
+                        })).addOnFailureListener(e -> Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show());
 
     }
 

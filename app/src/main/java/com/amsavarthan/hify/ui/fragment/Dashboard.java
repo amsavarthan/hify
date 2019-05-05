@@ -2,15 +2,15 @@ package com.amsavarthan.hify.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +21,9 @@ import android.widget.Toast;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
 import com.amsavarthan.hify.models.Post;
-import com.github.javiersantos.bottomdialogs.BottomDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,7 @@ public class Dashboard extends Fragment {
         mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mPostsRecyclerView.setHasFixedSize(true);
+        mPostsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
         mPostsRecyclerView.setAdapter(mAdapter_v19);
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -214,10 +216,6 @@ public class Dashboard extends Fragment {
                                                             }
                                                         }
 
-                                                        if (mPostsList.isEmpty()) {
-                                                           getCurrentUsersPosts();
-                                                        }
-
                                                     } else {
 
                                                        getCurrentUsersPosts();
@@ -308,38 +306,16 @@ public class Dashboard extends Fragment {
 
     public void showDialog(){
 
-        new BottomDialog.Builder(mView.getContext())
+        new DialogSheet(mView.getContext())
                 .setTitle("Information")
-                .setContent("Email has not been verified, please verify and continue.")
-                .setPositiveText("Send again")
-                .setPositiveBackgroundColorResource(R.color.colorAccentt)
+                .setMessage("Email has not been verified, please verify and continue.")
+                .setPositiveButton("Send again", v -> mAuth.getCurrentUser().sendEmailVerification()
+                        .addOnSuccessListener(aVoid -> Toast.makeText(mView.getContext(), "Verification email sent", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
+                .setNegativeButton("No", v -> {})
+                .setRoundedCorners(true)
+                .setColoredNavigationBar(true)
                 .setCancelable(true)
-                .onPositive(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull final BottomDialog dialog) {
-                        mAuth.getCurrentUser().sendEmailVerification()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        dialog.dismiss();
-                                        Toast.makeText(mView.getContext(), "Verification email sent", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error", e.getMessage());
-                                    }
-                                });
-                    }
-                })
-                .setNegativeText("Ok")
-                .onNegative(new BottomDialog.ButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull BottomDialog dialog) {
-                        dialog.dismiss();
-                    }
-                })
                 .show();
 
     }

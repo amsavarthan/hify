@@ -6,16 +6,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Looper;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
-import com.amsavarthan.hify.ui.activities.lottie.FestivalActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
@@ -47,14 +47,12 @@ public class FCMService extends FirebaseMessagingService {
         super.onNewToken(token);
         Log.d("NEW_TOKEN",token);
 
-        //String refreshedToken = FirebaseInstanceId.getInstance().getToken(); // Deprecated
         storeRegIdInPref(token);
         sendRegistrationToServer(token);
 
         Intent registrationComplete = new Intent(Config.REGISTRATION_COMPLETE);
         registrationComplete.putExtra("token", token);
 
-        // TODO Need to get array list from shared preferences and add token to list of tokens?
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 

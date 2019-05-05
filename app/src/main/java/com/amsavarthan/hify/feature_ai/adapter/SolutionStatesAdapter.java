@@ -2,15 +2,13 @@ package com.amsavarthan.hify.feature_ai.adapter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.feature_ai.activities.ResultState;

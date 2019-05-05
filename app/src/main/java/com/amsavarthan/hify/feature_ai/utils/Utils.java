@@ -7,12 +7,14 @@ import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -59,24 +61,6 @@ public class Utils {
         }
 
         return stringBuffer.toString();
-    }
-
-    // Show multiline snackbar with message and action
-
-    public static void showMultiLineSnackBar(CoordinatorLayout coordinatorLayout, String contentMessage, String actionMessage, View.OnClickListener mOnClickListener) {
-
-        Snackbar snackbar = Snackbar
-                .make(coordinatorLayout, contentMessage, Snackbar.LENGTH_INDEFINITE)
-                .setAction(actionMessage, mOnClickListener);
-        snackbar.setActionTextColor(Color.YELLOW);
-
-        View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(Color.DKGRAY);
-
-        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(4);
-
-        snackbar.show();
     }
 
     // Check network connectivity

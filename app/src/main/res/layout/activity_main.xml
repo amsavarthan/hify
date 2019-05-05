@@ -7,14 +7,14 @@
     android:background="#FFF"
     android:orientation="vertical">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_alignParentTop="true"
         android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             app:title="Dashboard"
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:background="#FFF"
             />
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
         android:layout_below="@+id/top"
@@ -44,7 +44,7 @@
             android:layout_height="match_parent"
             >
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recentsView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
