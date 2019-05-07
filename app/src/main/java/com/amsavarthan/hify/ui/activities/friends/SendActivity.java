@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -69,6 +68,7 @@ import java.util.Map;
 import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -279,7 +279,7 @@ public class SendActivity extends AppCompatActivity {
                        }
                    });
                }catch (Exception ex){
-                   Toast.makeText(SendActivity.this, "No image found for this place.", Toast.LENGTH_SHORT).show();
+                   Toasty.info(SendActivity.this, "No image found for this place.", Toasty.LENGTH_SHORT,true).show();
                }
             }
         });
@@ -358,7 +358,7 @@ public class SendActivity extends AppCompatActivity {
                         imagePreview.setVisibility(View.VISIBLE);
                         text.setVisibility(View.GONE);
                         imageUri=data.getData();
-                        Toast.makeText(SendActivity.this, "You can long press to remove the attachment", Toast.LENGTH_SHORT).show();
+                        Toasty.info(SendActivity.this, "You can long press to remove the attachment", Toasty.LENGTH_SHORT,true).show();
                         imagePreview.setImageURI(imageUri);
                         dialog.dismiss();
                     }
@@ -479,11 +479,11 @@ public class SendActivity extends AppCompatActivity {
             startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
         } catch (GooglePlayServicesRepairableException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Some error occurred.", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Some error occurred.", Toasty.LENGTH_SHORT,true).show();
             Log.e("Error",e.getMessage());
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Google play services not available", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Google play services not available", Toasty.LENGTH_SHORT,true).show();
             Log.e("Error",e.getMessage());
         }
 

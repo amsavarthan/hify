@@ -40,6 +40,8 @@ exports.sendLikeNotification = functions.firestore.document("Posts/{post_id}/Lik
                             title:liker_name,
                             from_image:liker_image,
                             body:"Liked your post",
+							notification_type:"like",
+							channel_name:"Hify Posts",
                             click_action:"com.amsavarthan.hify.TARGET_LIKE"
                         } 
                     };

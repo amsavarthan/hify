@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
@@ -99,7 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if(report.isAnyPermissionPermanentlyDenied()){
-                            Toast.makeText(RegisterActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toast.LENGTH_LONG).show();
+                            Toasty.info(RegisterActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toasty.LENGTH_LONG,true).show();
                         }
                     }
 
@@ -220,7 +220,7 @@ public class RegisterActivity extends AppCompatActivity {
                                         if(!documentSnapshot.exists()){
                                             registerUser();
                                         }else{
-                                            Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
+                                            Toasty.error(RegisterActivity.this, "Username already exists", Toasty.LENGTH_SHORT,true).show();
                                             AnimationUtil.shakeView(username, RegisterActivity.this);
                                             mDialog.dismiss();
                                         }
@@ -246,7 +246,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 }else{
                     AnimationUtil.shakeView(profile_image, RegisterActivity.this);
-                    Toast.makeText(RegisterActivity.this, "We recommend you to set a profile picture", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(RegisterActivity.this, "We recommend you to set a profile picture", Toasty.LENGTH_SHORT,true).show();
                     mDialog.dismiss();
                 }
 
@@ -306,7 +306,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                                             public void onSuccess(Void aVoid) {
 
                                                                                 mDialog.dismiss();
-                                                                                Toast.makeText(RegisterActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show();
+                                                                                Toasty.success(RegisterActivity.this, "Verification email sent", Toasty.LENGTH_SHORT,true).show();
                                                                                 finish();
 
                                                                             }
@@ -314,7 +314,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                                             @Override
                                                                             public void onFailure(@NonNull Exception e) {
                                                                                 mDialog.dismiss();
-                                                                                Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                                Toasty.error(RegisterActivity.this, "Error: " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
                                                                             }
                                                                         });
 
@@ -354,7 +354,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 } else {
                     mDialog.dismiss();
-                    Toast.makeText(RegisterActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    Toasty.error(RegisterActivity.this, "Error: " + task.getException().getMessage(), Toasty.LENGTH_SHORT,true).show();
                 }
             }
         });
@@ -385,14 +385,16 @@ public class RegisterActivity extends AppCompatActivity {
         if (requestCode == UCrop.REQUEST_CROP) {
             if (resultCode == RESULT_OK) {
                 imageUri = UCrop.getOutput(data);
-                try {
-                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
+                /*try {
+                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(70).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
                     profile_image.setImageURI(Uri.fromFile(compressedFile));
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(this, "Unable to compress: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    Toasty.warning(this, "Unable to compress: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                     profile_image.setImageURI(imageUri);
-                }
+                }*/
+                profile_image.setImageURI(imageUri);
+
             } else if (resultCode == UCrop.RESULT_ERROR) {
                 Log.e("Error", "Crop error:" + UCrop.getError(data).getMessage());
             }

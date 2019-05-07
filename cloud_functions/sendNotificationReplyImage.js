@@ -45,6 +45,8 @@ exports.sendNotificationReplyImage=functions.firestore.document("Users/{user_id}
                 image:reply_image,
                 reply_for:from_reply,
                 title:from_name,
+				notification_type:"Message",
+				channel_name:"Flash Messages",
                 body:"Reply for: Image you sent with message '" + from_reply + "'" + "\nMessage: " + from_message,
                 click_action:"com.amsavarthan.hify.TARGETNOTIFICATIONREPLY_IMAGE"
               }

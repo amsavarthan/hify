@@ -1,11 +1,8 @@
 package com.amsavarthan.hify.ui.activities;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,8 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,29 +34,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import androidx.appcompat.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.DrawerAdapter;
-import com.amsavarthan.hify.feature_ai.activities.AddQuestion;
-import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
-import com.amsavarthan.hify.feature_ai.activities.ResultActivity;
-import com.amsavarthan.hify.feature_ai.adapter.RecentsAdapter;
-import com.amsavarthan.hify.feature_ai.models.Recents;
-import com.amsavarthan.hify.feature_ai.utils.RecentsDatabase;
 import com.amsavarthan.hify.models.DrawerItem;
 import com.amsavarthan.hify.models.Images;
 import com.amsavarthan.hify.models.SimpleItem;
 import com.amsavarthan.hify.ui.activities.account.LoginActivity;
 import com.amsavarthan.hify.ui.activities.account.UpdateAvailable;
+import com.amsavarthan.hify.ui.activities.forum.AddQuestion;
+import com.amsavarthan.hify.ui.activities.forum.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
 import com.amsavarthan.hify.ui.activities.post.PostImage;
@@ -80,6 +67,8 @@ import com.amsavarthan.hify.ui.activities.notification.Notifications;
 import com.amsavarthan.hify.ui.fragment.ProfileFragment;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.NetworkUtil;
+import com.amsavarthan.hify.utils.NotificationUtil;
+import com.amsavarthan.hify.utils.database.NotificationsHelper;
 import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -92,6 +81,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -112,8 +102,6 @@ import com.tapadoo.alerter.Alerter;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -121,6 +109,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -188,19 +177,18 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     public static Toolbar toolbar;
     private MenuItem add_post;
     private boolean mState=true;
-    private RecyclerView recentsRecyclerView;
-    ArrayList<Recents> recentsList;
-    RecentsAdapter recentsAdapter;
-    private FrameLayout search_container;
-    private SearchView searchView;
-    private boolean searchOpen;
-    private MenuItem searchViewItem;
     private boolean mStateForum=false;
     private MenuItem add_question;
     private List<Images> imagesList=new ArrayList<>();
+    private boolean validate;
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
+        context.startActivity(intent);
+    }
+
+    public static void startActivity(Context context,boolean validate) {
+        Intent intent=new Intent(context,MainActivity.class).putExtra("validate",validate);
         context.startActivity(intent);
     }
 
@@ -245,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         username = findViewById(R.id.username);
         imageView = findViewById(R.id.profile_image);
+
+        validate=getIntent().getBooleanExtra("validate",false);
+
         if(currentuser!=null)
         {
             try {
@@ -269,54 +260,28 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     @Override
     public void onBackPressed() {
 
-        if(searchOpen){
+        if (!mState) {
 
-            searchOpen=false;
-            if(mState){
-                add_post.setVisible(true);
+            toolbar.setTitle("Dashboard");
+            try {
+                getSupportActionBar().setTitle("Dashboard");
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
             }
-            search_container.animate()
-                    .setDuration(100)
-                    .alpha(0.0f)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            super.onAnimationEnd(animation);
-                            searchViewItem.collapseActionView();
-                            search_container.setVisibility(View.GONE);
-                        }
-                    })
-                    .start();
-
-            searchView.setQuery("", false);
-            searchView.onActionViewCollapsed();
-            searchViewItem.collapseActionView();
-
-        }else {
-
-            if (!mState) {
-
-                toolbar.setTitle("Dashboard");
-                try {
-                    getSupportActionBar().setTitle("Dashboard");
-                } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                }
-                this.invalidateOptionsMenu();
-                mState = true;
-                showFragment(new Dashboard());
-                if (slidingRootNav.isMenuOpened()) {
-                    slidingRootNav.closeMenu(true);
-                }
-                adapter.setSelected(POS_DASHBOARD);
-
-            } else if (slidingRootNav.isMenuOpened()) {
+            this.invalidateOptionsMenu();
+            mState = true;
+            showFragment(new Dashboard());
+            if (slidingRootNav.isMenuOpened()) {
                 slidingRootNav.closeMenu(true);
-            } else {
-                super.onBackPressed();
             }
+            adapter.setSelected(POS_DASHBOARD);
 
+        } else if (slidingRootNav.isMenuOpened()) {
+            slidingRootNav.closeMenu(true);
+        } else {
+            super.onBackPressed();
         }
+
     }
 
     @Override
@@ -429,8 +394,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     startActivity(new Intent(this, SinglePostView.class).putExtra("post_id", getIntent().getStringExtra("post_id")).putExtra("forComment",true));
                 }
             }
-
-            setRecentsView();
         }
     }
 
@@ -459,22 +422,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         }
     }
 
-    private void setRecentsView() {
-
-        search_container=findViewById(R.id.search_container);
-        recentsRecyclerView = findViewById(R.id.recentsView);
-        recentsList = new ArrayList<>();
-        recentsAdapter = new RecentsAdapter(recentsList);
-
-        recentsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        recentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recentsRecyclerView.setHasFixedSize(true);
-        recentsRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        recentsRecyclerView.setAdapter(recentsAdapter);
-
-    }
-
     private void askPermission() {
 
         Dexter.withActivity(this)
@@ -487,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                          if(report.isAnyPermissionPermanentlyDenied()){
-                            Toast.makeText(MainActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toast.LENGTH_LONG).show();
+                            Toasty.info(MainActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toasty.LENGTH_LONG,true).show();
                         }
                     }
 
@@ -525,9 +472,9 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         new DialogSheet(this)
                 .setTitle("Information")
-                .setMessage("Email has not been verified, please verify and continue.")
+                .setMessage("Email has not been verified, please verify and continue. If you have verified we recommend you to logout and login again")
                 .setPositiveButton("Send again", v -> mAuth.getCurrentUser().sendEmailVerification()
-                        .addOnSuccessListener(aVoid -> Toast.makeText(MainActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show())
+                        .addOnSuccessListener(aVoid -> Toasty.success(MainActivity.this, "Verification email sent", Toasty.LENGTH_SHORT,true).show())
                         .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
                 .setNegativeButton("Ok", new DialogSheet.OnNegativeClickListener() {
                     @Override
@@ -561,31 +508,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 selectedScreen = new Dashboard();
                 showFragment(selectedScreen);
 
-                if(searchOpen){
-
-                    searchOpen=false;
-                    if(mState){
-                        add_post.setVisible(true);
-                    }
-                    search_container.animate()
-                            .setDuration(100)
-                            .alpha(0.0f)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    searchViewItem.collapseActionView();
-                                    search_container.setVisibility(View.GONE);
-                                }
-                            })
-                            .start();
-
-                    searchView.setQuery("", false);
-                    searchView.onActionViewCollapsed();
-                    searchViewItem.collapseActionView();
-
-                }
-
                 slidingRootNav.closeMenu(true);
 
                 return;
@@ -602,31 +524,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 mStateForum=true;
                 selectedScreen = new Forum();
                 showFragment(selectedScreen);
-
-                if(searchOpen){
-
-                    searchOpen=false;
-                    if(mState){
-                        add_post.setVisible(true);
-                    }
-                    search_container.animate()
-                            .setDuration(100)
-                            .alpha(0.0f)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    searchViewItem.collapseActionView();
-                                    search_container.setVisibility(View.GONE);
-                                }
-                            })
-                            .start();
-
-                    searchView.setQuery("", false);
-                    searchView.onActionViewCollapsed();
-                    searchViewItem.collapseActionView();
-
-                }
 
                 slidingRootNav.closeMenu(true);
 
@@ -646,31 +543,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     mStateForum=false;
                     selectedScreen = new FlashMessage();
                     showFragment(selectedScreen);
-
-                    if(searchOpen){
-
-                        searchOpen=false;
-                        if(mState){
-                            add_post.setVisible(true);
-                        }
-                        search_container.animate()
-                                .setDuration(100)
-                                .alpha(0.0f)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        searchViewItem.collapseActionView();
-                                        search_container.setVisibility(View.GONE);
-                                    }
-                                })
-                                .start();
-
-                        searchView.setQuery("", false);
-                        searchView.onActionViewCollapsed();
-                        searchViewItem.collapseActionView();
-
-                    }
 
                     slidingRootNav.closeMenu(true);
                 }else{
@@ -694,31 +566,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     selectedScreen = new FriendsFragment();
                     showFragment(selectedScreen);
 
-                    if(searchOpen){
-
-                        searchOpen=false;
-                        if(mState){
-                            add_post.setVisible(true);
-                        }
-                        search_container.animate()
-                                .setDuration(100)
-                                .alpha(0.0f)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        searchViewItem.collapseActionView();
-                                        search_container.setVisibility(View.GONE);
-                                    }
-                                })
-                                .start();
-
-                        searchView.setQuery("", false);
-                        searchView.onActionViewCollapsed();
-                        searchViewItem.collapseActionView();
-
-                    }
-
                     slidingRootNav.closeMenu(true);
                 }else{
                     showDialog();
@@ -728,6 +575,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             case POS_ABOUT:
 
                 if(currentuser.isEmailVerified()) {
+
                     toolbar.setTitle("About");
                     try {
                         getSupportActionBar().setTitle("About");
@@ -739,31 +587,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                     mStateForum=false;
                     selectedScreen = new About();
                     showFragment(selectedScreen);
-
-                    if(searchOpen){
-
-                        searchOpen=false;
-                        if(mState){
-                            add_post.setVisible(true);
-                        }
-                        search_container.animate()
-                                .setDuration(100)
-                                .alpha(0.0f)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        searchViewItem.collapseActionView();
-                                        search_container.setVisibility(View.GONE);
-                                    }
-                                })
-                                .start();
-
-                        searchView.setQuery("", false);
-                        searchView.onActionViewCollapsed();
-                        searchViewItem.collapseActionView();
-
-                    }
 
                     slidingRootNav.closeMenu(true);
                 }else{
@@ -838,6 +661,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         firestore.collection("Users").document(userId).update(tokenRemove).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                deleteAllnotifications();
                 userHelper.deleteContact(1);
                 mAuth.signOut();
                 LoginActivity.startActivityy(MainActivity.this);
@@ -848,11 +672,18 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(MainActivity.this, "Error logging out", Toast.LENGTH_SHORT).show();
+                Toasty.error(MainActivity.this, "Error logging out", Toasty.LENGTH_SHORT,true).show();
                 mDialog.dismiss();
                 Log.e("Logout Error", e.getMessage());
             }
         });
+
+    }
+
+    private void deleteAllnotifications() {
+
+        NotificationsHelper notificationsHelper=new NotificationsHelper(this);
+        notificationsHelper.deleteAll();
 
     }
 
@@ -1013,7 +844,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         String from_image = intent.getStringExtra("from_image");
         String message = intent.getStringExtra("message");
         String from_id = intent.getStringExtra("from_id");
-        String notification_id = intent.getStringExtra("notification_id");
         String timestamp = intent.getStringExtra("timestamp");
         String reply_for = intent.getStringExtra("reply_for");
         String image = intent.getStringExtra("image");
@@ -1036,6 +866,8 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         String link=intent.getStringExtra("link");
         String question_id=intent.getStringExtra("question_id");
         String question_timestamp=intent.getStringExtra("question_timestamp");
+        String channel_name=intent.getStringExtra("channel_name");
+        String notification_type=intent.getStringExtra("notification_type");
 
         resultIntent.putExtra("title", title);
         resultIntent.putExtra("body", body);
@@ -1043,7 +875,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("from_image", from_image);
         resultIntent.putExtra("message", message);
         resultIntent.putExtra("from_id", from_id);
-        resultIntent.putExtra("notification_id", notification_id);
         resultIntent.putExtra("timestamp", timestamp);
         resultIntent.putExtra("reply_for", reply_for);
         resultIntent.putExtra("image", image);
@@ -1066,12 +897,14 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("link", link);
         resultIntent.putExtra("question_id", question_id);
         resultIntent.putExtra("question_timestamp", question_timestamp);
+        resultIntent.putExtra("notification_type", notification_type);
+        resultIntent.putExtra("channel_name", channel_name);
 
         Alerter.create(MainActivity.this)
                 .setTitle(title)
                 .setText(body)
                 .enableSwipeToDismiss()
-                .setDuration(7000)//7sec
+                .setDuration(4000)//7sec
                 .enableProgress(true)
                 .enableVibration(true)
                 .setBackgroundColorRes(R.color.colorAccentt)
@@ -1114,145 +947,305 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 rc.close();
             }
 
-            FirebaseFirestore.getInstance().collection("Users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
+            if(!validate){
 
-                    String name = documentSnapshot.getString("name");
-                    String image = documentSnapshot.getString("image");
-                    final String email = documentSnapshot.getString("email");
-                    String bio = documentSnapshot.getString("bio");
-                    String usrname = documentSnapshot.getString("username");
-                    String location = documentSnapshot.getString("location");
+                FirebaseFirestore.getInstance().collection("Users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                    username.setText(name);
-                    Glide.with(MainActivity.this)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                            .load(image)
-                            .into(imageView);
+                        String name = documentSnapshot.getString("name");
+                        String image = documentSnapshot.getString("image");
+                        final String email = documentSnapshot.getString("email");
+                        String bio = documentSnapshot.getString("bio");
+                        String usrname = documentSnapshot.getString("username");
+                        String location = documentSnapshot.getString("location");
+
+                        username.setText(name);
+                        Glide.with(MainActivity.this)
+                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                .load(image)
+                                .into(imageView);
 
 
-                    if (!image.equals(imag)) {
-                        storageReference.putFile(Uri.parse(imag)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                if (task.isSuccessful()) {
+                        if (!image.equals(imag)) {
+                            storageReference.putFile(Uri.parse(imag)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    if (task.isSuccessful()) {
 
-                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(final Uri downloadUri) {
+                                                Map<String, Object> userMap = new HashMap<>();
+                                                userMap.put("image", downloadUri.toString());
+
+                                                FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        userHelper.updateContactImage(1, downloadUri.toString());
+                                                        Glide.with(MainActivity.this)
+                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                                .load(downloadUri)
+                                                                .into(imageView);
+
+                                                    }
+
+                                                });
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+                        }
+
+                        if (!bio.equals(bi)) {
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("bio", bi);
+
+                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    userHelper.updateContactBio(1, bi);
+
+                                }
+
+                            });
+                        }
+
+                        if (!location.equals(loc)) {
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("location", loc);
+
+                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    userHelper.updateContactLocation(1, loc);
+
+                                }
+
+                            });
+                        }
+
+                        if (!name.equals(nam)) {
+                            Map<String, Object> userMap = new HashMap<>();
+                            userMap.put("name", nam);
+
+                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    userHelper.updateContactName(1, nam);
+                                    username.setText(nam);
+
+                                }
+
+                            });
+                        }
+
+                        if (!currentuser.getEmail().equals(emai)) {
+
+
+                            credential = EmailAuthProvider
+                                    .getCredential(currentuser.getEmail(), password);
+
+                            currentuser.reauthenticate(credential)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
-                                        public void onSuccess(final Uri downloadUri) {
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            currentuser.updateEmail(emai).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                    if (task.isSuccessful()) {
+
+                                                        if (!email.equals(emai)) {
+                                                            Map<String, Object> userMap = new HashMap<>();
+                                                            userMap.put("email", emai);
+
+                                                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+
+                                                                    userHelper.updateContactEmail(1, emai);
+                                                                }
+
+                                                            });
+                                                        }
+
+                                                    } else {
+
+                                                        Log.e("Update email error", task.getException().getMessage() + "..");
+
+                                                    }
+
+                                                }
+                                            });
+
+                                        }
+                                    });
+                        }
+                    }
+                });
+
+            }else {
+
+                FirebaseAuth.getInstance().signOut();
+                FirebaseAuth.getInstance().signInWithEmailAndPassword(emai, password)
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                userHelper.deleteContact(1);
+                                Toasty.error(MainActivity.this, "Authentication revoked", Toasty.LENGTH_SHORT, true).show();
+                                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                                finish();
+                            }
+                        })
+                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+                                FirebaseFirestore.getInstance().collection("Users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                        String name = documentSnapshot.getString("name");
+                                        String image = documentSnapshot.getString("image");
+                                        final String email = documentSnapshot.getString("email");
+                                        String bio = documentSnapshot.getString("bio");
+                                        String usrname = documentSnapshot.getString("username");
+                                        String location = documentSnapshot.getString("location");
+
+                                        username.setText(name);
+                                        Glide.with(MainActivity.this)
+                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                .load(image)
+                                                .into(imageView);
+
+
+                                        if (!image.equals(imag)) {
+                                            storageReference.putFile(Uri.parse(imag)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                                    if (task.isSuccessful()) {
+
+                                                        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                            @Override
+                                                            public void onSuccess(final Uri downloadUri) {
+                                                                Map<String, Object> userMap = new HashMap<>();
+                                                                userMap.put("image", downloadUri.toString());
+
+                                                                FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        userHelper.updateContactImage(1, downloadUri.toString());
+                                                                        Glide.with(MainActivity.this)
+                                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                                                .load(downloadUri)
+                                                                                .into(imageView);
+
+                                                                    }
+
+                                                                });
+                                                            }
+                                                        });
+
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        if (!bio.equals(bi)) {
                                             Map<String, Object> userMap = new HashMap<>();
-                                            userMap.put("image", downloadUri.toString());
+                                            userMap.put("bio", bi);
 
                                             FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    userHelper.updateContactImage(1, downloadUri.toString());
-                                                    Glide.with(MainActivity.this)
-                                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                                            .load(downloadUri)
-                                                            .into(imageView);
+                                                    userHelper.updateContactBio(1, bi);
 
                                                 }
 
                                             });
                                         }
-                                    });
 
-                                }
-                            }
-                        });
-                    }
+                                        if (!location.equals(loc)) {
+                                            Map<String, Object> userMap = new HashMap<>();
+                                            userMap.put("location", loc);
 
-                    if (!bio.equals(bi)) {
-                        Map<String, Object> userMap = new HashMap<>();
-                        userMap.put("bio", bi);
-
-                        FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                userHelper.updateContactBio(1, bi);
-
-                            }
-
-                        });
-                    }
-
-                    if (!location.equals(loc)) {
-                        Map<String, Object> userMap = new HashMap<>();
-                        userMap.put("location", loc);
-
-                        FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                userHelper.updateContactLocation(1, loc);
-
-                            }
-
-                        });
-                    }
-
-                    if (!name.equals(nam)) {
-                        Map<String, Object> userMap = new HashMap<>();
-                        userMap.put("name", nam);
-
-                        FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                userHelper.updateContactName(1, nam);
-                                username.setText(nam);
-
-                            }
-
-                        });
-                    }
-
-                    if (!currentuser.getEmail().equals(emai)) {
-
-
-                        credential = EmailAuthProvider
-                                .getCredential(currentuser.getEmail(), password);
-
-                        currentuser.reauthenticate(credential)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-
-                                        currentuser.updateEmail(emai).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                                if (task.isSuccessful()) {
-
-                                                    if (!email.equals(emai)) {
-                                                        Map<String, Object> userMap = new HashMap<>();
-                                                        userMap.put("email", emai);
-
-                                                        FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-
-                                                                userHelper.updateContactEmail(1, emai);
-                                                            }
-
-                                                        });
-                                                    }
-
-                                                } else {
-
-                                                    Log.e("Update email error", task.getException().getMessage() + "..");
+                                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    userHelper.updateContactLocation(1, loc);
 
                                                 }
 
-                                            }
-                                        });
+                                            });
+                                        }
 
+                                        if (!name.equals(nam)) {
+                                            Map<String, Object> userMap = new HashMap<>();
+                                            userMap.put("name", nam);
+
+                                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    userHelper.updateContactName(1, nam);
+                                                    username.setText(nam);
+
+                                                }
+
+                                            });
+                                        }
+
+                                        if (!currentuser.getEmail().equals(emai)) {
+
+
+                                            credential = EmailAuthProvider
+                                                    .getCredential(currentuser.getEmail(), password);
+
+                                            currentuser.reauthenticate(credential)
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                                            currentuser.updateEmail(emai).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                    if (task.isSuccessful()) {
+
+                                                                        if (!email.equals(emai)) {
+                                                                            Map<String, Object> userMap = new HashMap<>();
+                                                                            userMap.put("email", emai);
+
+                                                                            FirebaseFirestore.getInstance().collection("Users").document(userId).update(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void aVoid) {
+
+                                                                                    userHelper.updateContactEmail(1, emai);
+                                                                                }
+
+                                                                            });
+                                                                        }
+
+                                                                    } else {
+
+                                                                        Log.e("Update email error", task.getException().getMessage() + "..");
+
+                                                                    }
+
+                                                                }
+                                                            });
+
+                                                        }
+                                                    });
+                                        }
                                     }
                                 });
-                    }
-                }
-            });
+                            }
+                        });
 
+            }
         }
     }
 
@@ -1292,6 +1285,21 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         add_post=menu.findItem(R.id.action_new);
         add_question=menu.findItem(R.id.action_new_question);
 
+        MenuItem notification=menu.findItem(R.id.action_notifications);
+        View badge_action=notification.getActionView();
+
+        if(badge_action!=null){
+
+            ImageView badge=badge_action.findViewById(R.id.badge);
+
+            if(!NotificationUtil.read){
+                badge.setVisibility(View.VISIBLE);
+            }else{
+                badge.setVisibility(View.GONE);
+            }
+
+        }
+
         if(mStateForum){
             add_question.setVisible(true);
         }else{
@@ -1300,117 +1308,9 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         if(mState){
             add_post.setVisible(true);
-        }else{
+        }else {
             add_post.setVisible(false);
         }
-
-        searchViewItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager=(SearchManager)MainActivity.this.getSystemService(Context.SEARCH_SERVICE);
-        searchView =null;
-        if(searchViewItem!=null){
-            searchView=(SearchView)searchViewItem.getActionView();
-        }
-        if(searchView!=null) {
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(MainActivity.this.getComponentName()));
-            searchView.setQueryHint("Search Anything");
-            searchView.setOnSearchClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mState){
-                        add_post.setVisible(false);
-                    }
-                    if(mStateForum){
-                        add_question.setVisible(false);
-                    }
-                    searchOpen=true;
-
-                    search_container.setVisibility(View.VISIBLE);
-                    search_container.setAlpha(0.0f);
-                    search_container.animate()
-                            .setDuration(100)
-                            .alpha(1.0f)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-
-                                    RecentsDatabase recentsDatabase = new RecentsDatabase(MainActivity.this);
-
-                                    if (!recentsDatabase.getAllQueries().isEmpty()) {
-
-                                        recentsList.clear();
-                                        for (String query : recentsDatabase.getAllQueries()) {
-                                            Recents recents = new Recents(query);
-                                            recentsList.add(recents);
-                                            recentsAdapter.notifyDataSetChanged();
-                                        }
-
-                                    }
-
-                                }
-                            })
-                            .start();
-                }
-            });
-
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-
-                    searchView.clearFocus();
-                    Recents recents = new Recents(query);
-                    recentsList.add(recents);
-                    recentsAdapter.notifyDataSetChanged();
-                    ResultActivity.startActivity(MainActivity.this, query);
-
-                    return false;
-
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-
-                    return false;
-                }
-            });
-
-            ImageView closebutton=searchView.findViewById(R.id.search_close_btn);
-            closebutton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    EditText editText=findViewById(R.id.search_src_text);
-                    if(StringUtils.isNotEmpty(editText.getText())) {
-                        editText.setText("");
-                    }else {
-                        searchOpen=false;
-                        if(mState){
-                            add_post.setVisible(true);
-                        }
-                        if(mStateForum){
-                            add_question.setVisible(true);
-                        }
-                        search_container.animate()
-                                .setDuration(100)
-                                .alpha(0.0f)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        super.onAnimationEnd(animation);
-                                        searchViewItem.collapseActionView();
-                                        search_container.setVisibility(View.GONE);
-                                    }
-                                })
-                                .start();
-
-                        searchView.setQuery("", false);
-                        searchView.onActionViewCollapsed();
-                        searchViewItem.collapseActionView();
-                    }
-                }
-            });
-
-        }
-
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -1489,7 +1389,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 return true;
 
             case R.id.action_notifications:
-                startActivity(new Intent(MainActivity.this, Notifications.class));
+                startActivity(new Intent(MainActivity.this,Notifications.class));
                 return true;
             case R.id.action_new_question:
                 startActivity(new Intent(MainActivity.this, AddQuestion.class));

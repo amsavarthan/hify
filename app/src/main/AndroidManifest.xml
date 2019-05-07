@@ -185,22 +185,15 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity> <!-- Professor -->
+        </activity>
         <meta-data
             android:name="android.app.searchable"
             android:resource="@xml/searchable" />
-
         <activity
-            android:name=".feature_ai.activities.ResultActivity"
+            android:name=".ui.activities.forum.AddQuestion"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".feature_ai.activities.ResultState"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".feature_ai.activities.AddQuestion"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".feature_ai.activities.AnswersActivity"
+            android:name=".ui.activities.forum.AnswersActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.amsavarthan.hify.TARGET_FORUM" />
@@ -208,9 +201,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".feature_ai.activities.Preview"
-            android:screenOrientation="portrait"
-            />
         <activity android:name=".ui.activities.lottie.SendingActivity"
             android:screenOrientation="portrait"
             />

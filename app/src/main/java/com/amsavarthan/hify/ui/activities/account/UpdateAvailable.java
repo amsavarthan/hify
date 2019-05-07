@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +35,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -75,7 +75,7 @@ public class UpdateAvailable extends AppCompatActivity {
                         .build();
 
                 notificationManager.notify(0, notification);
-                Toast.makeText(ctxt, "File downloaded in /Downloads/Hify Updates/Hify_v" + version+".apk", Toast.LENGTH_LONG).show();
+                Toasty.success(ctxt, "File downloaded in /Downloads/Hify Updates/Hify_v" + version+".apk", Toasty.LENGTH_LONG,true).show();
             }
         }
 
@@ -147,13 +147,13 @@ public class UpdateAvailable extends AppCompatActivity {
                             request.setVisibleInDownloadsUi(true);
                             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/Hify Updates/"+ "Hify_v" + version + ".apk");
 
-                            Toast.makeText(UpdateAvailable.this, "Downloading...", Toast.LENGTH_SHORT).show();
+                            Toasty.info(UpdateAvailable.this, "Downloading...", Toasty.LENGTH_SHORT,true).show();
 
                             refid = downloadManager.enqueue(request);
                             list.add(refid);
 
                         }else{
-                            Toast.makeText(UpdateAvailable.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                            Toasty.error(UpdateAvailable.this, "No internet connection", Toasty.LENGTH_SHORT,true).show();
                         }
                     }
 

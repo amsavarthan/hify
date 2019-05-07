@@ -11,8 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -230,7 +229,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
 
-                            Toast.makeText(NotificationReplyActivity.this, "Hify sent!", Toast.LENGTH_SHORT).show();
+                            Toasty.success(NotificationReplyActivity.this, "Hify sent!", Toasty.LENGTH_SHORT, true).show();
                             message.setText("");
                             mBar.setVisibility(View.GONE);
                             finish();
@@ -239,7 +238,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(NotificationReplyActivity.this, "Error sending Hify: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toasty.error(NotificationReplyActivity.this, "Error : " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
                             mBar.setVisibility(View.GONE);
                         }
                     });

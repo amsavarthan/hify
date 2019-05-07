@@ -2,6 +2,7 @@ package com.amsavarthan.hify.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,13 +21,14 @@ public class FlashMessage extends Fragment implements BottomNavigationView.OnNav
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_message_view, container, false);
+        mView = inflater.inflate(R.layout.frag_flash_message, container, false);
         return mView;
     }
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         loadFragment(new SendMessage());
 
         BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);

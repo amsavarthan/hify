@@ -3,6 +3,7 @@ package com.amsavarthan.hify.ui.fragment;
 import android.app.Fragment;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,7 @@ BottomNavigationView.OnNavigationItemSelectedListener{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.friends_fragment, container, false);
+        mView = inflater.inflate(R.layout.frag_friends, container, false);
         return mView;
     }
 

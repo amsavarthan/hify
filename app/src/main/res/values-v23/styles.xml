@@ -10,6 +10,7 @@
         <item name="android:statusBarColor">#FFF</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowContentTransitions">true</item>
+        <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
 
     <style name="UpdateAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -19,6 +20,7 @@
         <item name="colorAccent">@color/colorAccentt</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
 
     <style name="SplashAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -26,6 +28,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDarkk</item>
         <item name="colorAccent">@color/colorAccentt</item>
         <item name="android:windowBackground">@drawable/splash_window_bg</item>
+        <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
 
     <style name="LoginAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
@@ -36,7 +39,7 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
-
 
 </resources>

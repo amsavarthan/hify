@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import es.dmoral.toasty.Toasty;
 
 import static com.amsavarthan.hify.ui.activities.lottie.FestivalActivity.activity;
 import static com.amsavarthan.hify.utils.Config.random;
@@ -177,7 +178,7 @@ public class SendingActivity extends AppCompatActivity {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 super.onAnimationEnd(animation);
-                                Toast.makeText(SendingActivity.this, "Message sent", Toast.LENGTH_SHORT).show();
+                                Toasty.success(SendingActivity.this, "Message sent", Toasty.LENGTH_SHORT,true).show();
                                 if(type.equals("festival")) {
                                     activity.finish();
                                 }else{
@@ -189,7 +190,7 @@ public class SendingActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SendingActivity.this, "Error sending message :(", Toast.LENGTH_LONG).show();
+                        Toasty.error(SendingActivity.this, "Error sending message :(", Toasty.LENGTH_LONG,true).show();
 
                     }
                 });
@@ -230,7 +231,7 @@ public class SendingActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onAnimationEnd(Animator animation) {
                                                     super.onAnimationEnd(animation);
-                                                    Toast.makeText(SendingActivity.this, "Message sent", Toast.LENGTH_SHORT).show();
+                                                    Toasty.success(SendingActivity.this, "Message sent", Toasty.LENGTH_SHORT,true).show();
                                                     finish();
                                                 }
                                             });
@@ -239,7 +240,7 @@ public class SendingActivity extends AppCompatActivity {
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(SendingActivity.this, "Error sending message :(", Toast.LENGTH_LONG).show();
+                                            Toasty.error(SendingActivity.this, "Error sending message :(", Toasty.LENGTH_LONG,true).show();
                                         }
                                     });
 
@@ -247,7 +248,7 @@ public class SendingActivity extends AppCompatActivity {
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(SendingActivity.this, "Error sending message :(", Toast.LENGTH_LONG).show();
+                                    Toasty.error(SendingActivity.this, "Error sending message :(", Toasty.LENGTH_LONG,true).show();
 
                                 }
                             });
@@ -261,7 +262,7 @@ public class SendingActivity extends AppCompatActivity {
 
 
         }else{
-            Toast.makeText(this, "Empty message", Toast.LENGTH_SHORT).show();
+            Toasty.warning(this, "Message cannot be empty", Toasty.LENGTH_SHORT,true).show();
             finish();
         }
 

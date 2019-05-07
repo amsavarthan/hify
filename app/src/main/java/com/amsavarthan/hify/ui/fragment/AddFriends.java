@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,26 +20,19 @@ import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.addFriends.AddFriendAdapter;
 import com.amsavarthan.hify.adapters.addFriends.RecyclerViewTouchHelper;
 import com.amsavarthan.hify.models.Friends;
-import com.amsavarthan.hify.models.ViewFriends;
-import com.amsavarthan.hify.ui.activities.friends.SearchUsersActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.View.GONE;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -60,7 +51,7 @@ public class AddFriends extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.friends_add_frag, container, false);
+        mView = inflater.inflate(R.layout.frag_add_friends, container, false);
         return mView;
     }
 
@@ -160,7 +151,7 @@ public class AddFriends extends Fragment {
                     public void onFailure(@NonNull Exception e) {
 
                         refreshLayout.setRefreshing(false);
-                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
 
                     }

@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Person;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,7 +16,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Icon;
+import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
@@ -28,7 +27,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.feature_ai.activities.AnswersActivity;
+import com.amsavarthan.hify.ui.activities.forum.AnswersActivity;
 import com.amsavarthan.hify.ui.activities.MainActivity;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
@@ -82,26 +81,22 @@ public class NotificationUtil {
         return 0;
     }
 
-    public void showNotificationMessage(int id, String timeStamp, String click_action, String user_image, String title, String message, Intent intent) {
-        showNotificationMessage(id, timeStamp, click_action, user_image, title, message, intent, null);
-    }
-
     @RequiresApi(api =   Build.VERSION_CODES.O)
-    private void setupChannels(NotificationManager notificationManager) {
+    private void setupChannels(NotificationManager notificationManager,String name) {
         NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, Config.ADMIN_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-        adminChannel.setDescription(Config.ADMIN_CHANNEL_DESCPT);
+        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, Config.ADMIN_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
         adminChannel.enableLights(true);
         adminChannel.setLightColor(Color.BLUE);
         adminChannel.canShowBadge();
-        adminChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+        adminChannel.setSound(Uri.parse("android.resource://"+mContext.getPackageName()+"/"+R.raw.hify_sound), null);
+        adminChannel.setImportance(NotificationManager.IMPORTANCE_DEFAULT);
         adminChannel.enableVibration(true);
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel);
         }
     }
 
-    public void showNotificationMessage(int id, String timeStamp, String click_action, final String user_image, final String title, final String message, Intent intent, String imageUrl) {
+    public void showNotificationMessage(String timeStamp, String click_action, final String user_image, final String title, final String message, Intent intent, String imageUrl, String notification_type, String channel_name) {
 
         // Check for empty push message
         if (TextUtils.isEmpty(message))
@@ -131,13 +126,13 @@ public class NotificationUtil {
                 Bitmap bitmap = getBitmapFromURL(imageUrl);
 
                 if (bitmap != null) {
-                    showBigNotification(id, timeStamp, click_action, user_image, bitmap, mBuilder, icon, title, message, resultPendingIntent);
+                    showBigNotification(timeStamp, click_action, user_image, bitmap, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
                 } else {
-                    showSmallNotification(id, timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent);
+                    showSmallNotification(timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
                 }
 
             } else {
-                showSmallNotification(id, timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent);
+                showSmallNotification(timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
             }
         } catch (Exception e) {
             Log.e("showNotificationMessage", e.getMessage() == null ? "" : e.getMessage());
@@ -184,13 +179,13 @@ public class NotificationUtil {
 
     }
 
-    private void showSmallNotification(int id, String timeStamp, String click_action, String user_image, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
+    private void showSmallNotification(String timeStamp, String click_action, String user_image, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type, String channel_name) {
 
         Log.d(TAGPush, "showSmallNotification Push Notification. Click_action: " + click_action);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            setupChannels(notificationManager);
+            setupChannels(notificationManager,channel_name);
         }
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
@@ -218,20 +213,34 @@ public class NotificationUtil {
                 .build();
 
         NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
-        notificationsHelper.insertContact(user_image,title,message,timeStamp);
+        notificationsHelper.insertContact(user_image,title,message,String.valueOf(System.currentTimeMillis()));
         read=false;
         notificationsHelper.close();
 
-        notificationManagerCompat.notify(id, notification);
+        switch (notification_type){
+
+            case "like":
+                notificationManagerCompat.notify(100, notification);
+                return;
+            case "comment":
+                notificationManagerCompat.notify(200, notification);
+                return;
+            case "forum":
+                notificationManagerCompat.notify(300, notification);
+                return;
+            default:
+                notificationManagerCompat.notify(400, notification);
+
+        }
     }
 
-    private void showBigNotification(int id, String timeStamp, String click_action, String user_image, Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent) {
+    private void showBigNotification(String timeStamp, String click_action, String user_image, Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type, String channel_name) {
 
         Log.d(TAGPush, "showBigNotification Push Notification. Click_action: " + click_action);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            setupChannels(notificationManager);
+            setupChannels(notificationManager,channel_name);
         }
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
@@ -258,11 +267,25 @@ public class NotificationUtil {
                 .build();
 
         NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
-        notificationsHelper.insertContact(user_image,title,message,timeStamp);
+        notificationsHelper.insertContact(user_image,title,message,String.valueOf(System.currentTimeMillis()));
         read=false;
         notificationsHelper.close();
 
-        notificationManagerCompat.notify(id, notification);
+        switch (notification_type){
+
+            case "like":
+                notificationManagerCompat.notify(100, notification);
+                return;
+            case "comment":
+                notificationManagerCompat.notify(200, notification);
+                return;
+            case "forum":
+                notificationManagerCompat.notify(300, notification);
+                return;
+            default:
+                notificationManagerCompat.notify(400, notification);
+
+        }
     }
 
     private Bitmap getBitmapFromURL(String strURL) {

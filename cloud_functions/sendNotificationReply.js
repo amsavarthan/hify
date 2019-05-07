@@ -42,6 +42,8 @@ exports.sendNotificationReply = functions.firestore.document("Users/{user_id}/No
                 from_image:from_image,
                 reply_for:from_reply,
                 title:from_name,
+				notification_type:"Message",
+				channel_name:"Flash Messages",
                 body:"Reply for: "+from_reply+"\nMessage: "+from_message,
                 click_action:"com.amsavarthan.hify.TARGETNOTIFICATIONREPLY"
               }

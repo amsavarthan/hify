@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -262,17 +262,16 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 commentList.remove(holder.getAdapterPosition());
-                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                Toasty.success(context, "Comment deleted", Toasty.LENGTH_SHORT,true).show();
                                                 notifyDataSetChanged();
                                                 progressDialog.dismiss();
-                                                Toast.makeText(context, "Comment deleted", Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 progressDialog.dismiss();
-                                                Toast.makeText(context, "Error deleting comment: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                                Toasty.error(context, "Error deleting comment: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                                                 Log.w("Error","delete comment",e);
                                             }
                                         });

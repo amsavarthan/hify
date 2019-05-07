@@ -19,8 +19,7 @@ public class Config {
     public static final String SHARED_PREF            = "ah_firebase";
 
     public static final String ADMIN_CHANNEL_ID       = "com.amsavarthan.hify";
-    public static final String ADMIN_CHANNEL_NAME     = "Sample Channel Name";
-    public static final String ADMIN_CHANNEL_DESCPT   = "Sample Channel Description";
+    public static final String ADMIN_CHANNEL_NAME     = "Push Notifications";
 
     public static final int PICK_IMAGES = 102;
 

@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,6 +52,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -242,7 +242,7 @@ public class CommentsActivity extends AppCompatActivity {
                                         mProgress.setVisibility(View.GONE);
                                         sendNotification();
                                         mCommentText.setHint("Add a comment..");
-                                        Toast.makeText(CommentsActivity.this, "Comment added", Toast.LENGTH_SHORT).show();
+                                        Toasty.success(CommentsActivity.this, "Comment added", Toasty.LENGTH_SHORT,true).show();
                                         commentList.clear();
                                         getComments(mProgress);
                                     }
@@ -251,7 +251,7 @@ public class CommentsActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         mProgress.setVisibility(View.GONE);
-                                        Toast.makeText(CommentsActivity.this, "Error sending comment: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toasty.error(CommentsActivity.this, "Error adding comment: " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
                                         Log.e("Error send comment", e.getMessage());
                                     }
                                 });
@@ -284,25 +284,29 @@ public class CommentsActivity extends AppCompatActivity {
                             return;
                         }
 
-                        for (DocumentChange doc : querySnapshot.getDocumentChanges()) {
+                        if(!querySnapshot.isEmpty()) {
+                            for (DocumentChange doc : querySnapshot.getDocumentChanges()) {
 
-                            if (doc.getDocument().exists()) {
-                                if (doc.getType() == DocumentChange.Type.ADDED) {
+                                if (doc.getDocument().exists()) {
+                                    if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                    Comment comment = doc.getDocument().toObject(Comment.class).withId(doc.getDocument().getId());
-                                    commentList.add(comment);
-                                    mAdapter.notifyDataSetChanged();
+                                        Comment comment = doc.getDocument().toObject(Comment.class).withId(doc.getDocument().getId());
+                                        commentList.add(comment);
+                                        mAdapter.notifyDataSetChanged();
+
+                                    }
 
                                 }
+                            }
 
-                                if (querySnapshot.getDocuments().size() == commentList.size()) {
-                                    mProgress.setVisibility(View.GONE);
-                                }
-                            } else {
+                            if (commentList.isEmpty()) {
                                 mProgress.setVisibility(View.GONE);
                             }
 
+                        }else{
+                            mProgress.setVisibility(View.GONE);
                         }
+
 
                     }
                 });

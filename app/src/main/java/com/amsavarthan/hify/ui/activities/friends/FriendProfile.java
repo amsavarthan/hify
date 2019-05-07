@@ -14,9 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,7 +28,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
-import com.amsavarthan.hify.feature_ai.fragment.FriendQuestions;
+import com.amsavarthan.hify.ui.fragment.FriendQuestions;
 import com.amsavarthan.hify.models.Post;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -54,6 +52,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -204,7 +203,7 @@ public class FriendProfile extends AppCompatActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.frag_main, container, false);
             return rootView;
         }
 
@@ -215,7 +214,7 @@ public class FriendProfile extends AppCompatActivity {
             if (bundle != null) {
                 id = bundle.getString("id");
             }else{
-                Toast.makeText(rootView.getContext(), "Error retrieving information.", Toast.LENGTH_SHORT).show();
+                Toasty.error(rootView.getContext(), "Error retrieving information.", Toasty.LENGTH_SHORT,true).show();
                 getActivity().finish();
             }
 
@@ -290,7 +289,7 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             refreshLayout.setRefreshing(false);
-                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                            Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -325,7 +324,7 @@ public class FriendProfile extends AppCompatActivity {
             if (bundle != null) {
                 id = bundle.getString("id");
             }else{
-                Toast.makeText(rootView.getContext(), "Error retrieving information.", Toast.LENGTH_SHORT).show();
+                Toasty.error(rootView.getContext(), "Error retrieving information.", Toasty.LENGTH_SHORT,true).show();
                 getActivity().finish();
             }
 
@@ -349,6 +348,8 @@ public class FriendProfile extends AppCompatActivity {
             decline       = rootView.findViewById(R.id.decline);
 
             email.setVisibility(View.GONE);
+            req_sent.setVisibility(View.VISIBLE);
+            req_sent.setText("Please wait...");
 
             mDialog = new ProgressDialog(rootView.getContext());
             mDialog.setMessage("Please wait..");
@@ -393,9 +394,10 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                            if(documentSnapshot.exists())
+                            if(documentSnapshot.exists()) {
+                                req_sent.setVisibility(View.GONE);
                                 showRemoveButton();
-                            else{
+                            }else{
 
                                 mFirestore.collection("Users")
                                         .document(id)
@@ -415,10 +417,13 @@ public class FriendProfile extends AppCompatActivity {
                                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                                 @Override
                                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                                    if(documentSnapshot.exists())
+                                                                    if(documentSnapshot.exists()) {
+                                                                        req_sent.setVisibility(View.GONE);
                                                                         showRequestLayout();
-                                                                    else
+                                                                    }else{
+                                                                        req_sent.setVisibility(View.GONE);
                                                                         showAddButton();
+                                                                    }
 
                                                                 }
                                                             })
@@ -430,6 +435,7 @@ public class FriendProfile extends AppCompatActivity {
                                                             });
 
                                                 }else{
+                                                    req_sent.setText("Friend request sent");
                                                     req_sent.setVisibility(View.VISIBLE);
                                                     req_sent.setAlpha(0.0f);
 
@@ -666,7 +672,7 @@ public class FriendProfile extends AppCompatActivity {
                                                                                         public void onSuccess(Void aVoid) {
 
                                                                                             mDialog.dismiss();
-                                                                                            Toast.makeText(rootView.getContext(), "Friend request accepted", Toast.LENGTH_SHORT).show();
+                                                                                            Toasty.success(rootView.getContext(), "Friend request accepted", Toasty.LENGTH_SHORT,true).show();
 
                                                                                             req_layout.animate()
                                                                                                     .alpha(0.0f)
@@ -737,7 +743,7 @@ public class FriendProfile extends AppCompatActivity {
                         .collection("Friend_Requests").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(rootView.getContext(), "Friend request denied", Toast.LENGTH_SHORT).show();
+                        Toasty.success(rootView.getContext(), "Friend request denied", Toasty.LENGTH_SHORT,true).show();
 
                         req_layout.animate()
                                 .alpha(0.0f)
@@ -760,7 +766,7 @@ public class FriendProfile extends AppCompatActivity {
                 });
             } catch (Exception ex) {
                 Log.w("error", "fail", ex);
-                Toast.makeText(rootView.getContext(), "Some technical error occurred while declining friend request, Try again later.", Toast.LENGTH_SHORT).show();
+                Toasty.error(rootView.getContext(), "Some technical error occurred while declining friend request, Try again later.", Toasty.LENGTH_SHORT,true).show();
             }
         }
 
@@ -811,7 +817,7 @@ public class FriendProfile extends AppCompatActivity {
                                                             }).start();
 
 
-                                                    Toast.makeText(rootView.getContext(), "Friend request has been sent already", Toast.LENGTH_SHORT).show();
+                                                    Toasty.info(rootView.getContext(), "Friend request has been sent already", Toasty.LENGTH_SHORT,true).show();
                                                 }
 
                                             }
@@ -869,7 +875,7 @@ public class FriendProfile extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
 
-                                                            Toast.makeText(rootView.getContext(), "Friend request sent.", Toast.LENGTH_SHORT).show();
+                                                            Toasty.success(rootView.getContext(), "Friend request sent.", Toasty.LENGTH_SHORT,true).show();
 
                                                             add_friend.animate()
                                                                     .alpha(0.0f)
@@ -927,7 +933,7 @@ public class FriendProfile extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Toast.makeText(rootView.getContext(), "Friend removed successfully", Toast.LENGTH_SHORT).show();
+                                    Toasty.success(rootView.getContext(), "Friend removed successfully", Toasty.LENGTH_SHORT,true).show();
 
                                     remove_friend.animate()
                                             .alpha(0.0f)

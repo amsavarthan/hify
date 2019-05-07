@@ -44,11 +44,11 @@
                 android:layout_below="@+id/progressBar"
                 android:layout_centerHorizontal="true"
                 android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:textSize="17sp"
                 android:background="@drawable/textview_tab_style_blue"
                 android:padding="10dp"
-                android:text="Reply For"
                 android:textColor="#fff" />
 
             <LinearLayout
@@ -79,7 +79,6 @@
                         android:padding="5dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="username"
                         android:textColor="#FF000000"
                         />
 
@@ -87,12 +86,12 @@
                         android:id="@+id/messagetxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
                         android:background="@drawable/textview_tab_style_black"
                         android:padding="10dp"
-                        android:layout_marginStart="10dp"
-                        android:text="Message"
-                        android:textSize="17sp"
-                        android:textColor="#fff" />
+                        android:textColor="#fff"
+                        android:textSize="17sp" />
 
 
                 </LinearLayout>
@@ -130,19 +129,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/input_backgtound_grey"
-                android:hint="Enter Message"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_toStartOf="@+id/currentProfile"
-                android:inputType="textCapSentences"
-                android:padding="15dp" />
+                android:hint="Enter Message"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <EditText
+                    android:id="@+id/message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:padding="15dp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/currentProfile"
+                android:layout_centerInParent="true"
                 android:layout_width="48dp"
                 android:layout_marginStart="10dp"
                 android:layout_alignParentEnd="true"
@@ -159,29 +164,27 @@
             android:layout_height="wrap_content">
 
             <Button
+                android:id="@+id/sendNew"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_margin="5dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_height="wrap_content"
+                android:text="Send new"
+                android:onClick="SendNew"
+                android:textAllCaps="false"
+                />
+
+            <Button
                 android:id="@+id/send"
-                android:layout_below="@id/message_layout"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/input_backgtound"
                 android:text="Reply"
                 android:textAllCaps="false"
-                android:textColor="#ffffff"
-                android:textSize="15sp" />
+                />
 
-            <Button
-                android:id="@+id/sendNew"
-                android:layout_below="@id/send"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/input_light_white"
-                android:onClick="SendNew"
-                android:text="Send new Hify"
-                android:textAllCaps="false"
-                android:textSize="15sp" />
 
         </LinearLayout>
 

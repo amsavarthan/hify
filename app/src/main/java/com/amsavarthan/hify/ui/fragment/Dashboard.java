@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PostsAdapter;
@@ -37,6 +36,8 @@ import com.marcoscg.dialogsheet.DialogSheet;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
 
 import static com.amsavarthan.hify.ui.activities.MainActivity.currentuser;
 import static com.amsavarthan.hify.ui.activities.MainActivity.showFragment;
@@ -67,7 +68,7 @@ public class Dashboard extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.dashboard_fragment, container, false);
+        mView = inflater.inflate(R.layout.frag_dashboard, container, false);
         return mView;
     }
 
@@ -121,7 +122,7 @@ public class Dashboard extends Fragment {
         getAllPosts();
 
         checkFriendRequest();
-
+        
     }
 
     public void checkFriendRequest(){
@@ -228,7 +229,7 @@ public class Dashboard extends Fragment {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     refreshLayout.setRefreshing(false);
-                                                    Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                                                    Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                                                     Log.w("Error", "listen:error", e);
                                                 }
                                             });
@@ -249,7 +250,7 @@ public class Dashboard extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
                     }
                 });
@@ -296,7 +297,7 @@ public class Dashboard extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
                     }
                 });
@@ -310,7 +311,7 @@ public class Dashboard extends Fragment {
                 .setTitle("Information")
                 .setMessage("Email has not been verified, please verify and continue.")
                 .setPositiveButton("Send again", v -> mAuth.getCurrentUser().sendEmailVerification()
-                        .addOnSuccessListener(aVoid -> Toast.makeText(mView.getContext(), "Verification email sent", Toast.LENGTH_SHORT).show())
+                        .addOnSuccessListener(aVoid -> Toasty.success(mView.getContext(), "Verification email sent", Toasty.LENGTH_SHORT,true).show())
                         .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
                 .setNegativeButton("No", v -> {})
                 .setRoundedCorners(true)

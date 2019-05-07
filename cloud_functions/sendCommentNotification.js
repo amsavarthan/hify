@@ -45,6 +45,8 @@ exports.sendCommentNotification=functions.firestore.document("Notifications/{use
                         title:commenter_name,
                         from_image:commenter_image,
                         post_desc:post_desc,
+						notification_type:"comment",
+						channel_name:"Hify Posts",
                         body:"Commented on your post",
                         click_action:"com.amsavarthan.hify.TARGET_COMMENT"
                         }

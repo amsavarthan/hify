@@ -4,6 +4,7 @@
     <string name="register_message">Create a new Account</string>
     <string name="loading_name">Loading Name...</string>
 
+    <!--maps api key-->
     <string name="api_key">AIzaSyCJ7pGLnoyTiBF8_2tr6oKA0wzeKzR0FcY</string>
 
     <string name="default_notification_channel_id">@string/app_name</string>
@@ -21,7 +22,7 @@
 
     <!-- app. -->
     <string name="package_name">com.amsavarthan.hify</string>
-    <string name="version_code">v.beta5</string>
+    <string name="version_code">v.beta8</string>
 
     <string name="title_activity_about_us">About_us</string>
     <string name="tab_text_1">Tab 1</string>
@@ -49,23 +50,5 @@
     <string name="s_people_have_saved_this_post">%d people have saved this post</string>
     <string name="you_have_d_new_friend_request_s">You have %d new friend request(s)</string>
 
-    <!--Professor-->
-    <string name="scan_the_question">  Scan the question  </string>
-    <string name="enter_the_question_manually">  Enter the question manually  </string>
-    <string name="settings">  Settings  </string>
-    <string name="lesser_than"><![CDATA[<]]></string>
-    <string name="lesserthan_equal"><![CDATA[<=]]></string>
-    <string name="error_network_not_available">Please check your network connectivity and try again.</string>
-    <string name="error_unable_to_search">Unable to retrieve data. Please try again later.</string>
-    <string name="okay">OKAY</string>
-    <string name="dismiss">DISMISS</string>
-    <string name="welcome">Welcome</string>
-    <string name="edittext_hint">Enter your question here</string>
-    <string name="status">I am currently using my %s eye</string>
-    <string name="ai_name">I am not named yet but i know that i am an Artificial Intelligence</string>
-    <string name="ai_author_name">I was created by Amsavarthan Lv</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

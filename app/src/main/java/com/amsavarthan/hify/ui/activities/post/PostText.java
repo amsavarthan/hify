@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -201,7 +201,7 @@ public class PostText extends AppCompatActivity {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
                                 mDialog.dismiss();
-                                Toast.makeText(PostText.this, "Post sent", Toast.LENGTH_SHORT).show();
+                                Toasty.success(PostText.this, "Post sent", Toasty.LENGTH_SHORT,true).show();
                                 finish();
                             }
                         })

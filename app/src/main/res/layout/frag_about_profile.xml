@@ -81,10 +81,14 @@
                 />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/actionCard"
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackground"
                 app:cardUseCompatPadding="true"
-                android:layout_below="@+id/account_card"
+                android:layout_below="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -94,34 +98,29 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:visibility="gone"
-                        android:background="@drawable/button_primary_backgtound"
+                        android:visibility="visible"
                         android:id="@+id/friend_sent"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:textSize="17sp"
                         android:padding="10dp"
                         android:gravity="center"
-                        android:textColor="#FFF"
-                        android:text="Friend Request Sent"
+                        android:textAllCaps="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <Button
                         android:visibility="gone"
                         android:id="@+id/friend_no"
-                        android:textColor="#FFF"
                         android:text="Send Friend Request"
                         android:textAllCaps="false"
-                        android:background="@drawable/button_accent_backgtound"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <Button
                         android:visibility="gone"
                         android:id="@+id/friend_yes"
-                        android:textColor="#FFF"
                         android:text="Unfriend"
                         android:textAllCaps="false"
-                        android:background="@drawable/button_red_rounded_backgtound"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -134,22 +133,19 @@
 
                         <Button
                             android:id="@+id/accept"
-                            android:textColor="#FFF"
                             android:text="Accept"
                             android:layout_margin="5dp"
                             android:textAllCaps="false"
-                            android:background="@drawable/button_green_backgtound"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content" />
 
                         <Button
                             android:id="@+id/decline"
-                            android:textColor="#FFF"
                             android:text="Decline"
                             android:layout_margin="5dp"
                             android:textAllCaps="false"
-                            android:background="@drawable/button_red_backgtound"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="wrap_content" />
@@ -166,7 +162,10 @@
                 app:cardUseCompatPadding="true"
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
-                android:layout_below="@+id/email"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackground"
+                android:layout_below="@+id/actionCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -202,6 +201,9 @@
                 app:cardUseCompatPadding="true"
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackground"
                 android:layout_below="@+id/bio_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

@@ -22,7 +22,6 @@ import androidx.core.app.NotificationCompat;
 
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -41,6 +40,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -80,7 +80,7 @@ public class ImagePreviewSave extends AppCompatActivity {
                         .build();
 
                 notificationManager.notify(0, notification);
-                Toast.makeText(ctxt, "Image saved in /Downloads/Hify/" + sender_name, Toast.LENGTH_LONG).show();
+                Toasty.success(ctxt, "Image saved in /Downloads/Hify/" + sender_name, Toasty.LENGTH_LONG,true).show();
             }
         }
 
@@ -221,7 +221,7 @@ public class ImagePreviewSave extends AppCompatActivity {
                                 downloadImage(intent_URL);
                             }
                         }else{
-                            Toast.makeText(ImagePreviewSave.this, "No internet connection", Toast.LENGTH_SHORT).show();
+                            Toasty.error(ImagePreviewSave.this, "No internet connection", Toasty.LENGTH_SHORT,true).show();
                         }
                     }
 

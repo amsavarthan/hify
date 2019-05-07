@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -126,7 +126,7 @@ public class SinglePostView extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(!documentSnapshot.exists()){
-                            Toast.makeText(SinglePostView.this, "The post does not exist.", Toast.LENGTH_SHORT).show();
+                            Toasty.error(SinglePostView.this, "The post does not exist.", Toasty.LENGTH_SHORT, true).show();
                         }else{
 
                             Post post = new Post(documentSnapshot.getString("userId"),documentSnapshot.getString("name"),documentSnapshot.getString("timestamp"),documentSnapshot.getString("likes"),documentSnapshot.getString("favourites"),documentSnapshot.getString("description"),documentSnapshot.getString("color"),documentSnapshot.getString("username"),documentSnapshot.getString("userimage"),Integer.parseInt(String.valueOf(documentSnapshot.get("image_count"))),documentSnapshot.getString("image_url_0"),documentSnapshot.getString("image_url_1"),documentSnapshot.getString("image_url_2"),documentSnapshot.getString("image_url_3"),documentSnapshot.getString("image_url_4"),documentSnapshot.getString("image_url_5"),documentSnapshot.getString("image_url_6")).withId(post_id);
@@ -141,7 +141,7 @@ public class SinglePostView extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(SinglePostView.this, "Some error occured opening the post", Toast.LENGTH_SHORT).show();
+                        Toasty.error(SinglePostView.this, "Some error occured opening the post", Toasty.LENGTH_SHORT,true).show();
                         finish();
                     }
                 });

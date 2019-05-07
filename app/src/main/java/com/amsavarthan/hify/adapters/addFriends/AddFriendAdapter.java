@@ -1,7 +1,5 @@
 package com.amsavarthan.hify.adapters.addFriends;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -55,7 +53,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(context).inflate(R.layout.friend_item_list,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_friend,parent,false);
         return new ViewHolder(view);
     }
 

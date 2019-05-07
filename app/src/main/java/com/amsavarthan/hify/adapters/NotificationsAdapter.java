@@ -10,14 +10,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.Notification;
+import com.amsavarthan.hify.utils.database.NotificationsHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -27,10 +31,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private List<Notification> notificationsList;
     private Context context;
+    NotificationsHelper notificationsHelper;
 
-    public NotificationsAdapter(List<Notification> notificationsList, Context context) {
+    public NotificationsAdapter(List<Notification> notificationsList, Context context,NotificationsHelper notificationsHelper) {
         this.notificationsList = notificationsList;
         this.context = context;
+        this.notificationsHelper=notificationsHelper;
     }
 
     @NonNull
@@ -74,6 +80,26 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         }else{
             holder.type_image.setImageResource(R.drawable.ic_forum_black_24dp);
         }
+
+        holder.itemView.setOnLongClickListener(v -> {
+
+            new MaterialDialog.Builder(context)
+                    .title("Delete notification")
+                    .content("Are you sure do you want to delete this notification?")
+                    .positiveText("Yes")
+                    .negativeText("No")
+                    .onPositive((dialog, which) -> {
+
+                        notificationsHelper.deleteItem(holder.getAdapterPosition());
+                        notificationsList.remove(holder.getAdapterPosition());
+                        Toasty.success(context,"Notification removed",Toasty.LENGTH_SHORT,true).show();
+                        notifyDataSetChanged();
+
+                    })
+                    .show();
+
+            return true;
+        });
 
     }
 

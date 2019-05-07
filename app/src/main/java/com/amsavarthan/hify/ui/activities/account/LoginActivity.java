@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void performLogin(final boolean override) {
+    public void performLogin() {
 
         final String email_, pass_;
         email_ = email.getText().toString();
@@ -197,7 +197,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     @Override
                                                     public void onFailure(@NonNull Exception e) {
                                                         mDialog.dismiss();
-                                                        Toast.makeText(LoginActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                        Toasty.error(LoginActivity.this, "Error: " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
                                                     }
                                                 });
 
@@ -225,7 +225,7 @@ public class LoginActivity extends AppCompatActivity {
                                     .setPositiveButton("Send again", v -> task.getResult()
                                             .getUser()
                                             .sendEmailVerification()
-                                            .addOnSuccessListener(aVoid -> Toast.makeText(LoginActivity.this, "Verification email sent", Toast.LENGTH_SHORT).show())
+                                            .addOnSuccessListener(aVoid -> Toasty.success(LoginActivity.this, "Verification email sent", Toasty.LENGTH_SHORT,true).show())
                                             .addOnFailureListener(e -> Log.e("Error",e.getMessage())))
                                     .setNegativeButton("Ok", v -> {
 
@@ -240,13 +240,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     } else {
                         if (task.getException().getMessage().contains("The password is invalid")) {
-                            Toast.makeText(LoginActivity.this, "Error: The password you have entered is invalid.", Toast.LENGTH_SHORT).show();
+                            Toasty.error(LoginActivity.this, "Error: The password you have entered is invalid.", Toasty.LENGTH_SHORT,true).show();
                             mDialog.dismiss();
                         } else if (task.getException().getMessage().contains("There is no user record")) {
-                            Toast.makeText(LoginActivity.this, "Error: Invalid user, Please register using the button below.", Toast.LENGTH_SHORT).show();
+                            Toasty.error(LoginActivity.this, "Error: Invalid user, Please register using the button below.", Toasty.LENGTH_SHORT,true).show();
                             mDialog.dismiss();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toasty.error(LoginActivity.this, "Error: " + task.getException().getMessage(), Toasty.LENGTH_SHORT,true).show();
                             mDialog.dismiss();
                         }
 
@@ -299,7 +299,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLogin(View view) {
-        performLogin(false);
+        performLogin();
     }
 
     public void onRegister(View view) {
@@ -309,7 +309,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onForgotPassword(View view) {
 
         if(TextUtils.isEmpty(email.getText().toString())) {
-            Toast.makeText(activity, "Enter your email to send reset password mail.", Toast.LENGTH_SHORT).show();
+            Toasty.info(activity, "Enter your email to send reset password mail.", Toasty.LENGTH_SHORT,true).show();
             AnimationUtil.shakeView(email, this);
         }else{
 
@@ -320,14 +320,14 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Void aVoid) {
                     mDialog.dismiss();
-                    Toast.makeText(LoginActivity.this, "Reset password mail sent", Toast.LENGTH_SHORT).show();
+                    Toasty.success(LoginActivity.this, "Reset password mail sent", Toasty.LENGTH_SHORT,true).show();
                 }
             })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             mDialog.dismiss();
-                            Toast.makeText(LoginActivity.this, "Error sending mail : "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            Toasty.error(LoginActivity.this, "Error sending mail : "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                         }
                     });
         }

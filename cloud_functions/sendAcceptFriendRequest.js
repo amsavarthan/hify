@@ -56,6 +56,8 @@ exports.sendAcceptFriendRequest = functions.firestore.document("Notifications/{u
                         friend_email:from_email,
                         friend_image:from_imagee, // friend_token:from_tokenn string gone
                         title:from_name,
+						notification_type:"Friend request",
+						channel_name:"Friend Requests",
                         body:"Accepted your friend request",
                         click_action:"com.amsavarthan.hify.TARGET_ACCEPTED"
                     }   

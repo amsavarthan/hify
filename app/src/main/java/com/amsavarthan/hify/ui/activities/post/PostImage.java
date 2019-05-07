@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -282,7 +281,7 @@ public class PostImage extends AppCompatActivity {
         }else if(resultCode==UCrop.RESULT_ERROR){
             Throwable throwable=UCrop.getError(data);
             throwable.printStackTrace();
-            Toast.makeText(this, "Error cropping : "+throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Error cropping : "+throwable.getMessage(), Toasty.LENGTH_SHORT,true).show();
         }
 
     }
@@ -395,7 +394,7 @@ public class PostImage extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     mDialog.dismiss();
-                                    Toast.makeText(PostImage.this, "Post sent", Toast.LENGTH_SHORT).show();
+                                    Toasty.success(PostImage.this, "Post sent", Toasty.LENGTH_SHORT,true).show();
                                     finish();
                                 }
                             })
@@ -412,10 +411,10 @@ public class PostImage extends AppCompatActivity {
 
             } else {
                 mDialog.dismiss();
-                Toast.makeText(this, "No image has been uploaded, Please wait or try again", Toast.LENGTH_SHORT).show();
+                Toasty.info(this, "No image has been uploaded, Please wait or try again", Toasty.LENGTH_SHORT,true).show();
             }
         }else{
-            Toast.makeText(this, "Please wait, images are uploading...", Toast.LENGTH_SHORT).show();
+            Toasty.info(this, "Please wait, images are uploading...", Toasty.LENGTH_SHORT,true).show();
         }
 
     }

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +29,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import es.dmoral.toasty.Toasty;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
@@ -122,7 +124,7 @@ public class SendMessage extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         refreshLayout.setRefreshing(false);
                         Log.w("Error", "listen:error", e);
 

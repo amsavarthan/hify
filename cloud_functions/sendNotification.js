@@ -42,6 +42,8 @@ exports.sendNotification = functions.firestore.document("Users/{user_id}/Notific
                     from_image:from_image,
                     title:from_name,
                     body:from_message,
+					notification_type:"Message",
+					channel_name:"Flash Messages",
                     click_action:"com.amsavarthan.hify.TARGETNOTIFICATION"
                 }
             };

@@ -36,7 +36,7 @@ public class NotificationsHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "CREATE TABLE notifications " + "(id integer PRIMARY KEY,user_image text,title text,body text,timestamp text)"
+                "CREATE TABLE notifications " + "(id integer PRIMARY KEY AUTOINCREMENT,user_image text,title text,body text,timestamp text)"
         );
     }
 
@@ -46,7 +46,7 @@ public class NotificationsHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertContact( String user_image, String title, String body,String timestamp) {
+    public void insertContact(String user_image, String title, String body,String timestamp) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("user_image", user_image);
@@ -96,11 +96,20 @@ public class NotificationsHelper extends SQLiteOpenHelper {
 
     }
 
-    public Integer deleteContact (Integer id) {
+    public void deleteItem (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("notifications",
-                "id = ? ",
-                new String[] { Integer.toString(id) });
+        db.delete("notifications",
+                "id = "+id,
+                null);
+        db.close();
+    }
+
+    public void deleteAll () {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("notifications",
+                null,
+                null);
+        db.close();
     }
 
 }

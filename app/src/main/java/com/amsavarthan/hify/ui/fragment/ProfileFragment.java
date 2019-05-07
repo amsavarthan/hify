@@ -18,11 +18,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -76,6 +73,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
 
 import static android.app.Activity.RESULT_OK;
@@ -92,7 +90,7 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_profile_view, container, false);
+        mView = inflater.inflate(R.layout.frag_profile_view, container, false);
         return mView;
     }
 
@@ -172,7 +170,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.frag_main, container, false);
             return rootView;
         }
 
@@ -256,7 +254,7 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             refreshLayout.setRefreshing(false);
-                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                            Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -283,7 +281,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            rootView = inflater.inflate(R.layout.frag_main, container, false);
             return rootView;
         }
 
@@ -379,7 +377,7 @@ public class ProfileFragment extends Fragment {
                                                                     @Override
                                                                     public void onFailure(@NonNull Exception e) {
                                                                         refreshLayout.setRefreshing(false);
-                                                                        Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                                                                        Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                                                                         Log.e("Error",e.getMessage());
                                                                     }
                                                                 });
@@ -390,7 +388,7 @@ public class ProfileFragment extends Fragment {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     refreshLayout.setRefreshing(false);
-                                                    Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                                                    Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                                                     Log.e("Error",e.getMessage());
                                                 }
                                             });
@@ -407,7 +405,7 @@ public class ProfileFragment extends Fragment {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             refreshLayout.setRefreshing(false);
-                            Toast.makeText(rootView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                            Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                             Log.e("Error",e.getMessage());
                         }
                     });
@@ -447,6 +445,8 @@ public class ProfileFragment extends Fragment {
             post=rootView.findViewById(R.id.posts);
             friend=rootView.findViewById(R.id.friends);
             bio=rootView.findViewById(R.id.bio);
+
+            rootView.findViewById(R.id.actionCard).setVisibility(View.GONE);
 
             mFirestore.collection("Users")
                     .document(mAuth.getCurrentUser().getUid())
@@ -581,7 +581,7 @@ public class ProfileFragment extends Fragment {
                         startActivityForResult(Intent.createChooser(intent, "Select Profile Picture"), PICK_IMAGE);
 
                     }else{
-                        Toast.makeText(rootView.getContext(), "Go online to change profile picture", Toast.LENGTH_SHORT).show();
+                        Toasty.error(rootView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                     }
 
                 }
@@ -603,7 +603,7 @@ public class ProfileFragment extends Fragment {
 
                                                 if (!input.toString().equals(pass)) {
                                                     mdialog.dismiss();
-                                                    Toast.makeText(rootView.getContext(), "Invalid old password", Toast.LENGTH_SHORT).show();
+                                                    Toasty.error(rootView.getContext(), "Invalid password", Toasty.LENGTH_SHORT,true).show();
                                                 } else {
 
                                                     new MaterialDialog.Builder(rootView.getContext())
@@ -616,9 +616,9 @@ public class ProfileFragment extends Fragment {
 
                                                                     if(TextUtils.isEmpty(input.toString())){
                                                                         mdialog.dismiss();
-                                                                        Toast.makeText(rootView.getContext(), "Invalid new password", Toast.LENGTH_SHORT).show();
+                                                                        Toasty.error(rootView.getContext(), "Invalid new password", Toasty.LENGTH_SHORT,true).show();
                                                                     }else if(input.toString().length()<6){
-                                                                        Toast.makeText(rootView.getContext(), "Password should contain at least 6 characters", Toast.LENGTH_SHORT).show();
+                                                                        Toasty.error(rootView.getContext(), "Password should contain at least 6 characters", Toasty.LENGTH_SHORT,true).show();
                                                                     }else{
 
                                                                         final ProgressDialog dialog=new ProgressDialog(rootView.getContext());
@@ -634,14 +634,14 @@ public class ProfileFragment extends Fragment {
                                                                                 dialog.dismiss();
                                                                                 mdialog.dismiss();
                                                                                 userHelper.updateContactPassword(1,input.toString());
-                                                                                Toast.makeText(rootView.getContext(), "Password updated", Toast.LENGTH_SHORT).show();
+                                                                                Toasty.success(rootView.getContext(), "Password updated", Toasty.LENGTH_SHORT,true).show();
                                                                             }
                                                                         }).addOnFailureListener(new OnFailureListener() {
                                                                             @Override
                                                                             public void onFailure(@NonNull Exception e) {
                                                                                 dialog.dismiss();
                                                                                 mdialog.dismiss();
-                                                                                Toast.makeText(rootView.getContext(), "Error updating password: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                                Toasty.error(rootView.getContext(), "Error updating password: "+e.getMessage(), Toasty.LENGTH_SHORT,true).show();
                                                                                 Log.e("password error",e.getLocalizedMessage());
                                                                             }
                                                                         });
@@ -658,7 +658,7 @@ public class ProfileFragment extends Fragment {
                                 .show();
 
                     }else{
-                        Toast.makeText(rootView.getContext(), "Go online to change password", Toast.LENGTH_SHORT).show();
+                        Toasty.info(rootView.getContext(), "Go online to change password", Toasty.LENGTH_SHORT,true).show();
                     }
                 }
             });
@@ -787,7 +787,7 @@ public class ProfileFragment extends Fragment {
                                             if(!input.toString().equals(pass)){
                                                 dialog.dismiss();
                                                 mdialog.show();
-                                                Toast.makeText(rootView.getContext(), "Invalid password", Toast.LENGTH_SHORT).show();
+                                                Toasty.error(rootView.getContext(), "Invalid password", Toasty.LENGTH_SHORT,true).show();
                                             }else{
 
                                                 mdialog.dismiss();
@@ -822,7 +822,7 @@ public class ProfileFragment extends Fragment {
                                                                                                 public void onSuccess(Void aVoid) {
                                                                                                     dialog.dismiss();
                                                                                                     userHelper.updateContactEmail(1,  email.getText().toString());
-                                                                                                    Toast.makeText(rootView.getContext(),"Verification email sent.",Toast.LENGTH_SHORT).show();
+                                                                                                    Toasty.success(rootView.getContext(),"Verification email sent.",Toasty.LENGTH_SHORT,true).show();
                                                                                                     dialog.dismiss();
                                                                                                 }
                                                                                             }).addOnFailureListener(new OnFailureListener() {
@@ -988,7 +988,7 @@ public class ProfileFragment extends Fragment {
                                             }else{
 
                                                 dialog.dismiss();
-                                                Toast.makeText(rootView.getContext(), "Username already exists", Toast.LENGTH_SHORT).show();
+                                                Toasty.error(rootView.getContext(), "Username already exists", Toasty.LENGTH_SHORT,true).show();
                                                 AnimationUtil.shakeView(username,rootView.getContext());
 
                                             }
@@ -1082,7 +1082,7 @@ public class ProfileFragment extends Fragment {
 
                         }
 
-                        Toast.makeText(rootView.getContext(),"Only your name,bio and location has been scheduled for update, when internet connection is available it will be updated.",Toast.LENGTH_LONG).show();
+                        Toasty.info(rootView.getContext(),"Only your name,bio and location has been scheduled for update, when internet connection is available it will be updated.",Toasty.LENGTH_LONG).show();
 
 
                     }
@@ -1123,13 +1123,13 @@ public class ProfileFragment extends Fragment {
             if (requestCode == UCrop.REQUEST_CROP) {
                 if (resultCode == RESULT_OK) {
                     try {
-                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(50).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(UCrop.getOutput(data).getPath()));
+                        File compressedFile= new Compressor(rootView.getContext()).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(70).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(UCrop.getOutput(data).getPath()));
                         profile_pic.setImageURI(Uri.fromFile(compressedFile));
 						imageUri=Uri.fromFile(compressedFile);
-                        Toast.makeText(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toast.LENGTH_LONG).show();
+                        Toasty.info(rootView.getContext(), "Profile picture uploaded, click Save details button to apply changes", Toasty.LENGTH_LONG,true).show();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(rootView.getContext(), "Profile photo updated click Save details to apply but unable to compress: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        Toasty.info(rootView.getContext(), "Profile photo updated click Save details to apply but unable to compress: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                         profile_pic.setImageURI(imageUri);
                         imageUri = UCrop.getOutput(data);
                     }
