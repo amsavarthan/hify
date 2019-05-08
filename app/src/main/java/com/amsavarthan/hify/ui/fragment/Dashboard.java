@@ -2,44 +2,31 @@ package com.amsavarthan.hify.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.adapters.PostsAdapter;
-import com.amsavarthan.hify.models.Post;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.amsavarthan.hify.ui.activities.MainActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.marcoscg.dialogsheet.DialogSheet;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import es.dmoral.toasty.Toasty;
 
-import static com.amsavarthan.hify.ui.activities.MainActivity.currentuser;
+import static com.amsavarthan.hify.ui.activities.MainActivity.add_post;
 import static com.amsavarthan.hify.ui.activities.MainActivity.showFragment;
 import static com.amsavarthan.hify.ui.activities.MainActivity.toolbar;
 
@@ -47,23 +34,10 @@ import static com.amsavarthan.hify.ui.activities.MainActivity.toolbar;
  * Created by amsavarthan on 29/3/18.
  */
 
-public class Dashboard extends Fragment {
+public class Dashboard extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener,
+        BottomNavigationView.OnNavigationItemReselectedListener{
 
-    private List<Post> mPostsList;
-    private FirebaseFirestore mFirestore;
-    private FirebaseAuth mAuth;
-    private FirebaseUser currentUser;
-    private RecyclerView mPostsRecyclerView;
-    private View mView;
-    private List<String> mFriendIdList=new ArrayList<>();
-    private View statsheetView;
-    private BottomSheetDialog mmBottomSheetDialog;
-    private SwipeRefreshLayout refreshLayout;
-    private CardView request_alert;
-    private TextView request_alert_text;
-    private DocumentSnapshot lastVisible;
-    private boolean isFirstPageFirstLoad=true;
-    private PostsAdapter mAdapter_v19;
+    View mView;
 
     @Nullable
     @Override
@@ -73,64 +47,67 @@ public class Dashboard extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mAdapter_v19.notifyDataSetChanged();
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemReselectedListener(this);
+
+        loadfragment(new Home());
+        checkFriendRequest();
+
+    }
+
+    public void loadfragment(androidx.fragment.app.Fragment fragment) {
+        ((AppCompatActivity)getActivity()).getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_container, fragment)
+                .commit();
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
 
-        mFirestore = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+            case R.id.action_home:
+                add_post.setVisible(true);
+                loadfragment(new Home());
+                break;
 
-        refreshLayout=view.findViewById(R.id.refreshLayout);
-        request_alert=view.findViewById(R.id.friend_req_alert);
-        request_alert_text=view.findViewById(R.id.friend_req_alert_text);
+            case R.id.action_discover:
+                add_post.setVisible(false);
+                loadfragment(new Discover());
+                break;
 
-        request_alert.setVisibility(View.GONE);
-
-        statsheetView = ((AppCompatActivity)getActivity()).getLayoutInflater().inflate(R.layout.stat_bottom_sheet_dialog, null);
-        mmBottomSheetDialog = new BottomSheetDialog(view.getContext());
-        mmBottomSheetDialog.setContentView(statsheetView);
-        mmBottomSheetDialog.setCanceledOnTouchOutside(true);
-        mPostsRecyclerView = view.findViewById(R.id.posts_recyclerview);
-
-        mPostsList = new ArrayList<>();
-
-        mAdapter_v19 = new PostsAdapter(mPostsList, view.getContext(), getActivity(), mmBottomSheetDialog, statsheetView, false);
-        mPostsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mPostsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mPostsRecyclerView.setHasFixedSize(true);
-        mPostsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(),DividerItemDecoration.VERTICAL));
-        mPostsRecyclerView.setAdapter(mAdapter_v19);
-
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-
-                mPostsList.clear();
-                mAdapter_v19.notifyDataSetChanged();
-                getAllPosts();
-                checkFriendRequest();
-
-            }
-        });
-
-        getAllPosts();
-
-        checkFriendRequest();
-        
+        }
+        return true;
     }
 
-    public void checkFriendRequest(){
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
 
-        mFirestore.collection("Users")
-                .document(mAuth.getCurrentUser().getUid())
+            case R.id.action_home:
+                break;
+
+            case R.id.action_discover:
+                break;
+
+        }
+    }
+    private CardView request_alert;
+    private TextView request_alert_text;
+
+    private void checkFriendRequest(){
+
+        request_alert=mView.findViewById(R.id.friend_req_alert);
+        request_alert_text=mView.findViewById(R.id.friend_req_alert_text);
+
+        FirebaseFirestore.getInstance().collection("Users")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("Friend_Requests")
-                .addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+                .addSnapshotListener(getActivity(),new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
@@ -155,7 +132,7 @@ public class Dashboard extends Fragment {
                                 request_alert.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        if (currentuser.isEmailVerified()) {
+                                        if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
                                             toolbar.setTitle("Manage Friends");
                                             try {
                                                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Manage Friends");
@@ -178,148 +155,25 @@ public class Dashboard extends Fragment {
 
     }
 
-    public void getAllPosts() {
-
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
-        refreshLayout.setRefreshing(true);
-
-        mFirestore.collection("Posts")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        if (!queryDocumentSnapshots.isEmpty()) {
-
-                            for (final DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-
-                                if (doc.getType() == DocumentChange.Type.ADDED) {
-
-                                    mFirestore.collection("Users")
-                                            .document(currentUser.getUid())
-                                            .collection("Friends")
-                                            .get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot querySnapshot) {
-
-                                                    if (!querySnapshot.isEmpty()) {
-
-                                                        for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
-                                                            if (documentChange.getDocument().getId().equals(doc.getDocument().get("userId"))) {
-
-                                                                Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
-                                                                mPostsList.add(post);
-                                                                refreshLayout.setRefreshing(false);
-                                                                mAdapter_v19.notifyDataSetChanged();
-
-                                                            }
-                                                        }
-
-                                                    } else {
-
-                                                       getCurrentUsersPosts();
-
-                                                    }
-
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    refreshLayout.setRefreshing(false);
-                                                    Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
-                                                    Log.w("Error", "listen:error", e);
-                                                }
-                                            });
-
-                                }
-                            }
-
-
-                        }else{
-                            refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
-
-                        }
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
-                        Log.w("Error", "listen:error", e);
-                    }
-                });
-
-    }
-
-    private void getCurrentUsersPosts() {
-
-        mFirestore.collection("Posts")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                        if(queryDocumentSnapshots.isEmpty()){
-
-                            refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
-
-                        }else{
-
-                            for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                                if (documentChange.getDocument().getString("userId").equals(mAuth.getCurrentUser().getUid())) {
-
-                                    Post post = documentChange.getDocument().toObject(Post.class).withId(documentChange.getDocument().getId());
-                                    mPostsList.add(post);
-                                    refreshLayout.setRefreshing(false);
-                                    mAdapter_v19.notifyDataSetChanged();
-
-                                }
-                            }
-
-                            if (mPostsList.isEmpty()) {
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
-                                refreshLayout.setRefreshing(false);
-                            }
-
-                        }
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
-                        Log.w("Error", "listen:error", e);
-                    }
-                });
-
-
-    }
-
     public void showDialog(){
 
         new DialogSheet(mView.getContext())
                 .setTitle("Information")
-                .setMessage("Email has not been verified, please verify and continue.")
-                .setPositiveButton("Send again", v -> mAuth.getCurrentUser().sendEmailVerification()
+                .setMessage("Email has not been verified, please verify and continue. If you have verified we recommend you to logout and login again")
+                .setPositiveButton("Send again", v -> FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification()
                         .addOnSuccessListener(aVoid -> Toasty.success(mView.getContext(), "Verification email sent", Toasty.LENGTH_SHORT,true).show())
                         .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
-                .setNegativeButton("No", v -> {})
+                .setNegativeButton("Ok", new DialogSheet.OnNegativeClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                })
+                .setCancelable(true)
                 .setRoundedCorners(true)
                 .setColoredNavigationBar(true)
-                .setCancelable(true)
                 .show();
 
     }
-
 
 }

@@ -19,7 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * Created by amsavarthan on 29/3/18.
  */
 
-public class Forum extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener{
+public class Forum extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemReselectedListener {
 
     View mView;
 
@@ -36,6 +36,7 @@ public class Forum extends Fragment implements BottomNavigationView.OnNavigation
 
         BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnNavigationItemReselectedListener(this);
 
         loadfragment(new AllQuestions());
 
@@ -62,5 +63,18 @@ public class Forum extends Fragment implements BottomNavigationView.OnNavigation
 
         }
         return true;
+    }
+
+    @Override
+    public void onNavigationItemReselected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+
+            case R.id.action_global:
+                break;
+
+            case R.id.action_my:
+                break;
+
+        }
     }
 }

@@ -23,7 +23,8 @@
 
             <LinearLayout
                 android:id="@+id/options"
-                android:padding="10dp"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"

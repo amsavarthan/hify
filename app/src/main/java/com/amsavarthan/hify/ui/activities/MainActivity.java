@@ -86,8 +86,11 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -175,12 +178,12 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     };
     private BottomSheetDialog mBottomSheetDialog;
     public static Toolbar toolbar;
-    private MenuItem add_post;
     private boolean mState=true;
     private boolean mStateForum=false;
     private MenuItem add_question;
     private List<Images> imagesList=new ArrayList<>();
     private boolean validate;
+    public static MenuItem add_post;
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
@@ -1264,6 +1267,10 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    public static MainActivity getApplicationInstance(){
+        return activity;
+    }
+
     public void onViewProfileClicked(View view) {
 
         toolbar.setTitle("My Profile");
@@ -1290,7 +1297,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         if(badge_action!=null){
 
-            ImageView badge=badge_action.findViewById(R.id.badge);
+            CircleImageView badge=badge_action.findViewById(R.id.badge);
 
             if(!NotificationUtil.read){
                 badge.setVisibility(View.VISIBLE);
@@ -1398,6 +1405,5 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
 }

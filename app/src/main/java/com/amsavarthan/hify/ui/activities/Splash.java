@@ -81,7 +81,7 @@ public class Splash extends AppCompatActivity {
                         Cursor rs = userHelper.getData(1);
                         rs.moveToFirst();
 
-                        String email = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_EMAIL));
+                         String email = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_EMAIL));
                         String pass = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_PASS));
 
                         if (!rs.isClosed()) {

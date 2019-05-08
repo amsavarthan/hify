@@ -22,6 +22,7 @@ public class Config {
     public static final String ADMIN_CHANNEL_NAME     = "Push Notifications";
 
     public static final int PICK_IMAGES = 102;
+    public static final String NEWS_API_KEY = "0c565c0ee59741d8923b28167a05b97f";
 
     @NonNull
     public static String random() {
