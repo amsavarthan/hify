@@ -1,3 +1,5 @@
+# Hify
+
 <img src="https://github.com/lvamsavarthan/Hify/blob/master/preview.png">
 
 ## If you like this project please consider donating
@@ -89,4 +91,5 @@ If you like to contribute, please let me know
 
 ## Credits
 
-Logo designed by Live Mail Team from Uplabs.com
+News from www.newsapi.org <br>
+Logo from www.shutterstock.com
