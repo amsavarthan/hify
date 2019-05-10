@@ -26,7 +26,7 @@ public class About extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.about_fragment, container, false);
+        mView = inflater.inflate(R.layout.frag_about, container, false);
         return mView;
     }
 
@@ -37,69 +37,45 @@ public class About extends Fragment {
         email=mView.findViewById(R.id.email);
         website=mView.findViewById(R.id.website);
         instagram=mView.findViewById(R.id.instagram);
-        google=mView.findViewById(R.id.google);
         github=mView.findViewById(R.id.github);
 
-        email.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        email.setOnClickListener(v -> {
 
-                Intent email = new Intent(Intent.ACTION_SEND);
-                email.putExtra(Intent.EXTRA_EMAIL, new String[]{"amsavarthan.a@gmail.com"});
-                email.putExtra(Intent.EXTRA_SUBJECT, "Sent from Hify ( "+ Build.BRAND+"("+Build.VERSION.SDK_INT+") )");
-                email.putExtra(Intent.EXTRA_TEXT, "");
-                email.setType("message/rfc822");
-                startActivity(Intent.createChooser(email, "Send using..."));
+            Intent email = new Intent(Intent.ACTION_SEND);
+            email.putExtra(Intent.EXTRA_EMAIL, new String[]{"amsavarthan.a@gmail.com"});
+            email.putExtra(Intent.EXTRA_SUBJECT, "Sent from Hify ( "+ Build.BRAND+"("+Build.VERSION.SDK_INT+") )");
+            email.putExtra(Intent.EXTRA_TEXT, "");
+            email.setType("message/rfc822");
+            startActivity(Intent.createChooser(email, "Send using..."));
 
-            }
         });
 
-        website.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        website.setOnClickListener(v -> {
 
-                String url = "http://lvamsavarthan.github.io/lvstore";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+            String url = "http://lvamsavarthan.github.io/lvstore";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
 
-            }
         });
 
-        instagram.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        instagram.setOnClickListener(v -> {
 
-                String url = "https://www.instagram.com/lvamsavarthan";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+            String url = "https://www.instagram.com/lvamsavarthan";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
 
-            }
         });
 
-        google.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                String url = "https://plus.google.com/118398512849520996107";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
+        github.setOnClickListener(v -> {
 
-            }
-        });
+            String url = "https://github.com/lvamsavarthan/Hify";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
 
-        github.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String url = "https://github.com/lvamsavarthan/Hify";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-
-            }
         });
 
 

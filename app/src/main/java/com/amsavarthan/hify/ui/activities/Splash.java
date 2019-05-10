@@ -54,7 +54,7 @@ public class Splash extends AppCompatActivity {
 
         setContentView(R.layout.activity_splash);
 
-        findViewById(R.id.appname).animate()
+        /*findViewById(R.id.appname).animate()
                 .alpha(1.0f)
                 .setDuration(300)
                 .setListener(new AnimatorListenerAdapter() {
@@ -64,7 +64,7 @@ public class Splash extends AppCompatActivity {
                         findViewById(R.id.appname).setVisibility(View.VISIBLE);
                     }
                 })
-                .start();
+                .start();*/
 
         new Timer().schedule(new TimerTask() {
             @Override

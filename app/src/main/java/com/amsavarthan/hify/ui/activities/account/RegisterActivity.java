@@ -403,32 +403,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransitionExit();
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
-        overridePendingTransitionEnter();
-    }
-
-    /**
-     * Overrides the pending Activity transition by performing the "Enter" animation.
-     */
-    protected void overridePendingTransitionEnter() {
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-    }
-
-    /**
-     * Overrides the pending Activity transition by performing the "Exit" animation.
-     */
-    protected void overridePendingTransitionExit() {
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-    }
-
     public void setProfilepic(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -436,4 +410,21 @@ public class RegisterActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Profile Picture"), PICK_IMAGE);
     }
 
+    public void onLogin(View view) {
+        onBackPressed();
+    }
+
+    public void openPolicy(View view) {
+        String url = "http://lvamsavarthan.github.io/lvstore/hify_privacy_policy.html";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
+
+    public void openTerms(View view) {
+        String url = "http://lvamsavarthan.github.io/lvstore/hify_terms.html";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
 }

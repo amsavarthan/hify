@@ -242,6 +242,7 @@ public class CommentsActivity extends AppCompatActivity {
                                         mProgress.setVisibility(View.GONE);
                                         sendNotification();
                                         mCommentText.setHint("Add a comment..");
+                                        mCommentText.setText("");
                                         Toasty.success(CommentsActivity.this, "Comment added", Toasty.LENGTH_SHORT,true).show();
                                         commentList.clear();
                                         getComments(mProgress);
@@ -261,6 +262,7 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        mProgress.setVisibility(View.GONE);
                         Log.e("Error getuser", e.getMessage());
                     }
                 });
@@ -290,6 +292,7 @@ public class CommentsActivity extends AppCompatActivity {
                                 if (doc.getDocument().exists()) {
                                     if (doc.getType() == DocumentChange.Type.ADDED) {
 
+                                        mProgress.setVisibility(View.GONE);
                                         Comment comment = doc.getDocument().toObject(Comment.class).withId(doc.getDocument().getId());
                                         commentList.add(comment);
                                         mAdapter.notifyDataSetChanged();

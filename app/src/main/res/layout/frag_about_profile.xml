@@ -80,82 +80,70 @@
                 android:textColor="#212121"
                 />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/actionCard"
-                android:layout_margin="10dp"
-                app:cardCornerRadius="4dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?selectableItemBackground"
-                app:cardUseCompatPadding="true"
+            <FrameLayout
+                android:id="@+id/frame"
                 android:layout_below="@+id/email"
+                android:layout_margin="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <FrameLayout
-                    android:id="@+id/frame"
+                <TextView
+                    android:visibility="visible"
+                    android:id="@+id/friend_sent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:textSize="17sp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:textAllCaps="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:visibility="gone"
+                    android:id="@+id/friend_no"
+                    android:text="Send Friend Request"
+                    android:textAllCaps="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:visibility="gone"
+                    android:id="@+id/friend_yes"
+                    android:text="Unfriend"
+                    android:textAllCaps="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/friend_req"
+                    android:visibility="gone"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <TextView
-                        android:visibility="visible"
-                        android:id="@+id/friend_sent"
+                    <Button
+                        android:id="@+id/accept"
+                        android:text="Accept"
+                        android:layout_margin="5dp"
+                        android:textAllCaps="false"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/decline"
+                        android:text="Decline"
+                        android:layout_margin="5dp"
+                        android:textAllCaps="false"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:textSize="17sp"
-                        android:padding="10dp"
-                        android:gravity="center"
-                        android:textAllCaps="false"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content" />
 
-                    <Button
-                        android:visibility="gone"
-                        android:id="@+id/friend_no"
-                        android:text="Send Friend Request"
-                        android:textAllCaps="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
 
-                    <Button
-                        android:visibility="gone"
-                        android:id="@+id/friend_yes"
-                        android:text="Unfriend"
-                        android:textAllCaps="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/friend_req"
-                        android:visibility="gone"
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/accept"
-                            android:text="Accept"
-                            android:layout_margin="5dp"
-                            android:textAllCaps="false"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content" />
-
-                        <Button
-                            android:id="@+id/decline"
-                            android:text="Decline"
-                            android:layout_margin="5dp"
-                            android:textAllCaps="false"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content" />
-
-
-                    </LinearLayout>
-
-                </FrameLayout>
-
-            </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/bio_card"
@@ -165,7 +153,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?selectableItemBackground"
-                android:layout_below="@+id/actionCard"
+                android:layout_below="@+id/frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

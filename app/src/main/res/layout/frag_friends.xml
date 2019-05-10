@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_above="@+id/bottom_nav"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

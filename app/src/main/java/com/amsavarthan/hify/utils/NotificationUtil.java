@@ -16,7 +16,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
@@ -103,7 +102,7 @@ public class NotificationUtil {
             return;
 
         // notification icon
-        final int icon = R.mipmap.ic_launcher;
+        final int icon = R.mipmap.logo_accent;
 
         int requestID = (int) System.currentTimeMillis();
 

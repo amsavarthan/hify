@@ -7,29 +7,24 @@
     android:background="@color/colorPrimaryy"
     tools:context="com.amsavarthan.hify.ui.activities.friends.SearchUsersActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:orientation="horizontal"
-        android:padding="5dp">
+        >
 
-        <TextView
-            fontPath="fonts/bold.ttf"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:gravity="center_vertical"
-            android:text="Search Friends"
-            android:textColor="#212121"
-            android:textSize="22sp"
-            tools:ignore="MissingPrefix" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:title="Search users"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
-    </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/layout"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/searchLayout"
@@ -47,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:cardBackgroundColor="#212121"
+        app:cardBackgroundColor="@color/colorAccentt"
         app:cardCornerRadius="0dp"
         app:cardElevation="8dp"
         app:cardMaxElevation="15dp">
@@ -63,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_toStartOf="@id/search_button"
-                android:background="@drawable/edittext_primary_backgtound"
+                android:background="@drawable/edittext_accent"
                 android:hint="Search by name"
                 android:maxLength="25"
                 android:padding="10dp"

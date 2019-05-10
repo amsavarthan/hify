@@ -670,7 +670,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 LoginActivity.startActivityy(MainActivity.this);
                 mDialog.dismiss();
                 finish();
-                overridePendingTransitionExit();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -726,26 +725,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     @ColorInt
     private int color(@ColorRes int res) {
         return ContextCompat.getColor(this, res);
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransitionExit();
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
-        overridePendingTransitionEnter();
-    }
-
-    protected void overridePendingTransitionEnter() {
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-    }
-
-    protected void overridePendingTransitionExit() {
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 
     private void firebaseMessagingService() {

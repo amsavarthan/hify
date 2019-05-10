@@ -170,7 +170,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.frag_main, container, false);
+            rootView = inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -281,7 +281,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.frag_main, container, false);
+            rootView = inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -446,7 +446,7 @@ public class ProfileFragment extends Fragment {
             friend=rootView.findViewById(R.id.friends);
             bio=rootView.findViewById(R.id.bio);
 
-            rootView.findViewById(R.id.actionCard).setVisibility(View.GONE);
+            rootView.findViewById(R.id.frame).setVisibility(View.GONE);
 
             mFirestore.collection("Users")
                     .document(mAuth.getCurrentUser().getUid())

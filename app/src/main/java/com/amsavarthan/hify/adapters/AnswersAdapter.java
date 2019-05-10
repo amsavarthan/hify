@@ -110,7 +110,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         Glide.with(context)
-                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_6))
+                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
                                 .load(documentSnapshot.getString("image"))
                                 .into(holder.profile_pic);
                     }

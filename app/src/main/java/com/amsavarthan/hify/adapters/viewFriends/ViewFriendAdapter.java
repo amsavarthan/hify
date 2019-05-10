@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -360,8 +361,8 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
 
         TextView name, listenerText,username;
         RelativeLayout viewBackground, viewForeground;
-        private View mView;
-        private CircleImageView image;
+        View mView;
+        CircleImageView image;
 
         public ViewHolder(View itemView) {
             super(itemView);

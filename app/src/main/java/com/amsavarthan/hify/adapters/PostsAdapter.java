@@ -464,23 +464,15 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             Log.w("error","fastscrolled",ex);
         }
 
-        holder.user_name.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FriendProfile.startActivity(context,postList.get(holder.getAdapterPosition()).getUserId());
-            }
-        });
+        holder.user_name.setOnClickListener(v -> FriendProfile.startActivity(context,postList.get(holder.getAdapterPosition()).getUserId()));
 
-        holder.comment_btn.setOnFavoriteAnimationEndListener(new MaterialFavoriteButton.OnFavoriteAnimationEndListener() {
-            @Override
-            public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
+        holder.comment_btn.setOnFavoriteAnimationEndListener((buttonView, favorite) -> {
 
 
-                    String desc = "<b>" + postList.get(holder.getAdapterPosition()).getUsername() + "</b> " + postList.get(holder.getAdapterPosition()).getDescription();
-                    CommentsActivity.startActivity(context, postList,desc, holder.getAdapterPosition(),isOwner);
+                String desc = "<b>" + postList.get(holder.getAdapterPosition()).getUsername() + "</b> : " + postList.get(holder.getAdapterPosition()).getDescription();
+                CommentsActivity.startActivity(context, postList,desc, holder.getAdapterPosition(),isOwner);
 
 
-            }
         });
 
         if(forComment){

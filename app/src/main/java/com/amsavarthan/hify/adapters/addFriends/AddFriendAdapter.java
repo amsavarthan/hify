@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -127,6 +128,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
+                            holder.progressBar.setVisibility(View.GONE);
                             holder.exist_icon.setVisibility(View.GONE);
                             holder.friend_icon.setVisibility(View.VISIBLE);
                             holder.friend_icon.setAlpha(0.0f);
@@ -146,6 +148,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                     @Override
                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                                         if (documentSnapshot.exists()) {
+                                            holder.progressBar.setVisibility(View.GONE);
                                             holder.friend_icon.setVisibility(View.GONE);
                                             holder.exist_icon.setVisibility(View.VISIBLE);
                                             holder.exist_icon.setAlpha(0.0f);
@@ -154,6 +157,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                                     .alpha(1.0f)
                                                     .start();
                                         } else {
+                                            holder.progressBar.setVisibility(View.GONE);
                                             holder.exist_icon.setVisibility(View.GONE);
                                             holder.friend_icon.setVisibility(View.GONE);
                                         }
@@ -293,6 +297,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
 
+                                                        holder.progressBar.setVisibility(View.GONE);
                                                         holder.friend_icon.setVisibility(View.GONE);
                                                         holder.exist_icon.setVisibility(View.VISIBLE);
                                                         holder.exist_icon.setAlpha(0.0f);
@@ -309,6 +314,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                                 }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
+                                                holder.progressBar.setVisibility(View.GONE);
                                                 Log.e("Error",e.getMessage());
                                             }
                                         });
@@ -318,6 +324,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
                                 }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                holder.progressBar.setVisibility(View.GONE);
                                 Log.e("Error",e.getMessage());
                             }
                         });
@@ -334,11 +341,13 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
         TextView        name, listenerText,username;
         RelativeLayout  viewBackground, viewForeground;
         ImageView       exist_icon,friend_icon;
+        ProgressBar     progressBar;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             mView =itemView;
+            progressBar=mView.findViewById(R.id.progressBar);
             image = mView.findViewById(R.id.image);
             name = mView.findViewById(R.id.name);
             username = mView.findViewById(R.id.username);

@@ -60,7 +60,6 @@
         android:text="Download"
         android:id="@+id/button"
         android:textColor="#fff"
-        android:background="@drawable/button_accent_backgtound"
         android:onClick="onDownloadClick"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"

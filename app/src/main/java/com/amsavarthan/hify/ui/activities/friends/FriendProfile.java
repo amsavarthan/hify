@@ -203,7 +203,7 @@ public class FriendProfile extends AppCompatActivity {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.frag_main, container, false);
+            rootView = inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -367,7 +367,6 @@ public class FriendProfile extends AppCompatActivity {
                             friend_name  = documentSnapshot.getString("name");
                             friend_email = documentSnapshot.getString("email");
                             friend_image = documentSnapshot.getString("image");
-                            //friend_token = documentSnapshot.getString("token");
                             friend_tokens = (List<String>) documentSnapshot.get("tokens");
 
                             username.setText(String.format(Locale.ENGLISH,"@%s", documentSnapshot.getString("username")));
@@ -875,6 +874,7 @@ public class FriendProfile extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
 
+                                                            req_sent.setText("Friend request sent");
                                                             Toasty.success(rootView.getContext(), "Friend request sent.", Toasty.LENGTH_SHORT,true).show();
 
                                                             add_friend.animate()
