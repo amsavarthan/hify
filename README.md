@@ -1,4 +1,4 @@
-<img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Design.png">
+<img src="https://github.com/lvamsavarthan/Hify/blob/master/preview.png">
 
 ## If you like this project please consider donating
 By donating you help me to improve this project to next level and also buy me some coffee :)
