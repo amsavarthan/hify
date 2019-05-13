@@ -43,8 +43,9 @@ Just a social app. This app is mostly completed but some bugs would be there so 
   - Double tap like feature added **(stable)**
   - Error handling Recycler View **(stable)**
 * Discuss
-  - Homework helper for students with inbuilt AI (Wolfram|Alpha) **(stable)**
   - Forum **(stable)**
+* Discover
+  - Categorized News **(stable)**
   
 ## Cloud Functions Code
 
@@ -84,8 +85,7 @@ Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
 
 ## Developer
 
-This whole project is maintained only by **Amsavarthan Lv (me)**.
-
+This whole project is maintained only by **Amsavarthan Lv (me)**.<br>
 If you like to contribute, please let me know
 <B>Email : amsavarthan.a@gmail.com</B>
 
