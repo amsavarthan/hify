@@ -89,5 +89,5 @@ By donating you help me to improve this project to next level and also buy me so
 
 ## Credits
 
-News from www.newsapi.org <br>
+News from newsapi.org <br>
 Logo from www.shutterstock.com
