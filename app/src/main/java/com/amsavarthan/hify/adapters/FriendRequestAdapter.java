@@ -36,14 +36,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendRequestAdapter extends RecyclerView.Adapter<FriendRequestAdapter.ViewHolder> {
 
-    public static Activity activity;
     private Context context;
     private List<FriendRequest> usersList;
 
-    public FriendRequestAdapter(List<FriendRequest> usersList, Context context, Activity activity) {
+    public FriendRequestAdapter(List<FriendRequest> usersList, Context context) {
         this.usersList = usersList;
         this.context = context;
-        this.activity = activity;
     }
 
 	@Override

@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.ui.activities.friends.SendActivity;
+import com.amsavarthan.hify.ui.activities.SendMessage;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
@@ -30,7 +30,6 @@ public class FestivalActivity extends AppCompatActivity {
     }
 
     String festival_name,festival_text,send,reason,dev_id;
-    public static Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +45,6 @@ public class FestivalActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_festival);
 
-        activity=this;
         festival_name=getIntent().getStringExtra("festival_name");
         festival_text=getIntent().getStringExtra("festival_text");
         send=getIntent().getStringExtra("send_text");
@@ -74,7 +72,8 @@ public class FestivalActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        SendingActivity.startActivity(FestivalActivity.this,reason,dev_id);
+                        SendMessage.startActivity(FestivalActivity.this,reason,dev_id);
+                        finish();
                     }
                 }
         );

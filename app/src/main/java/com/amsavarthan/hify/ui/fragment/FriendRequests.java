@@ -116,7 +116,7 @@ public class FriendRequests extends Fragment {
         refreshLayout=mView.findViewById(R.id.refreshLayout);
 
         requestList = new ArrayList<>();
-        requestAdapter = new FriendRequestAdapter(requestList, view.getContext(), getActivity());
+        requestAdapter = new FriendRequestAdapter(requestList, view.getContext());
 
         mRequestView.setItemAnimator(new DefaultItemAnimator());
         mRequestView.setLayoutManager(new LinearLayoutManager(view.getContext(), VERTICAL, false));
@@ -124,12 +124,7 @@ public class FriendRequests extends Fragment {
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);
 
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getUsers();
-            }
-        });
+        refreshLayout.setOnRefreshListener(() -> getUsers());
 
         getUsers();
 

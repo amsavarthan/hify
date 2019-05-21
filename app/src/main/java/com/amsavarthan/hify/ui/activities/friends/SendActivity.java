@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,9 +12,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,13 +23,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
-import com.amsavarthan.hify.ui.activities.lottie.SendingActivity;
+import com.amsavarthan.hify.ui.activities.SendMessage;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.utils.AnimationUtil;
-import com.amsavarthan.hify.utils.Config;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -44,30 +38,18 @@ import com.google.android.gms.location.places.PlacePhotoResponse;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.yalantis.ucrop.UCrop;
-
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
@@ -95,6 +77,7 @@ public class SendActivity extends AppCompatActivity {
     private ProgressDialog mDialog;
     private String c_image,c_name;
     private TextView text;
+    private String f_name;
 
     public static void startActivityExtra(Context context,String extraString){
         Intent intent=new Intent(context,SendActivity.class);
@@ -164,17 +147,18 @@ public class SendActivity extends AppCompatActivity {
         imagePreview.setVisibility(View.GONE);
         text.setVisibility(View.VISIBLE);
 
-        String name=getIntent().getStringExtra("user__name");
-        if(!TextUtils.isEmpty(name)) {
-            getSupportActionBar().setTitle(name);
-            toolbar.setTitle(name);
+        f_name=getIntent().getStringExtra("user__name");
+        if(!TextUtils.isEmpty(f_name)) {
+            getSupportActionBar().setTitle(f_name);
+            toolbar.setTitle(f_name);
         }
 
         mFirestore.collection("Users").document(user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                getSupportActionBar().setTitle(documentSnapshot.getString("name"));
+                f_name=documentSnapshot.getString("name");
+                getSupportActionBar().setTitle(f_name);
                 toolbar.setTitle(documentSnapshot.getString("name"));
 
                 toolbar.setOnClickListener(new View.OnClickListener() {
@@ -204,13 +188,13 @@ public class SendActivity extends AppCompatActivity {
 
                     if(imageUri==null){
 
-                        SendingActivity.startActivity(SendActivity.this,"normal_message",message_,c_name,c_image,current_id,user_id);
+                        SendMessage.startActivity(SendActivity.this,"normal_message",message_,c_name,c_image,current_id,user_id);
                         //Send only message
                         message.setText("");
 
                     }else {
 
-                        SendingActivity.startActivity(SendActivity.this,"normal_message",message_,imageUri,c_name,c_image,current_id,user_id);
+                        SendMessage.startActivity(SendActivity.this,"normal_message",message_,imageUri,c_name,c_image,current_id,user_id,f_name);
                         //Send message with Image
                         message.setText("");
                         imagePreview.setVisibility(View.GONE);

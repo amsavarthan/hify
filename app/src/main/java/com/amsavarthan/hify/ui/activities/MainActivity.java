@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.ColorInt;
@@ -319,6 +320,10 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
         mAuth = FirebaseAuth.getInstance();
         currentuser = mAuth.getCurrentUser();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Config.createNotificationChannels(this);
+        }
 
         if (currentuser == null) {
 
@@ -848,7 +853,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         String link=intent.getStringExtra("link");
         String question_id=intent.getStringExtra("question_id");
         String question_timestamp=intent.getStringExtra("question_timestamp");
-        String channel_name=intent.getStringExtra("channel_name");
         String notification_type=intent.getStringExtra("notification_type");
 
         resultIntent.putExtra("title", title);
@@ -880,25 +884,18 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         resultIntent.putExtra("question_id", question_id);
         resultIntent.putExtra("question_timestamp", question_timestamp);
         resultIntent.putExtra("notification_type", notification_type);
-        resultIntent.putExtra("channel_name", channel_name);
 
         Alerter.create(MainActivity.this)
                 .setTitle(title)
                 .setText(body)
                 .enableSwipeToDismiss()
-                .setDuration(4000)//7sec
-                .enableProgress(true)
+                .setDuration(4000)//4sec
                 .enableVibration(true)
                 .setBackgroundColorRes(R.color.colorAccentt)
                 .setProgressColorRes(R.color.colorPrimaryy)
                 .setTitleAppearance(R.style.AlertTextAppearance_Title)
                 .setTextAppearance(R.style.AlertTextAppearance_Text)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(resultIntent);
-                    }
-                }).show();
+                .setOnClickListener(view -> startActivity(resultIntent)).show();
 
 
     }

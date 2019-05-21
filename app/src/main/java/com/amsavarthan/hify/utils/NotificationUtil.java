@@ -50,8 +50,6 @@ import java.util.Date;
 public class NotificationUtil {
 
     private static String TAG = NotificationUtil.class.getSimpleName();
-    private static String TAGPush = "Push Notification";
-
     private Context mContext;
     public static boolean read=true;
 
@@ -59,17 +57,7 @@ public class NotificationUtil {
         this.mContext = mContext;
     }
 
-    public static void clearNotifications(Context context) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancelAll();
-    }
-
-    public static void clearNotificationsById(Context context, int id) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(id);
-    }
-
-    public static long getTimeMilliSec(String timeStamp) {
+    private static long getTimeMilliSec(String timeStamp) {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date date = format.parse(timeStamp);
@@ -80,22 +68,7 @@ public class NotificationUtil {
         return 0;
     }
 
-    @RequiresApi(api =   Build.VERSION_CODES.O)
-    private void setupChannels(NotificationManager notificationManager,String name) {
-        NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, Config.ADMIN_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-        adminChannel.enableLights(true);
-        adminChannel.setLightColor(Color.BLUE);
-        adminChannel.canShowBadge();
-        adminChannel.setSound(Uri.parse("android.resource://"+mContext.getPackageName()+"/"+R.raw.hify_sound), null);
-        adminChannel.setImportance(NotificationManager.IMPORTANCE_DEFAULT);
-        adminChannel.enableVibration(true);
-        if (notificationManager != null) {
-            notificationManager.createNotificationChannel(adminChannel);
-        }
-    }
-
-    public void showNotificationMessage(String timeStamp, String click_action, final String user_image, final String title, final String message, Intent intent, String imageUrl, String notification_type, String channel_name) {
+    public void showNotificationMessage(String timeStamp, final String user_image, final String title, final String message, Intent intent, String imageUrl, String notification_type) {
 
         // Check for empty push message
         if (TextUtils.isEmpty(message))
@@ -115,23 +88,19 @@ public class NotificationUtil {
                         PendingIntent.FLAG_UPDATE_CURRENT //PendingIntent.FLAG_CANCEL_CURRENT
                 );
 
-        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                mContext, Config.ADMIN_CHANNEL_ID);
-
-
         try {
             if (!TextUtils.isEmpty(imageUrl)) {
 
                 Bitmap bitmap = getBitmapFromURL(imageUrl);
 
                 if (bitmap != null) {
-                    showBigNotification(timeStamp, click_action, user_image, bitmap, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
+                    showBigNotification(timeStamp, user_image, bitmap, icon, title, message, resultPendingIntent,notification_type);
                 } else {
-                    showSmallNotification(timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
+                    showSmallNotification(timeStamp, user_image, icon, title, message, resultPendingIntent,notification_type);
                 }
 
             } else {
-                showSmallNotification(timeStamp, click_action, user_image, mBuilder, icon, title, message, resultPendingIntent,notification_type,channel_name);
+                showSmallNotification(timeStamp,user_image, icon, title, message, resultPendingIntent,notification_type);
             }
         } catch (Exception e) {
             Log.e("showNotificationMessage", e.getMessage() == null ? "" : e.getMessage());
@@ -178,16 +147,34 @@ public class NotificationUtil {
 
     }
 
-    private void showSmallNotification(String timeStamp, String click_action, String user_image, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type, String channel_name) {
+    private void showSmallNotification(String timeStamp, String user_image, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type) {
 
-        Log.d(TAGPush, "showSmallNotification Push Notification. Click_action: " + click_action);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            setupChannels(notificationManager,channel_name);
-        }
-
+        int id;
+        NotificationCompat.Builder mBuilder;
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
+
+        switch (notification_type){
+
+            case "like":
+                id=100;
+                mBuilder = new NotificationCompat.Builder(mContext, "like_channel");
+                break;
+            case "comment":
+                id=200;
+                mBuilder = new NotificationCompat.Builder(mContext, "comments_channel");
+                break;
+            case "forum":
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "forum_channel");
+                break;
+            case "Message":
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "flash_message");
+                break;
+            default:
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "hify_other_channel");
+        }
 
         NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
         bigTextStyle.setBigContentTitle(title);
@@ -216,35 +203,40 @@ public class NotificationUtil {
         read=false;
         notificationsHelper.close();
 
+        notificationManagerCompat.notify(id, notification);
+
+    }
+
+    private void showBigNotification(String timeStamp, String user_image, Bitmap bitmap, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type) {
+
+        int id;
+        NotificationCompat.Builder mBuilder;
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
+
         switch (notification_type){
 
             case "like":
-                notificationManagerCompat.notify(100, notification);
-                return;
+                id=100;
+                mBuilder = new NotificationCompat.Builder(mContext, "like_channel");
+                break;
             case "comment":
-                notificationManagerCompat.notify(200, notification);
-                return;
+                id=200;
+                mBuilder = new NotificationCompat.Builder(mContext, "comments_channel");
+                break;
             case "forum":
-                notificationManagerCompat.notify(300, notification);
-                return;
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "forum_channel");
+                break;
+            case "Message":
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "flash_message");
+                break;
             default:
-                notificationManagerCompat.notify(400, notification);
-
-        }
-    }
-
-    private void showBigNotification(String timeStamp, String click_action, String user_image, Bitmap bitmap, NotificationCompat.Builder mBuilder, int icon, String title, String message, PendingIntent resultPendingIntent, String notification_type, String channel_name) {
-
-        Log.d(TAGPush, "showBigNotification Push Notification. Click_action: " + click_action);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            setupChannels(notificationManager,channel_name);
+                id=(int)System.currentTimeMillis();
+                mBuilder = new NotificationCompat.Builder(mContext, "hify_other_channel");
         }
 
-        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(mContext);
         Notification notification;
-
         NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
         bigPictureStyle.setBigContentTitle(title);
         bigPictureStyle.bigPicture(bitmap);
@@ -270,21 +262,8 @@ public class NotificationUtil {
         read=false;
         notificationsHelper.close();
 
-        switch (notification_type){
+        notificationManagerCompat.notify(id, notification);
 
-            case "like":
-                notificationManagerCompat.notify(100, notification);
-                return;
-            case "comment":
-                notificationManagerCompat.notify(200, notification);
-                return;
-            case "forum":
-                notificationManagerCompat.notify(300, notification);
-                return;
-            default:
-                notificationManagerCompat.notify(400, notification);
-
-        }
     }
 
     private Bitmap getBitmapFromURL(String strURL) {

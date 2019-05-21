@@ -3,6 +3,7 @@ package com.amsavarthan.hify.ui.activities.account;
 import android.app.DownloadManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -57,25 +58,24 @@ public class UpdateAvailable extends AppCompatActivity {
             if (list.isEmpty()) {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    setupChannels(notificationManager);
-                }
+                PendingIntent pendingIntent = PendingIntent.getActivity(ctxt, 0, intent, 0);
+
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                        UpdateAvailable.this, Config.ADMIN_CHANNEL_ID);
+                        UpdateAvailable.this, "other_channel");
 
                 android.app.Notification notification;
                 notification = mBuilder
                         .setAutoCancel(true)
-                        .setContentTitle("Download success")
+                        .setContentTitle("Hify_v" + version+".apk")
                         .setColorized(true)
-                        .setSound(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.hify_sound))
+                        .setContentIntent(pendingIntent)
                         .setColor(Color.parseColor("#2591FC"))
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentText("File downloaded in /Downloads/Hify Updates/Hify_v" + version+".apk")
+                        .setContentText("Download success")
                         .build();
 
                 notificationManager.notify(0, notification);
-                Toasty.success(ctxt, "File downloaded in /Downloads/Hify Updates/Hify_v" + version+".apk", Toasty.LENGTH_LONG,true).show();
+                Toasty.success(ctxt, "File downloaded and saved at Downloads/Hify Updates", Toasty.LENGTH_LONG,true).show();
             }
         }
 
@@ -176,19 +176,6 @@ public class UpdateAvailable extends AppCompatActivity {
                     }
                 }).check();
 
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setupChannels(NotificationManager notificationManager) {
-        CharSequence adminChannelName = "Downloads";
-        String adminChannelDescription = "Used to show the progress of downloads";
-        NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-        adminChannel.setDescription(adminChannelDescription);
-        adminChannel.enableVibration(true);
-        if (notificationManager != null) {
-            notificationManager.createNotificationChannel(adminChannel);
-        }
     }
 
 }

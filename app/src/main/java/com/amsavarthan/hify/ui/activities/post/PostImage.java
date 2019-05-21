@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +29,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.PagerPhotosAdapter;
 import com.amsavarthan.hify.models.Images;
+import com.amsavarthan.hify.service.UploadService;
+import com.amsavarthan.hify.ui.activities.SendMessage;
 import com.amsavarthan.hify.utils.AnimationUtil;
 import com.esafirm.imagepicker.model.Image;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -202,8 +206,25 @@ public class PostImage extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(mEditText.getText().toString()))
                     AnimationUtil.shakeView(mEditText, PostImage.this);
-                else
-                    uploadImages(0);
+                else {
+                    //uploadImages(0);
+
+                    //Even if user closes the app this proceeds
+                    Intent intent=new Intent(PostImage.this, UploadService.class);
+                    intent.putParcelableArrayListExtra("imagesList",(ArrayList<? extends Parcelable>) imagesList);
+                    intent.putExtra("notification_id",(int) System.currentTimeMillis());
+                    intent.putExtra("current_id",mCurrentUser.getUid());
+                    intent.putExtra("description",mEditText.getText().toString());
+                    intent.setAction(UploadService.ACTION_START_FOREGROUND_SERVICE);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(intent);
+                    }else{
+                        startService(intent);
+                    }
+                    Toasty.info(this,"Uploading images..",Toasty.LENGTH_SHORT,true).show();
+                    finish();
+
+                }
 
                 return true;
 

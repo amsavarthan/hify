@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".ui.activities.lottie.SendingActivity">
+    tools:context=".ui.activities.SendMessage">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie"

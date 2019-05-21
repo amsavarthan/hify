@@ -2,6 +2,7 @@ package com.amsavarthan.hify.ui.activities.post;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
@@ -26,6 +27,7 @@ import com.amsavarthan.hify.adapters.CommentsAdapter;
 import com.amsavarthan.hify.models.Comment;
 import com.amsavarthan.hify.models.Post;
 import com.amsavarthan.hify.utils.AnimationUtil;
+import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -151,6 +153,20 @@ public class CommentsActivity extends AppCompatActivity {
         user_image=findViewById(R.id.comment_admin);
         post_desc=findViewById(R.id.comment_post_desc);
 
+        Cursor rs = new UserHelper(this).getData(1);
+        rs.moveToFirst();
+
+        String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+
+        if (!rs.isClosed()) {
+            rs.close();
+        }
+
+        Glide.with(this)
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .load(image)
+                .into(user_image);
+
         setupCommentView();
 
     }
@@ -166,21 +182,11 @@ public class CommentsActivity extends AppCompatActivity {
         mFirestore.collection("Users")
                 .document(user_id)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                       Glide.with(CommentsActivity.this)
-                               .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.gradient_2))
-                               .load( documentSnapshot.getString("image"))
-                               .into(user_image);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("error",e.getLocalizedMessage());
-                    }
-                });
+                .addOnSuccessListener(documentSnapshot -> Glide.with(CommentsActivity.this)
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.gradient_2))
+                        .load( documentSnapshot.getString("image"))
+                        .into(user_image))
+                .addOnFailureListener(e -> Log.e("error",e.getLocalizedMessage()));
 
         mCommentsRecycler = findViewById(R.id.recyclerView);
         mCommentText = findViewById(R.id.text);
@@ -189,17 +195,12 @@ public class CommentsActivity extends AppCompatActivity {
 
         commentList = new ArrayList<>();
         mAdapter = new CommentsAdapter(commentList, this,owner);
-
-        mCommentText.setHint("Add a comment..");
-        mCommentsSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String comment = mCommentText.getText().toString();
-                if (!TextUtils.isEmpty(comment))
-                    sendComment(comment, mCommentText, mProgress);
-                else
-                    AnimationUtil.shakeView(mCommentText, CommentsActivity.this);
-            }
+        mCommentsSend.setOnClickListener(view -> {
+            String comment = mCommentText.getText().toString();
+            if (!TextUtils.isEmpty(comment))
+                sendComment(comment, mCommentText, mProgress);
+            else
+                AnimationUtil.shakeView(mCommentText, CommentsActivity.this);
         });
 
         mCommentsRecycler.setItemAnimator(new DefaultItemAnimator());
@@ -236,35 +237,25 @@ public class CommentsActivity extends AppCompatActivity {
                                 .document(post_id)
                                 .collection("Comments")
                                 .add(commentMap)
-                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                    @Override
-                                    public void onSuccess(DocumentReference documentReference) {
-                                        mProgress.setVisibility(View.GONE);
-                                        sendNotification();
-                                        mCommentText.setHint("Add a comment..");
-                                        mCommentText.setText("");
-                                        Toasty.success(CommentsActivity.this, "Comment added", Toasty.LENGTH_SHORT,true).show();
-                                        commentList.clear();
-                                        getComments(mProgress);
-                                    }
+                                .addOnSuccessListener(documentReference -> {
+                                    mProgress.setVisibility(View.GONE);
+                                    sendNotification();
+                                    mCommentText.setText("");
+                                    Toasty.success(CommentsActivity.this, "Comment added", Toasty.LENGTH_SHORT,true).show();
+                                    commentList.clear();
+                                    getComments(mProgress);
                                 })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        mProgress.setVisibility(View.GONE);
-                                        Toasty.error(CommentsActivity.this, "Error adding comment: " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
-                                        Log.e("Error send comment", e.getMessage());
-                                    }
+                                .addOnFailureListener(e -> {
+                                    mProgress.setVisibility(View.GONE);
+                                    Toasty.error(CommentsActivity.this, "Error adding comment: " + e.getMessage(), Toasty.LENGTH_SHORT,true).show();
+                                    Log.e("Error send comment", e.getMessage());
                                 });
 
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        mProgress.setVisibility(View.GONE);
-                        Log.e("Error getuser", e.getMessage());
-                    }
+                .addOnFailureListener(e -> {
+                    mProgress.setVisibility(View.GONE);
+                    Log.e("Error getuser", e.getMessage());
                 });
 
     }
@@ -276,42 +267,39 @@ public class CommentsActivity extends AppCompatActivity {
                 .document(post_id)
                 .collection("Comments")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
-                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException e) {
+                .addSnapshotListener(this, (querySnapshot, e) -> {
 
-                        if(e!=null){
-                            mProgress.setVisibility(View.GONE);
-                            e.printStackTrace();
-                            return;
-                        }
+                    if(e!=null){
+                        mProgress.setVisibility(View.GONE);
+                        e.printStackTrace();
+                        return;
+                    }
 
-                        if(!querySnapshot.isEmpty()) {
-                            for (DocumentChange doc : querySnapshot.getDocumentChanges()) {
+                    if(!querySnapshot.isEmpty()) {
+                        for (DocumentChange doc : querySnapshot.getDocumentChanges()) {
 
-                                if (doc.getDocument().exists()) {
-                                    if (doc.getType() == DocumentChange.Type.ADDED) {
+                            if (doc.getDocument().exists()) {
+                                if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                        mProgress.setVisibility(View.GONE);
-                                        Comment comment = doc.getDocument().toObject(Comment.class).withId(doc.getDocument().getId());
-                                        commentList.add(comment);
-                                        mAdapter.notifyDataSetChanged();
-
-                                    }
+                                    mProgress.setVisibility(View.GONE);
+                                    Comment comment = doc.getDocument().toObject(Comment.class).withId(doc.getDocument().getId());
+                                    commentList.add(comment);
+                                    mAdapter.notifyDataSetChanged();
 
                                 }
-                            }
 
-                            if (commentList.isEmpty()) {
-                                mProgress.setVisibility(View.GONE);
                             }
+                        }
 
-                        }else{
+                        if (commentList.isEmpty()) {
                             mProgress.setVisibility(View.GONE);
                         }
 
-
+                    }else{
+                        mProgress.setVisibility(View.GONE);
                     }
+
+
                 });
     }
 

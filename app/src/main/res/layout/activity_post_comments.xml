@@ -88,7 +88,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_toStartOf="@+id/send"
             android:layout_width="match_parent"
-            android:hint="Comment as ...."
+            android:hint="Add a comment"
             android:layout_centerInParent="true"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"

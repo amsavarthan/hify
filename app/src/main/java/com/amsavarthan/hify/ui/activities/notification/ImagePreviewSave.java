@@ -62,25 +62,21 @@ public class ImagePreviewSave extends AppCompatActivity {
             if (list.isEmpty()) {
                 NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    setupChannels(notificationManager);
-                }
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                        ImagePreviewSave.this, Config.ADMIN_CHANNEL_ID);
+                        ImagePreviewSave.this, "other_channel");
 
                 android.app.Notification notification;
                 notification = mBuilder
                         .setAutoCancel(true)
-                        .setContentTitle("Download success")
+                        .setContentTitle("Hify")
                         .setColorized(true)
-                        .setSound(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.hify_sound))
                         .setColor(Color.parseColor("#2591FC"))
                         .setSmallIcon(R.drawable.ic_file_download_accent_24dp)
-                        .setContentText("Image saved in /Downloads/Hify/" + sender_name)
+                        .setContentText("Image saved at Downloads/Hify/" + sender_name)
                         .build();
 
                 notificationManager.notify(0, notification);
-                Toasty.success(ctxt, "Image saved in /Downloads/Hify/" + sender_name, Toasty.LENGTH_LONG,true).show();
+                Toasty.success(ctxt, "Image saved at Downloads/Hify/" + sender_name, Toasty.LENGTH_LONG,true).show();
             }
         }
 
@@ -245,18 +241,4 @@ public class ImagePreviewSave extends AppCompatActivity {
                 }).check();
 
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void setupChannels(NotificationManager notificationManager) {
-        CharSequence adminChannelName = "Downloads";
-        String adminChannelDescription = "Used to show the progress of downloads";
-        NotificationChannel adminChannel;
-        adminChannel = new NotificationChannel(Config.ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_DEFAULT);
-        adminChannel.setDescription(adminChannelDescription);
-        adminChannel.enableVibration(true);
-        if (notificationManager != null) {
-            notificationManager.createNotificationChannel(adminChannel);
-        }
-    }
-
 }

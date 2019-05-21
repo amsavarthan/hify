@@ -95,7 +95,6 @@ public class FCMService extends FirebaseMessagingService {
 
         String question_id=remoteMessage.getData().get("question_id");
 
-        String channel_name=remoteMessage.getData().get("channel_name");
         String notification_type=remoteMessage.getData().get("notification_type");
 
         final Intent resultIntent;
@@ -198,14 +197,10 @@ public class FCMService extends FirebaseMessagingService {
         resultIntent.putExtra("question_id",question_id);
 
         resultIntent.putExtra("notification_type",notification_type);
-        resultIntent.putExtra("channel_name",channel_name);
-
 
         try {
 
-
             boolean foreground = new ForegroundCheckTask().execute(getApplicationContext()).get();
-
 
             if(!foreground){
 
@@ -215,19 +210,19 @@ public class FCMService extends FirebaseMessagingService {
 
                     if (!TextUtils.isEmpty(from_image)) {
 
-                        showNotificationMessage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent, notification_type, channel_name);
+                        showNotificationMessage(timeStamp, from_image, getApplicationContext(), title, body, resultIntent, notification_type);
                     } else {
 
-                        showNotificationMessage(timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent, notification_type, channel_name);
+                        showNotificationMessage(timeStamp, friend_image, getApplicationContext(), title, body, resultIntent, notification_type);
                     }
 
                 } else {
 
                     // image is present, show notification with image
                     if (!TextUtils.isEmpty(from_image)) {
-                        showNotificationMessageWithBigImage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent, imageUrl, notification_type, channel_name);
+                        showNotificationMessageWithBigImage(timeStamp,from_image, getApplicationContext(), title, body, resultIntent, imageUrl, notification_type);
                     } else {
-                        showNotificationMessageWithBigImage(timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl, notification_type, channel_name);
+                        showNotificationMessageWithBigImage(timeStamp, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl, notification_type);
                     }
                 }
 
@@ -269,17 +264,16 @@ public class FCMService extends FirebaseMessagingService {
                     intent.putExtra("question_id",question_id);
 
                     resultIntent.putExtra("notification_type",notification_type);
-                    resultIntent.putExtra("channel_name",channel_name);
 
                     if (title.toLowerCase().contains("update")) {
 
                         Log.d("FCM_LOGIC", "showNotificationMessage if(title.toLowerCase().contains(updatePer)) ");
-                        showNotificationMessage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent,notification_type,channel_name);
+                        showNotificationMessage(timeStamp, from_image, getApplicationContext(), title, body, resultIntent,notification_type);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                     } else {
 
                         Log.d("FCM_LOGIC", "showNotificationMessage if(title.toLowerCase().contains(updatePer)) ELSE ");
-                        showNotificationMessage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent,notification_type,channel_name);
+                        showNotificationMessage(timeStamp, from_image, getApplicationContext(), title, body, resultIntent,notification_type);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                     }
                 }else{
@@ -293,11 +287,11 @@ public class FCMService extends FirebaseMessagingService {
                         if (!TextUtils.isEmpty(from_image)) {
 
                             Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(!TextUtils.isEmpty(from_image)) ");
-                            showNotificationMessage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent,notification_type,channel_name);
+                            showNotificationMessage(timeStamp, from_image, getApplicationContext(), title, body, resultIntent,notification_type);
                         } else {
 
                             Log.d("FCM_LOGIC", "showNotificationMessage AFTER if(TextUtils.isEmpty(from_image)) ELSE ");
-                            showNotificationMessage(timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent,notification_type,channel_name);
+                            showNotificationMessage(timeStamp, friend_image, getApplicationContext(), title, body, resultIntent,notification_type);
                         }
 
                     } else {
@@ -307,11 +301,11 @@ public class FCMService extends FirebaseMessagingService {
                         if (!TextUtils.isEmpty(from_image)) {
 
                             Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ");
-                            showNotificationMessageWithBigImage(timeStamp, click_action, from_image, getApplicationContext(), title, body, resultIntent, imageUrl,notification_type,channel_name);
+                            showNotificationMessageWithBigImage(timeStamp, from_image, getApplicationContext(), title, body, resultIntent, imageUrl,notification_type);
                         } else {
 
                             Log.d("FCM_LOGIC", "showNotificationMessageWithBigImage AFTER if(!TextUtils.isEmpty(from_image)) ELSE ");
-                            showNotificationMessageWithBigImage(timeStamp, click_action, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl,notification_type,channel_name);
+                            showNotificationMessageWithBigImage(timeStamp, friend_image, getApplicationContext(), title, body, resultIntent, imageUrl,notification_type);
                         }
                     }
 
@@ -330,19 +324,19 @@ public class FCMService extends FirebaseMessagingService {
 
     }
 
-    private void showNotificationMessage(String timeStamp, String click_action, String user_image, Context context, String title, String message, Intent intent, String notification_type, String channel_name) {
+    private void showNotificationMessage(String timeStamp, String user_image, Context context, String title, String message, Intent intent, String notification_type) {
         notificationUtils = new NotificationUtil(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(timeStamp, click_action, user_image, title, message, intent, null,notification_type,channel_name);
+        notificationUtils.showNotificationMessage(timeStamp, user_image, title, message, intent, null,notification_type);
     }
 
-    private void showNotificationMessageWithBigImage(String timeStamp, String click_action, String user_image, Context context, String title, String message, Intent intent, String imageUrl, String notification_type, String channel_name) {
+    private void showNotificationMessageWithBigImage(String timeStamp, String user_image, Context context, String title, String message, Intent intent, String imageUrl, String notification_type) {
         notificationUtils = new NotificationUtil(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationUtils.showNotificationMessage(timeStamp, click_action, user_image, title, message, intent, imageUrl,notification_type,channel_name);
+        notificationUtils.showNotificationMessage(timeStamp, user_image, title, message, intent, imageUrl,notification_type);
     }
 
-    class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {
+    private class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Context... params) {
