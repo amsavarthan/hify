@@ -3,6 +3,7 @@ package com.amsavarthan.hify.ui.activities.post;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -43,6 +44,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.marcoscg.dialogsheet.DialogSheet;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 import com.yalantis.ucrop.UCrop;
 
@@ -79,6 +81,9 @@ public class PostImage extends AppCompatActivity {
     private DotsIndicator indicator;
     private RelativeLayout indicator_holder;
     private int selectedIndex;
+    private SharedPreferences sharedPreferences;
+    private int serviceCount;
+    ArrayList<String> uploadedImagesUrl=new ArrayList<>();
 
 
     public static void startActivity(Context context) {
@@ -177,13 +182,14 @@ public class PostImage extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
 
+        sharedPreferences=getSharedPreferences("uploadservice",MODE_PRIVATE);
+        serviceCount=sharedPreferences.getInt("count",0);
+
         mEditText = findViewById(R.id.text);
 
         compressor=new Compressor(this)
-                .setQuality(75)
-                .setCompressFormat(Bitmap.CompressFormat.PNG)
-                .setMaxHeight(350);
-
+                .setQuality(85)
+                .setCompressFormat(Bitmap.CompressFormat.PNG);
 
         mDialog = new ProgressDialog(this);
         mStorage=FirebaseStorage.getInstance().getReference();
@@ -209,20 +215,34 @@ public class PostImage extends AppCompatActivity {
                 else {
                     //uploadImages(0);
 
-                    //Even if user closes the app this proceeds
-                    Intent intent=new Intent(PostImage.this, UploadService.class);
-                    intent.putParcelableArrayListExtra("imagesList",(ArrayList<? extends Parcelable>) imagesList);
-                    intent.putExtra("notification_id",(int) System.currentTimeMillis());
-                    intent.putExtra("current_id",mCurrentUser.getUid());
-                    intent.putExtra("description",mEditText.getText().toString());
-                    intent.setAction(UploadService.ACTION_START_FOREGROUND_SERVICE);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        startForegroundService(intent);
-                    }else{
-                        startService(intent);
-                    }
-                    Toasty.info(this,"Uploading images..",Toasty.LENGTH_SHORT,true).show();
-                    finish();
+                    new DialogSheet(this)
+                            .setRoundedCorners(true)
+                            .setColoredNavigationBar(true)
+                            .setPositiveButton("Yes", v -> {
+
+                                sharedPreferences.edit().putInt("count", ++serviceCount).apply();
+
+                                Intent intent=new Intent(PostImage.this, UploadService.class);
+                                intent.putExtra("count",serviceCount);
+                                intent.putStringArrayListExtra("uploadedImagesUrl",uploadedImagesUrl);
+                                intent.putParcelableArrayListExtra("imagesList",(ArrayList<? extends Parcelable>) imagesList);
+                                intent.putExtra("notification_id",(int) System.currentTimeMillis());
+                                intent.putExtra("current_id",mCurrentUser.getUid());
+                                intent.putExtra("description",mEditText.getText().toString());
+                                intent.setAction(UploadService.ACTION_START_FOREGROUND_SERVICE);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    startForegroundService(intent);
+                                }else{
+                                    startService(intent);
+                                }
+                                Toasty.info(PostImage.this,"Uploading images..",Toasty.LENGTH_SHORT,true).show();
+                                finish();
+
+                            })
+                            .setNegativeButton("No", v -> { })
+                            .setTitle("Upload")
+                            .setMessage("Are you sure is this the content you want to upload?")
+                            .show();
 
                 }
 
@@ -303,139 +323,6 @@ public class PostImage extends AppCompatActivity {
             Throwable throwable=UCrop.getError(data);
             throwable.printStackTrace();
             Toasty.error(this, "Error cropping : "+throwable.getMessage(), Toasty.LENGTH_SHORT,true).show();
-        }
-
-    }
-
-    List<String> uploadedImagesUrl=new ArrayList<>();
-    private void uploadImages(final int index) {
-
-        mDialog=new ProgressDialog(this);
-        int img_count=index+1;
-        mDialog.setMessage("Uploading "+img_count+"/"+imagesList.size()+" images...");
-        mDialog.setIndeterminate(true);
-        mDialog.setCancelable(false);
-        mDialog.setCanceledOnTouchOutside(false);
-        if(!mDialog.isShowing()){
-            Toasty.info(this, "Uploading " + img_count + "/" + imagesList.size() + " images...", Toasty.LENGTH_SHORT, true).show();
-            mDialog.show();
-        }
-
-        final StorageReference fileToUpload=mStorage.child("post_images").child("HIFY_"+System.currentTimeMillis()+"_"+imagesList.get(index).getName());
-        fileToUpload.putFile(Uri.fromFile(new File(imagesList.get(index).getPath())))
-                .addOnSuccessListener(taskSnapshot -> fileToUpload.getDownloadUrl()
-                        .addOnSuccessListener(uri -> {
-
-                            uploadedImagesUrl.add(uri.toString());
-                            int next_index=index+1;
-                            try {
-                                if (!TextUtils.isEmpty(imagesList.get(index + 1).getOg_path())) {
-                                    uploadImages(next_index);
-                                } else {
-                                    canUpload = true;
-                                    mDialog.dismiss();
-                                    uploadPost();
-                                }
-                            }catch (Exception e){
-                                canUpload = true;
-                                mDialog.dismiss();
-                                uploadPost();
-                            }
-
-                        })
-                        .addOnFailureListener(Throwable::printStackTrace))
-                .addOnFailureListener(Throwable::printStackTrace);
-
-    }
-
-    private void uploadPost() {
-
-        mDialog=new ProgressDialog(this);
-        mDialog.setMessage("Posting...");
-        mDialog.setIndeterminate(true);
-        mDialog.setCancelable(false);
-        mDialog.setCanceledOnTouchOutside(false);
-
-        if(canUpload) {
-            if (!uploadedImagesUrl.isEmpty()) {
-
-                mDialog.show();
-
-                mFirestore.collection("Users").document(mCurrentUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-
-                    postMap.put("userId", documentSnapshot.getString("id"));
-                    postMap.put("username", documentSnapshot.getString("username"));
-                    postMap.put("name", documentSnapshot.getString("name"));
-                    postMap.put("userimage", documentSnapshot.getString("image"));
-                    postMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                    postMap.put("image_count", uploadedImagesUrl.size());
-                    try {
-                        postMap.put("image_url_0", uploadedImagesUrl.get(0));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_1", uploadedImagesUrl.get(1));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_2", uploadedImagesUrl.get(2));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_3", uploadedImagesUrl.get(3));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_4", uploadedImagesUrl.get(4));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_5", uploadedImagesUrl.get(5));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        postMap.put("image_url_6", uploadedImagesUrl.get(6));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    postMap.put("likes", "0");
-                    postMap.put("favourites", "0");
-                    postMap.put("description", mEditText.getText().toString());
-                    postMap.put("color", "0");
-
-                    mFirestore.collection("Posts")
-                            .add(postMap)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    mDialog.dismiss();
-                                    Toasty.success(PostImage.this, "Post sent", Toasty.LENGTH_SHORT,true).show();
-                                    finish();
-                                }
-                            })
-                            .addOnFailureListener(e -> {
-                                mDialog.dismiss();
-                                Log.e("Error sending post", e.getMessage());
-                            });
-
-
-                }).addOnFailureListener(e -> {
-                    mDialog.dismiss();
-                    Log.e("Error getting user", e.getMessage());
-                });
-
-            } else {
-                mDialog.dismiss();
-                Toasty.info(this, "No image has been uploaded, Please wait or try again", Toasty.LENGTH_SHORT,true).show();
-            }
-        }else{
-            Toasty.info(this, "Please wait, images are uploading...", Toasty.LENGTH_SHORT,true).show();
         }
 
     }

@@ -40,6 +40,7 @@ public class MessageService extends Service {
     private static final String TAG_FOREGROUND_SERVICE = MessageService.class.getSimpleName();
     public static final String ACTION_START_FOREGROUND_SERVICE = "ACTION_START_FOREGROUND_SERVICE";
     public static final String ACTION_STOP_FOREGROUND_SERVICE = "ACTION_STOP_FOREGROUND_SERVICE";
+    private int count;
 
     @Override
     public void onCreate() {
@@ -61,6 +62,7 @@ public class MessageService extends Service {
                 String current_id=intent.getStringExtra("current_id");
                 String user_id=intent.getStringExtra("user_id");
                 String imageUri = intent.getStringExtra("imageUri");
+                count=intent.getIntExtra("count",0);
 
                 sendMessage(notification_id,message, Uri.parse(imageUri), c_name, c_image, current_id, user_id, f_name);
 
@@ -96,12 +98,12 @@ public class MessageService extends Service {
                 .child("notification")
                 .child("IMG_"+System.currentTimeMillis()+"_"+random()+".jpg");
         storageReference.putFile(imageUri).addOnFailureListener(e -> {
-            Toasty.error(MessageService.this,"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
+            Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
             NotificationManagerCompat.from(getApplicationContext()).cancel(0);
             e.printStackTrace();
         }).addOnCompleteListener(task -> {
 
-            if(task.isSuccessful() && task.getResult().toString()!=null){
+            if(task.isSuccessful()){
 
                 storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
 
@@ -118,35 +120,58 @@ public class MessageService extends Service {
                     FirebaseFirestore.getInstance().collection("Users/"+user_id+"/Notifications_image")
                             .add(notificationMessage)
                             .addOnSuccessListener(documentReference -> {
-                                Toasty.success(MessageService.this,"Message sent",Toasty.LENGTH_SHORT,true).show();
-                                stopForegroundService(true);
+
+                                getSharedPreferences("messageservice",MODE_PRIVATE)
+                                        .edit()
+                                        .putInt("count", --count).apply();
+
+                                Toasty.success(getApplicationContext(),"Message sent to "+f_name,Toasty.LENGTH_SHORT,true).show();
+
+                                if(count==0) {
+                                    stopForegroundService(true);
+                                }
                             })
                             .addOnFailureListener(e -> {
-                                Toasty.error(MessageService.this,"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
+                                Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
                                 stopForegroundService(true);
                                 e.printStackTrace();
                             });
 
                 }).addOnFailureListener(e -> {
-                    Toasty.error(MessageService.this,"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
+                    Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
                     stopForegroundService(true);
                     e.printStackTrace();
                 });
 
+            }else{
+                Toasty.error(getApplicationContext(),"Error :"+task.getException().getMessage(),Toasty.LENGTH_SHORT,true).show();
+                stopForegroundService(true);
             }
 
         }).addOnProgressListener(taskSnapshot -> {
 
             //progress in MB
             //String progressText=taskSnapshot.getBytesTransferred()/(1024*1024)+"mb / "+taskSnapshot.getTotalByteCount()/(1024*1024)+"mb";
-            notifyProgress(notification_id
-                    ,android.R.drawable.stat_sys_upload
-                    ,"Sending image to "+f_name+".."
-                    ,((int)((100.0*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount()))+"%"
-                    ,getApplicationContext()
-                    ,100
-                    ,(int) ((100.0*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount())
-                    ,false);
+
+            if(count==1) {
+                notifyProgress(notification_id
+                        , android.R.drawable.stat_sys_upload
+                        , "Sending image to " + f_name + ".."
+                        , ((int) ((100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount())) + "%"
+                        , getApplicationContext()
+                        , 100
+                        , (int) ((100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount())
+                        , false);
+            }else if (count>1){
+                notifyProgress(notification_id
+                        , android.R.drawable.stat_sys_upload
+                        , "Hify"
+                        , "Sending "+count+" images.."
+                        , getApplicationContext()
+                        , 100
+                        , 0
+                        , true);
+            }
 
         });
 

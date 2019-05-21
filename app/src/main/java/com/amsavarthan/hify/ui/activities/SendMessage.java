@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ import static com.amsavarthan.hify.utils.Config.random;
 public class SendMessage extends AppCompatActivity {
 
     private LottieAnimationView lottieAnimationView;
+    SharedPreferences sharedPreferences;
+    private int serviceCount;
 
     public static void startActivity(Context context, String reason, String message_, Uri imageUri, String c_name, String c_image, String current_id, String user_id, String f_name){
         context.startActivity(new Intent(context, SendMessage.class)
@@ -69,11 +72,19 @@ public class SendMessage extends AppCompatActivity {
     StorageReference storageReference;
 
     @Override
+    public void onBackPressed() {
+        //do nothing
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_message);
         mFirestore=FirebaseFirestore.getInstance();
         storageReference= FirebaseStorage.getInstance().getReference().child("notification").child("IMG_"+System.currentTimeMillis()+"_"+random()+".jpg");
+
+        sharedPreferences=getSharedPreferences("messageservice",MODE_PRIVATE);
+        serviceCount=sharedPreferences.getInt("count",0);
 
         lottieAnimationView=findViewById(R.id.lottie);
         lottieAnimationView.useHardwareAcceleration(true);
@@ -88,9 +99,10 @@ public class SendMessage extends AppCompatActivity {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
 
-                        //Even if user closes the app this proceeds
+                        sharedPreferences.edit().putInt("count", ++serviceCount).apply();
+
                         Intent intent=new Intent(SendMessage.this, MessageService.class);
-                        intent.putExtra("type","message");
+                        intent.putExtra("count",serviceCount);
                         intent.putExtra("f_name",getIntent().getStringExtra("f_name"));
                         intent.putExtra("message",getIntent().getStringExtra("message_"));
                         intent.putExtra("imageUri",getIntent().getStringExtra("imageUri"));
@@ -101,11 +113,10 @@ public class SendMessage extends AppCompatActivity {
                         intent.setAction(MessageService.ACTION_START_FOREGROUND_SERVICE);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             startForegroundService(intent);
-                        }else{
+                        }else {
                             startService(intent);
                         }
-
-                        Toasty.info(SendMessage.this,"Image is being uploaded...",Toasty.LENGTH_SHORT,true).show();
+                        Toasty.info(SendMessage.this,"Message will be sent after the image uploads",Toasty.LENGTH_SHORT,true).show();
                         finish();
                     }
                 });

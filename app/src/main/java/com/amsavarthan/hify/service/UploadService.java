@@ -1,32 +1,21 @@
 package com.amsavarthan.hify.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import com.amsavarthan.hify.R;
+
 import com.amsavarthan.hify.models.Images;
-import com.amsavarthan.hify.ui.activities.post.PostImage;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,13 +25,12 @@ import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
 
-import static com.amsavarthan.hify.utils.Config.random;
-
 public class UploadService extends Service {
 
     public static final String ACTION_START_FOREGROUND_SERVICE = "ACTION_START_FOREGROUND_SERVICE" ;
     private static final String TAG_FOREGROUND_SERVICE = UploadService.class.getSimpleName();
     public static final String ACTION_STOP_FOREGROUND_SERVICE = "ACTION_STOP_FOREGROUND_SERVICE";
+    private int count;
 
     @Override
     public void onCreate() {
@@ -60,7 +48,9 @@ public class UploadService extends Service {
                 int notification_id=intent.getIntExtra("notification_id",2);
                 String current_id=intent.getStringExtra("current_id");
                 String description=intent.getStringExtra("description");
-                uploadImages(notification_id,0,imagesList,current_id,description);
+                ArrayList<String> uploadedImagesUrl=intent.getStringArrayListExtra("uploadedImagesUrl");
+                count=intent.getIntExtra("count",0);
+                uploadImages(notification_id,0,imagesList,current_id,description,uploadedImagesUrl);
 
             }
 
@@ -113,8 +103,7 @@ public class UploadService extends Service {
         startForeground(id,builder.build());
     }
 
-    List<String> uploadedImagesUrl=new ArrayList<>();
-    private void uploadImages(final int notification_id,final int index,final List<Images> imagesList,String currentUser_id,String description ) {
+    private void uploadImages(final int notification_id, final int index, final List<Images> imagesList, String currentUser_id, String description, ArrayList<String> uploadedImagesUrl) {
 
         int img_count=index+1;
 
@@ -127,13 +116,13 @@ public class UploadService extends Service {
                             int next_index=index+1;
                             try {
                                 if (!TextUtils.isEmpty(imagesList.get(index + 1).getOg_path())) {
-                                    uploadImages(notification_id,next_index,imagesList,currentUser_id,description);
+                                    uploadImages(notification_id,next_index,imagesList,currentUser_id,description, uploadedImagesUrl);
                                 } else {
-                                    uploadPost(notification_id,currentUser_id,description);
+                                    uploadPost(notification_id,currentUser_id,description,uploadedImagesUrl);
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
-                                uploadPost(notification_id,currentUser_id,description);
+                                uploadPost(notification_id,currentUser_id,description,uploadedImagesUrl);
                             }
 
                         })
@@ -141,33 +130,60 @@ public class UploadService extends Service {
                 .addOnFailureListener(Throwable::printStackTrace)
                 .addOnProgressListener(taskSnapshot -> {
 
-                    String title="Uploading "+img_count+"/"+imagesList.size()+" images...";
-                    int progress=(int) ((100.0*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount());
-                    notifyProgress(notification_id
-                            ,android.R.drawable.stat_sys_upload
-                            ,title
-                            ,progress+"%"
-                            ,UploadService.this
-                            ,100
-                            ,progress
-                            ,false);
+                    if(count==1) {
+                        String title = "Uploading " + img_count + "/" + imagesList.size() + " images...";
+                        int progress = (int) ((100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount());
+                        notifyProgress(notification_id
+                                , android.R.drawable.stat_sys_upload
+                                , title
+                                , progress + "%"
+                                , getApplicationContext()
+                                , 100
+                                , progress
+                                , false);
+                    }else if(count>1){
+
+                        notifyProgress(notification_id
+                                , android.R.drawable.stat_sys_upload
+                                , "Hify"
+                                , "Uploading "+count+" posts"
+                                , getApplicationContext()
+                                , 100
+                                , 0
+                                , true);
+
+                    }
 
                 });
 
     }
 
-    private void uploadPost(int notification_id,String currentUser_id,String description) {
+    private void uploadPost(int notification_id, String currentUser_id, String description, ArrayList<String> uploadedImagesUrl) {
 
         if (!uploadedImagesUrl.isEmpty()) {
 
-            notifyProgress(notification_id
-                    ,android.R.drawable.stat_sys_upload
-                    ,"Hify"
-                    ,"Sending post.."
-                    ,UploadService.this
-                    ,100
-                    ,0
-                    ,true);
+            if(count==1) {
+                notifyProgress(notification_id
+                        , android.R.drawable.stat_sys_upload
+                        , "Hify"
+                        , "Sending post.."
+                        , getApplicationContext()
+                        , 100
+                        , 0
+                        , true);
+            }
+            /*else if(count>1)
+            {
+                notifyProgress(notification_id+1
+                        , android.R.drawable.stat_sys_upload
+                        , "Hify"
+                        , "Sending post.."
+                        , getApplicationContext()
+                        , 100
+                        , 0
+                        , true);
+            }
+            */
 
             FirebaseFirestore.getInstance().collection("Users")
                     .document(currentUser_id)
@@ -225,18 +241,23 @@ public class UploadService extends Service {
                         FirebaseFirestore.getInstance().collection("Posts")
                                 .add(postMap)
                                 .addOnSuccessListener(documentReference -> {
-                                    Toasty.success(UploadService.this, "Post added", Toasty.LENGTH_SHORT, true).show();
-                                    stopForegroundService(true);
+                                    getSharedPreferences("uploadservice",MODE_PRIVATE)
+                                            .edit()
+                                            .putInt("count", --count).apply();
+                                    Toasty.success(getApplicationContext(), "Post added", Toasty.LENGTH_SHORT, true).show();
+                                    if(count==0) {
+                                        stopForegroundService(true);
+                                    }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toasty.error(UploadService.this,"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
+                                    Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
                                     stopForegroundService(true);
                                     e.printStackTrace();
                                 });
 
 
                     }).addOnFailureListener(e -> {
-                Toasty.error(UploadService.this,"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
+                Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
                 stopForegroundService(true);
                 e.printStackTrace();
                     });
