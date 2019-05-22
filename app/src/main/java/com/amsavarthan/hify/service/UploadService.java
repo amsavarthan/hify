@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -18,12 +19,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
+import id.zelory.compressor.Compressor;
 
 public class UploadService extends Service {
 
@@ -98,8 +101,6 @@ public class UploadService extends Service {
                 .setProgress(max_progress,progress,indeterminate)
                 .setVibrate(new long[0]);
 
-        // Show the notification
-        //NotificationManagerCompat.from(context).notify(1, builder.build());
         startForeground(id,builder.build());
     }
 
@@ -107,8 +108,20 @@ public class UploadService extends Service {
 
         int img_count=index+1;
 
+        Uri imageUri;
+        try {
+            File compressedFile=new Compressor(this)
+                    .setQuality(80)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .compressToFile(new File(imagesList.get(index).getPath()));
+            imageUri=Uri.fromFile(compressedFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            imageUri=Uri.fromFile(new File(imagesList.get(index).getPath()));
+        }
+
         final StorageReference fileToUpload=FirebaseStorage.getInstance().getReference().child("post_images").child("HIFY_"+System.currentTimeMillis()+"_"+imagesList.get(index).getName());
-        fileToUpload.putFile(Uri.fromFile(new File(imagesList.get(index).getPath())))
+        fileToUpload.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> fileToUpload.getDownloadUrl()
                         .addOnSuccessListener(uri -> {
 

@@ -2,8 +2,6 @@ package com.amsavarthan.hify.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -17,11 +15,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -75,7 +71,7 @@ public class NotificationUtil {
             return;
 
         // notification icon
-        final int icon = R.mipmap.logo_accent;
+        final int icon = R.mipmap.ic_notification;
 
         int requestID = (int) System.currentTimeMillis();
 

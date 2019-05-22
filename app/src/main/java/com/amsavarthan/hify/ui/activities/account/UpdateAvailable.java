@@ -165,7 +165,6 @@ public class UpdateAvailable extends AppCompatActivity {
                                     .withTitle("Storage permission")
                                     .withMessage("Storage permission is needed for downloading update.")
                                     .withButtonText(android.R.string.ok)
-                                    .withIcon(R.mipmap.logo_accent)
                                     .build();
                         }
                     }

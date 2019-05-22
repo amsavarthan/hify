@@ -229,7 +229,6 @@ public class ImagePreviewSave extends AppCompatActivity {
                                             .withTitle("Storage permission")
                                             .withMessage("Storage permission is needed for downloading images.")
                                             .withButtonText(android.R.string.ok)
-                                            .withIcon(R.mipmap.logo_accent)
                                             .build();
                         }
                     }

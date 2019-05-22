@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
@@ -26,12 +27,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
+import id.zelory.compressor.Compressor;
 
 import static com.amsavarthan.hify.utils.Config.random;
 
@@ -97,7 +100,20 @@ public class MessageService extends Service {
         StorageReference storageReference=FirebaseStorage.getInstance().getReference()
                 .child("notification")
                 .child("IMG_"+System.currentTimeMillis()+"_"+random()+".jpg");
-        storageReference.putFile(imageUri).addOnFailureListener(e -> {
+
+        Uri finalUri;
+        try {
+            File compressedFile=new Compressor(this)
+                    .setQuality(80)
+                    .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                    .compressToFile(new File(imageUri.getPath()));
+            finalUri=Uri.fromFile(compressedFile);
+        } catch (Exception e) {
+            finalUri=imageUri;
+            e.printStackTrace();
+        }
+
+        storageReference.putFile(finalUri).addOnFailureListener(e -> {
             Toasty.error(getApplicationContext(),"Error :"+e.getMessage(),Toasty.LENGTH_SHORT,true).show();
             NotificationManagerCompat.from(getApplicationContext()).cancel(0);
             e.printStackTrace();
@@ -110,12 +126,12 @@ public class MessageService extends Service {
                     Map<String,Object> notificationMessage=new HashMap<>();
                     notificationMessage.put("username",c_name);
                     notificationMessage.put("userimage",c_image);
-                    notificationMessage.put("image",uri.toString());
                     notificationMessage.put("message",message_);
                     notificationMessage.put("from",current_id);
                     notificationMessage.put("notification_id", String.valueOf(System.currentTimeMillis()));
                     notificationMessage.put("timestamp", String.valueOf(System.currentTimeMillis()));
                     notificationMessage.put("read","false");
+                    notificationMessage.put("image",uri.toString());
 
                     FirebaseFirestore.getInstance().collection("Users/"+user_id+"/Notifications_image")
                             .add(notificationMessage)

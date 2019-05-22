@@ -12,7 +12,7 @@
 
     <ImageView
         android:layout_gravity="center_horizontal"
-        android:src="@mipmap/white_logo"
+        android:src="@mipmap/ic_notification"
         android:layout_marginBottom="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

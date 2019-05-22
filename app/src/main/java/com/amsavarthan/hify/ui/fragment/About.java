@@ -9,10 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.amsavarthan.hify.BuildConfig;
 import com.amsavarthan.hify.R;
+import com.amsavarthan.hify.ui.activities.MainActivity;
+import com.mikepenz.aboutlibraries.LibsBuilder;
 
 /**
  * Created by amsavarthan on 29/3/18.
@@ -20,33 +24,55 @@ import com.amsavarthan.hify.R;
 
 public class About extends Fragment {
 
-    View mView;
-    LinearLayout email,website,instagram,google,github;
+    LinearLayout email,website,instagram,google,github,libraries,support;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_about, container, false);
-        return mView;
+        return inflater.inflate(R.layout.frag_about, container, false);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        email=mView.findViewById(R.id.email);
-        website=mView.findViewById(R.id.website);
-        instagram=mView.findViewById(R.id.instagram);
-        github=mView.findViewById(R.id.github);
+        email=view.findViewById(R.id.email);
+        website=view.findViewById(R.id.website);
+        instagram=view.findViewById(R.id.instagram);
+        github=view.findViewById(R.id.github);
+        libraries=view.findViewById(R.id.libraries);
+        support=view.findViewById(R.id.support);
+
+        TextView version=view.findViewById(R.id.version);
+        version.setText(BuildConfig.VERSION_NAME);
+
+        support.setOnClickListener(v -> {
+
+            String url = "https://ko-fi.com/lvamsavarthan";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+
+        });
+
+        libraries.setOnClickListener(v -> {
+
+           new LibsBuilder()
+                    .withAutoDetect(true)
+                    .withActivityTitle("Open Source Libraries")
+                    .withActivityTheme(R.style.AppTheme)
+                    .start(getView().getContext());
+
+        });
 
         email.setOnClickListener(v -> {
 
             Intent email = new Intent(Intent.ACTION_SEND);
             email.putExtra(Intent.EXTRA_EMAIL, new String[]{"amsavarthan.a@gmail.com"});
-            email.putExtra(Intent.EXTRA_SUBJECT, "Sent from Hify ( "+ Build.BRAND+"("+Build.VERSION.SDK_INT+") )");
-            email.putExtra(Intent.EXTRA_TEXT, "");
+            email.putExtra(Intent.EXTRA_SUBJECT, "Sent from "+Build.BRAND+" "+Build.DEVICE);
+            email.putExtra(Intent.EXTRA_TEXT, "Hify\nversion:"+BuildConfig.VERSION_NAME+"\nandroid version:"+Build.VERSION.CODENAME);
             email.setType("message/rfc822");
-            startActivity(Intent.createChooser(email, "Send using..."));
+            startActivity(Intent.createChooser(email, "Select email app"));
 
         });
 

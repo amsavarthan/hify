@@ -5,7 +5,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +56,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -63,22 +70,18 @@ import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE =100 ;
-    private static final int PIC_CROP = 1;
+    private static final int PICK_IMAGE = 100;
     public Uri imageUri;
     public StorageReference storageReference;
     public ProgressDialog mDialog;
-    public String name_, pass_, email_,username_,location_;
-    private EditText name,email,password,location,username;
+    public String name_, pass_, email_, username_, location_;
+    private EditText name, email, password, location, username;
     private CircleImageView profile_image;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
-    private static final String TAG = RegisterActivity.class.getSimpleName();
 
-    public static void startActivity(Activity activity, Context context, View view) {
-        Intent intent = new Intent(context, RegisterActivity.class);
-        context.startActivity(intent);
-
+    public static void startActivity(Context context){
+        context.startActivity(new Intent(context,RegisterActivity.class));
     }
 
     @Override
@@ -86,11 +89,11 @@ public class RegisterActivity extends AppCompatActivity {
         super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
     }
 
-
     private void askPermission() {
 
         Dexter.withActivity(this)
-                .withPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                .withPermissions(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.READ_EXTERNAL_STORAGE
@@ -98,8 +101,8 @@ public class RegisterActivity extends AppCompatActivity {
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if(report.isAnyPermissionPermanentlyDenied()){
-                            Toasty.info(RegisterActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toasty.LENGTH_LONG,true).show();
+                        if (report.isAnyPermissionPermanentlyDenied()) {
+                            Toasty.info(RegisterActivity.this, "You have denied some permissions permanently, if the app force close try granting permission from settings.", Toasty.LENGTH_LONG, true).show();
                         }
                     }
 
@@ -115,7 +118,6 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         ViewPump.init(ViewPump.builder()
                 .addInterceptor(new CalligraphyInterceptor(
                         new CalligraphyConfig.Builder()
@@ -128,18 +130,31 @@ public class RegisterActivity extends AppCompatActivity {
 
         askPermission();
 
-        mAuth=FirebaseAuth.getInstance();
-        storageReference= FirebaseStorage.getInstance().getReference().child("images");
-        firebaseFirestore=FirebaseFirestore.getInstance();
-        imageUri=null;
-        UserHelper userHelper = new UserHelper(this);
+        mAuth = FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference().child("images");
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        imageUri = null;
 
+        name = findViewById(R.id.name);
+        email = findViewById(R.id.email);
+        password = findViewById(R.id.password);
+        location = findViewById(R.id.location);
+        username = findViewById(R.id.username);
 
-        name=(EditText)findViewById(R.id.name);
-        email=(EditText)findViewById(R.id.email);
-        password=(EditText)findViewById(R.id.password);
-        location=(EditText)findViewById(R.id.location);
-        username=(EditText)findViewById(R.id.username);
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        Location location1 = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+        Geocoder geocoder=new Geocoder(getBaseContext(), Locale.getDefault());
+        List<Address> addresses;
+
+        try {
+            addresses=geocoder.getFromLocation(location1.getLatitude(),location1.getLongitude(),1);
+            if(addresses.size()>0){
+                location.setText(addresses.get(0).getLocality());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Please wait..");
@@ -162,95 +177,104 @@ public class RegisterActivity extends AppCompatActivity {
             }
         }
 
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        register.setOnClickListener(view -> {
 
-                if(imageUri!=null){
-                    username_=username.getText().toString();
-                    name_=name.getText().toString();
-                    email_=email.getText().toString();
-                    pass_=password.getText().toString();
-                    location_=location.getText().toString();
+            if(imageUri!=null){
+                username_=username.getText().toString();
+                name_=name.getText().toString();
+                email_=email.getText().toString();
+                pass_=password.getText().toString();
+                location_=location.getText().toString();
 
-                    mDialog.show();
+                mDialog.show();
 
-                    if (TextUtils.isEmpty(username_)) {
-
-                        AnimationUtil.shakeView(username, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-
-                    if (TextUtils.isEmpty(name_)) {
-
-                        AnimationUtil.shakeView(name, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-                    if (TextUtils.isEmpty(email_)) {
-
-                        AnimationUtil.shakeView(email, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-                    if (TextUtils.isEmpty(pass_)) {
-
-                        AnimationUtil.shakeView(password, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-
-                    if (TextUtils.isEmpty(location_)) {
-
-                        AnimationUtil.shakeView(location, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-
-                    if (!TextUtils.isEmpty(name_) || !TextUtils.isEmpty(email_) ||
-                            !TextUtils.isEmpty(pass_) || !TextUtils.isEmpty(username_) || !TextUtils.isEmpty(location_)) {
-
-                        firebaseFirestore.collection("Usernames")
-                                .document(username_)
-                                .get()
-                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                        if(!documentSnapshot.exists()){
-                                            registerUser();
-                                        }else{
-                                            Toasty.error(RegisterActivity.this, "Username already exists", Toasty.LENGTH_SHORT,true).show();
-                                            AnimationUtil.shakeView(username, RegisterActivity.this);
-                                            mDialog.dismiss();
-                                        }
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error",e.getMessage());
-                                    }
-                                });
-
-                    }else{
-
-                        AnimationUtil.shakeView(username, RegisterActivity.this);
-                        AnimationUtil.shakeView(name, RegisterActivity.this);
-                        AnimationUtil.shakeView(email, RegisterActivity.this);
-                        AnimationUtil.shakeView(password, RegisterActivity.this);
-                        AnimationUtil.shakeView(location, RegisterActivity.this);
-                        mDialog.dismiss();
-
-                    }
-
-                }else{
-                    AnimationUtil.shakeView(profile_image, RegisterActivity.this);
-                    Toasty.warning(RegisterActivity.this, "We recommend you to set a profile picture", Toasty.LENGTH_SHORT,true).show();
+                if (TextUtils.isEmpty(username_) ) {
+                    AnimationUtil.shakeView(username, RegisterActivity.this);
                     mDialog.dismiss();
+
+                }else if(username_.length()<5){
+
+                    Toasty.error(getApplicationContext(),"Username should be more than 5 characters",Toasty.LENGTH_SHORT,true).show();
+                    AnimationUtil.shakeView(username, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }else if(!username_.matches("[a-zA-Z._]*")){
+
+                    Toasty.error(getApplicationContext(),"No numbers or special character than period and underscore allowed",Toasty.LENGTH_SHORT,true).show();
+                    AnimationUtil.shakeView(username, RegisterActivity.this);
+                    mDialog.dismiss();
+
                 }
 
+                if (TextUtils.isEmpty(name_) && !name_.matches("[a-zA-Z ]*")) {
+
+                    Toasty.error(getApplicationContext(),"Invalid name",Toasty.LENGTH_SHORT,true).show();
+                    AnimationUtil.shakeView(name, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }
+                if (TextUtils.isEmpty(email_)) {
+
+                    AnimationUtil.shakeView(email, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }
+                if (TextUtils.isEmpty(pass_)) {
+
+                    AnimationUtil.shakeView(password, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }
+
+                if (TextUtils.isEmpty(location_)) {
+
+                    AnimationUtil.shakeView(location, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }
+
+                if (!TextUtils.isEmpty(name_) || !TextUtils.isEmpty(email_) ||
+                        !TextUtils.isEmpty(pass_) || !TextUtils.isEmpty(username_) || !TextUtils.isEmpty(location_)) {
+
+                    firebaseFirestore.collection("Usernames")
+                            .document(username_)
+                            .get()
+                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    if(!documentSnapshot.exists()){
+                                        registerUser();
+                                    }else{
+                                        Toasty.error(RegisterActivity.this, "Username already exists", Toasty.LENGTH_SHORT,true).show();
+                                        AnimationUtil.shakeView(username, RegisterActivity.this);
+                                        mDialog.dismiss();
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Error",e.getMessage());
+                                }
+                            });
+
+                }else{
+
+                    AnimationUtil.shakeView(username, RegisterActivity.this);
+                    AnimationUtil.shakeView(name, RegisterActivity.this);
+                    AnimationUtil.shakeView(email, RegisterActivity.this);
+                    AnimationUtil.shakeView(password, RegisterActivity.this);
+                    AnimationUtil.shakeView(location, RegisterActivity.this);
+                    mDialog.dismiss();
+
+                }
+
+            }else{
+                AnimationUtil.shakeView(profile_image, RegisterActivity.this);
+                Toasty.warning(RegisterActivity.this, "We recommend you to set a profile picture", Toasty.LENGTH_SHORT,true).show();
+                mDialog.dismiss();
             }
+
         });
 
 
@@ -361,7 +385,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -375,7 +398,7 @@ public class RegisterActivity extends AppCompatActivity {
                 options.setCompressionQuality(100);
                 options.setShowCropGrid(true);
 
-                UCrop.of(imageUri, Uri.fromFile(new File(getCacheDir(), "sparks_user_profile_picture.png")))
+                UCrop.of(imageUri, Uri.fromFile(new File(getCacheDir(), "hify_user_profile_picture.png")))
                         .withAspectRatio(1, 1)
                         .withOptions(options)
                         .start(this);
@@ -385,14 +408,6 @@ public class RegisterActivity extends AppCompatActivity {
         if (requestCode == UCrop.REQUEST_CROP) {
             if (resultCode == RESULT_OK) {
                 imageUri = UCrop.getOutput(data);
-                /*try {
-                    File compressedFile= new Compressor(this).setCompressFormat(Bitmap.CompressFormat.PNG).setQuality(70).setMaxHeight(96).setMaxWidth(96).compressToFile(new File(imageUri.getPath()));
-                    profile_image.setImageURI(Uri.fromFile(compressedFile));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toasty.warning(this, "Unable to compress: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                    profile_image.setImageURI(imageUri);
-                }*/
                 profile_image.setImageURI(imageUri);
 
             } else if (resultCode == UCrop.RESULT_ERROR) {

@@ -277,7 +277,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onRegister(View view) {
-        RegisterActivity.startActivity(this, this, findViewById(R.id.button));
+        RegisterActivity.startActivity(this);
     }
 
     public void onForgotPassword(View view) {
@@ -290,19 +290,13 @@ public class LoginActivity extends AppCompatActivity {
             mDialog.show();
 
             FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    mDialog.dismiss();
-                    Toasty.success(LoginActivity.this, "Reset password mail sent", Toasty.LENGTH_SHORT,true).show();
-                }
-            })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            mDialog.dismiss();
-                            Toasty.error(LoginActivity.this, "Error sending mail : "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                        }
+                    .addOnSuccessListener(aVoid -> {
+                        mDialog.dismiss();
+                        Toasty.success(LoginActivity.this, "Reset password mail sent", Toasty.LENGTH_SHORT,true).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        mDialog.dismiss();
+                        Toasty.error(LoginActivity.this, "Error sending mail : "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                     });
         }
 
