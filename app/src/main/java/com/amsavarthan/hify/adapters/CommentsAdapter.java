@@ -86,19 +86,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
        }
 
         holder.username.setText(commentList.get(position).getUsername());
-       holder.username.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               FriendProfile.startActivity(context,commentList.get(holder.getAdapterPosition()).getId());
-           }
-       });
+       holder.username.setOnClickListener(v -> FriendProfile.startActivity(context,commentList.get(holder.getAdapterPosition()).getId()));
 
-       holder.image.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               FriendProfile.startActivity(context,commentList.get(holder.getAdapterPosition()).getId());
-           }
-       });
+       holder.image.setOnClickListener(v -> FriendProfile.startActivity(context,commentList.get(holder.getAdapterPosition()).getId()));
 
         Glide.with(context)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
@@ -114,112 +104,74 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
             mFirestore.collection("Users")
                     .document(commentList.get(position).getId())
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(final DocumentSnapshot documentSnapshot) {
+                    .addOnSuccessListener(documentSnapshot -> {
 
-                            try {
-                                if (!documentSnapshot.getString("username").equals(commentList.get(holder.getAdapterPosition()).getUsername()) &&
-                                        !documentSnapshot.getString("image").equals(commentList.get(holder.getAdapterPosition()).getImage())) {
+                        try {
+                            if (!documentSnapshot.getString("username").equals(commentList.get(holder.getAdapterPosition()).getUsername()) &&
+                                    !documentSnapshot.getString("image").equals(commentList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> commentMap = new HashMap<>();
-                                    commentMap.put("username", documentSnapshot.getString("username"));
-                                    commentMap.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> commentMap = new HashMap<>();
+                                commentMap.put("username", documentSnapshot.getString("username"));
+                                commentMap.put("image", documentSnapshot.getString("image"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(commentList.get(holder.getAdapterPosition()).getPost_id())
-                                            .collection("Comments")
-                                            .document(commentList.get(holder.getAdapterPosition()).commentId)
-                                            .update(commentMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("comment_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("comment_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(commentList.get(holder.getAdapterPosition()).getPost_id())
+                                        .collection("Comments")
+                                        .document(commentList.get(holder.getAdapterPosition()).commentId)
+                                        .update(commentMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("comment_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("comment_update", "failure"));
 
-                                    holder.username.setText(documentSnapshot.getString("username"));
+                                holder.username.setText(documentSnapshot.getString("username"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
 
-                                } else if (!documentSnapshot.getString("username").equals(commentList.get(holder.getAdapterPosition()).getUsername())) {
+                            } else if (!documentSnapshot.getString("username").equals(commentList.get(holder.getAdapterPosition()).getUsername())) {
 
 
-                                    Map<String, Object> commentMap = new HashMap<>();
-                                    commentMap.put("username", documentSnapshot.getString("username"));
+                                Map<String, Object> commentMap = new HashMap<>();
+                                commentMap.put("username", documentSnapshot.getString("username"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(commentList.get(holder.getAdapterPosition()).getPost_id())
-                                            .collection("Comments")
-                                            .document(commentList.get(holder.getAdapterPosition()).commentId)
-                                            .update(commentMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("comment_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("comment_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(commentList.get(holder.getAdapterPosition()).getPost_id())
+                                        .collection("Comments")
+                                        .document(commentList.get(holder.getAdapterPosition()).commentId)
+                                        .update(commentMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("comment_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("comment_update", "failure"));
 
-                                    holder.username.setText(documentSnapshot.getString("username"));
+                                holder.username.setText(documentSnapshot.getString("username"));
 
-                                } else if (!documentSnapshot.getString("image").equals(commentList.get(holder.getAdapterPosition()).getImage())) {
+                            } else if (!documentSnapshot.getString("image").equals(commentList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> commentMap = new HashMap<>();
-                                    commentMap.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> commentMap = new HashMap<>();
+                                commentMap.put("image", documentSnapshot.getString("image"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(commentList.get(holder.getAdapterPosition()).getPost_id())
-                                            .collection("Comments")
-                                            .document(commentList.get(holder.getAdapterPosition()).commentId)
-                                            .update(commentMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("comment_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("comment_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(commentList.get(holder.getAdapterPosition()).getPost_id())
+                                        .collection("Comments")
+                                        .document(commentList.get(holder.getAdapterPosition()).commentId)
+                                        .update(commentMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("comment_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("comment_update", "failure"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
-                                }
-
-
-                            }catch(Exception e){
-                                e.printStackTrace();
                             }
+
+
+                        }catch(Exception e){
+                            e.printStackTrace();
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("Error", e.getMessage());
-                        }
-                    });
+                    .addOnFailureListener(e -> Log.e("Error", e.getMessage()));
         }catch (Exception ex){
             Log.w("error","fastscrolled",ex);
         }
@@ -235,58 +187,39 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                 .alpha(1.0f)
                 .start();
 
-        holder.delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new MaterialDialog.Builder(context)
-                        .title("Delete comment")
-                        .content("Are you sure do you want to delete your comment?")
-                        .positiveText("Yes")
-                        .negativeText("No")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
+        holder.delete.setOnClickListener(v -> new MaterialDialog.Builder(context)
+                .title("Delete comment")
+                .content("Are you sure do you want to delete your comment?")
+                .positiveText("Yes")
+                .negativeText("No")
+                .onPositive((dialog, which) -> {
+                    dialog.dismiss();
 
-                                final ProgressDialog progressDialog=new ProgressDialog(context);
-                                progressDialog.setMessage("Deleting comment...");
-                                progressDialog.setIndeterminate(true);
-                                progressDialog.show();
+                    final ProgressDialog progressDialog=new ProgressDialog(context);
+                    progressDialog.setMessage("Deleting comment...");
+                    progressDialog.setIndeterminate(true);
+                    progressDialog.show();
 
-                                mFirestore.collection("Posts")
-                                        .document(commentList.get(holder.getAdapterPosition()).getPost_id())
-                                        .collection("Comments")
-                                        .document(commentList.get(holder.getAdapterPosition()).commentId)
-                                        .delete()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                commentList.remove(holder.getAdapterPosition());
-                                                Toasty.success(context, "Comment deleted", Toasty.LENGTH_SHORT,true).show();
-                                                notifyDataSetChanged();
-                                                progressDialog.dismiss();
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                progressDialog.dismiss();
-                                                Toasty.error(context, "Error deleting comment: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                                Log.w("Error","delete comment",e);
-                                            }
-                                        });
+                    mFirestore.collection("Posts")
+                            .document(commentList.get(holder.getAdapterPosition()).getPost_id())
+                            .collection("Comments")
+                            .document(commentList.get(holder.getAdapterPosition()).commentId)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                commentList.remove(holder.getAdapterPosition());
+                                Toasty.success(context, "Comment deleted", Toasty.LENGTH_SHORT,true).show();
+                                notifyDataSetChanged();
+                                progressDialog.dismiss();
+                            })
+                            .addOnFailureListener(e -> {
+                                progressDialog.dismiss();
+                                Toasty.error(context, "Error deleting comment: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                Log.w("Error","delete comment",e);
+                            });
 
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-            }
-        });
+                })
+                .onNegative((dialog, which) -> dialog.dismiss())
+                .show());
 
     }
 

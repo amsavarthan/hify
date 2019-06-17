@@ -11,6 +11,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -41,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,8 +53,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.MultipleImage;
 import com.amsavarthan.hify.models.Post;
+import com.amsavarthan.hify.ui.activities.Splash;
 import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
+import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
@@ -63,7 +67,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -161,194 +168,120 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             isOwner=true;
             holder.delete.setVisibility(View.VISIBLE);
 
-            holder.delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   new MaterialDialog.Builder(context)
-                           .title("Delete post")
-                           .content("Are you sure do you want to delete this post?")
-                           .positiveText("Yes")
-                           .negativeText("No")
-                           .onPositive(new MaterialDialog.SingleButtonCallback() {
-                               @Override
-                               public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+            holder.delete.setOnClickListener(v -> new MaterialDialog.Builder(context)
+                    .title("Delete post")
+                    .content("Are you sure do you want to delete this post?")
+                    .positiveText("Yes")
+                    .negativeText("No")
+                    .onPositive((dialog, which) -> {
 
-                                   final ProgressDialog pdialog=new ProgressDialog(context);
-                                   pdialog.setMessage("Please wait...");
-                                   pdialog.setIndeterminate(true);
-                                   pdialog.setCancelable(false);
-                                   pdialog.setCanceledOnTouchOutside(false);
-                                   pdialog.show();
+                        final ProgressDialog pdialog=new ProgressDialog(context);
+                        pdialog.setMessage("Please wait...");
+                        pdialog.setIndeterminate(true);
+                        pdialog.setCancelable(false);
+                        pdialog.setCanceledOnTouchOutside(false);
+                        pdialog.show();
 
-                                   dialog.dismiss();
-                                   FirebaseFirestore.getInstance().collection("Posts")
-                                           .document(postList.get(holder.getAdapterPosition()).postId)
-                                           .delete()
-                                           .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                               @Override
-                                               public void onSuccess(Void aVoid) {
+                        dialog.dismiss();
+                        FirebaseFirestore.getInstance().collection("Posts")
+                                .document(postList.get(holder.getAdapterPosition()).postId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
 
 
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_0())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_0());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_0())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_0());
+                                        img.delete().addOnSuccessListener(aVoid1 ->
+                                        {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_1())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_1());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_1())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_1());
+                                        img.delete().addOnSuccessListener(aVoid12 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_2())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_2());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_2())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_2());
+                                        img.delete().addOnSuccessListener(aVoid13 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_3())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_3());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_3())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_3());
+                                        img.delete().addOnSuccessListener(aVoid14 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_4())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_4());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_4())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_4());
+                                        img.delete().addOnSuccessListener(aVoid15 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_5())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_5());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_5())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_5());
+                                        img.delete().addOnSuccessListener(aVoid16 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   pdialog.show();
-                                                   if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_6())) {
-                                                       StorageReference img = FirebaseStorage.getInstance()
-                                                               .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_6());
-                                                       img.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                           @Override
-                                                           public void onSuccess(Void aVoid) {
-                                                               pdialog.dismiss();
-                                                               Log.i("Post Image","deleted");
-                                                           }
-                                                       })
-                                                               .addOnFailureListener(new OnFailureListener() {
-                                                                   @Override
-                                                                   public void onFailure(@NonNull Exception e) {
-                                                                       Log.e("Post Image",e.getLocalizedMessage());
-                                                                   }
-                                                               });
-                                                   }
+                                    pdialog.show();
+                                    if(!TextUtils.isEmpty(postList.get(holder.getAdapterPosition()).getImage_url_6())) {
+                                        StorageReference img = FirebaseStorage.getInstance()
+                                                .getReferenceFromUrl(postList.get(holder.getAdapterPosition()).getImage_url_6());
+                                        img.delete().addOnSuccessListener(aVoid17 -> {
+                                            pdialog.dismiss();
+                                            Log.i("Post Image","deleted");
+                                        })
+                                                .addOnFailureListener(e -> Log.e("Post Image",e.getLocalizedMessage()));
+                                    }
 
-                                                   Toasty.success(context, "Post deleted", Toasty.LENGTH_SHORT,true).show();
-                                                   postList.remove(holder.getAdapterPosition());
-                                                   notifyItemRemoved(holder.getAdapterPosition());
-                                                   notifyDataSetChanged();
+                                    Toasty.success(context, "Post deleted", Toasty.LENGTH_SHORT,true).show();
+                                    postList.remove(holder.getAdapterPosition());
+                                    notifyItemRemoved(holder.getAdapterPosition());
+                                    notifyDataSetChanged();
 
-                                                   pdialog.dismiss();
+                                    pdialog.dismiss();
 
 
-                                               }
-                                           })
-                                           .addOnFailureListener(new OnFailureListener() {
-                                               @Override
-                                               public void onFailure(@NonNull Exception e) {
-                                                   pdialog.dismiss();
-                                                   Log.e("error",e.getLocalizedMessage());
-                                               }
-                                           });
+                                })
+                                .addOnFailureListener(e -> {
+                                    pdialog.dismiss();
+                                    Log.e("error",e.getLocalizedMessage());
+                                });
 
-                               }
-                           })
-                           .onNegative(new MaterialDialog.SingleButtonCallback() {
-                               @Override
-                               public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                   dialog.dismiss();
-                               }
-                           }).show();
-                }
-            });
+                    })
+                    .onNegative((dialog, which) -> dialog.dismiss()).show());
 
         }else{
             isOwner=false;
@@ -360,106 +293,68 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             mFirestore.collection("Users")
                     .document(postList.get(position).getUserId())
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(final DocumentSnapshot documentSnapshot) {
+                    .addOnSuccessListener(documentSnapshot -> {
 
-                            try {
-                                if (!documentSnapshot.getString("username").equals(postList.get(holder.getAdapterPosition()).getUsername()) &&
-                                        !documentSnapshot.getString("image").equals(postList.get(holder.getAdapterPosition()).getUserimage())) {
+                        try {
+                            if (!documentSnapshot.getString("username").equals(postList.get(holder.getAdapterPosition()).getUsername()) &&
+                                    !documentSnapshot.getString("image").equals(postList.get(holder.getAdapterPosition()).getUserimage())) {
 
-                                    Map<String, Object> postMap = new HashMap<>();
-                                    postMap.put("username", documentSnapshot.getString("username"));
-                                    postMap.put("userimage", documentSnapshot.getString("image"));
+                                Map<String, Object> postMap = new HashMap<>();
+                                postMap.put("username", documentSnapshot.getString("username"));
+                                postMap.put("userimage", documentSnapshot.getString("image"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(postList.get(holder.getAdapterPosition()).postId)
-                                            .update(postMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("post_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("post_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(postList.get(holder.getAdapterPosition()).postId)
+                                        .update(postMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("post_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("post_update", "failure"));
 
-                                    holder.user_name.setText(documentSnapshot.getString("username"));
+                                holder.user_name.setText(documentSnapshot.getString("username"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.user_image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.user_image);
 
 
-                                } else if (!documentSnapshot.getString("username").equals(postList.get(holder.getAdapterPosition()).getUsername())) {
+                            } else if (!documentSnapshot.getString("username").equals(postList.get(holder.getAdapterPosition()).getUsername())) {
 
 
-                                    Map<String, Object> postMap = new HashMap<>();
-                                    postMap.put("username", documentSnapshot.getString("username"));
+                                Map<String, Object> postMap = new HashMap<>();
+                                postMap.put("username", documentSnapshot.getString("username"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(postList.get(holder.getAdapterPosition()).postId)
-                                            .update(postMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("post_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("post_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(postList.get(holder.getAdapterPosition()).postId)
+                                        .update(postMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("post_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("post_update", "failure"));
 
-                                    holder.user_name.setText(documentSnapshot.getString("username"));
+                                holder.user_name.setText(documentSnapshot.getString("username"));
 
-                                } else if (!documentSnapshot.getString("image").equals(postList.get(holder.getAdapterPosition()).getUserimage())) {
+                            } else if (!documentSnapshot.getString("image").equals(postList.get(holder.getAdapterPosition()).getUserimage())) {
 
-                                    Map<String, Object> postMap = new HashMap<>();
-                                    postMap.put("userimage", documentSnapshot.getString("image"));
+                                Map<String, Object> postMap = new HashMap<>();
+                                postMap.put("userimage", documentSnapshot.getString("image"));
 
-                                    mFirestore.collection("Posts")
-                                            .document(postList.get(holder.getAdapterPosition()).postId)
-                                            .update(postMap)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("post_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("post_update", "failure");
-                                                }
-                                            });
+                                mFirestore.collection("Posts")
+                                        .document(postList.get(holder.getAdapterPosition()).postId)
+                                        .update(postMap)
+                                        .addOnSuccessListener(aVoid -> Log.i("post_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("post_update", "failure"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.user_image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.user_image);
 
-                                }
-
-
-                            }catch(Exception e){
-                                e.printStackTrace();
                             }
+
+
+                        }catch(Exception e){
+                            e.printStackTrace();
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("Error", e.getMessage());
-                        }
-                    });
+                    .addOnFailureListener(e -> Log.e("Error", e.getMessage()));
         }catch (Exception ex){
             Log.w("error","fastscrolled",ex);
         }
@@ -572,44 +467,33 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             enableDoubleTap(holder);
         }
 
-        holder.stat_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
-            @Override
-            public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+        holder.stat_btn.setOnFavoriteChangeListener((buttonView, favorite) -> {
 
-                mmBottomSheetDialog.show();
+            mmBottomSheetDialog.show();
 
-                final ProgressBar pbar=statsheetView.findViewById(R.id.pbar);
-                final LinearLayout main=statsheetView.findViewById(R.id.main);
-                final TextView smile=statsheetView.findViewById(R.id.smiles);
-                final TextView save=statsheetView.findViewById(R.id.saves);
+            final ProgressBar pbar=statsheetView.findViewById(R.id.pbar);
+            final LinearLayout main=statsheetView.findViewById(R.id.main);
+            final TextView smile=statsheetView.findViewById(R.id.smiles);
+            final TextView save=statsheetView.findViewById(R.id.saves);
 
-                pbar.setVisibility(View.VISIBLE);
-                main.setVisibility(View.GONE);
-                FirebaseFirestore.getInstance().collection("Posts")
-                        .document(postList.get(holder.getAdapterPosition()).postId)
-                        .collection("Liked_Users")
-                        .get()
-                        .addOnSuccessListener(queryDocumentSnapshots -> {
+            pbar.setVisibility(View.VISIBLE);
+            main.setVisibility(View.GONE);
+            FirebaseFirestore.getInstance().collection("Posts")
+                    .document(postList.get(holder.getAdapterPosition()).postId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        List<String> liked_users=(List<String>) documentSnapshot.get("liked_users");
+                        smile.setText(String.format(context.getString(R.string.s_people_have_smiled_for_this_post),liked_users.size()));
 
-                            smile.setText(String.format(context.getString(R.string.s_people_have_smiled_for_this_post),queryDocumentSnapshots.size()));
+                        List<String> saved_users=(List<String>) documentSnapshot.get("saved_users");
+                        save.setText(String.format(context.getString(R.string.s_people_have_saved_this_post), saved_users.size()));
 
-                            FirebaseFirestore.getInstance().collection("Posts")
-                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                    .collection("Saved_Users")
-                                    .get()
-                                    .addOnSuccessListener(queryDocumentSnapshots1 -> {
+                        pbar.setVisibility(View.GONE);
+                        main.setVisibility(View.VISIBLE);
 
-                                        save.setText(String.format(context.getString(R.string.s_people_have_saved_this_post), queryDocumentSnapshots1.size()));
-                                        pbar.setVisibility(View.GONE);
-                                        main.setVisibility(View.VISIBLE);
+                    })
+                    .addOnFailureListener(e -> e.printStackTrace());
 
-                                    })
-                                    .addOnFailureListener(e -> e.printStackTrace());
-
-                        })
-                        .addOnFailureListener(e -> e.printStackTrace());
-
-            }
         });
 
         if (postList.get(pos).getImage_count()==0) {
@@ -637,7 +521,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         } else if(postList.get(pos).getImage_count()==1) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
-            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn);
+            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn,postList.get(holder.getAdapterPosition()).getUserId());
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
@@ -657,7 +541,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }else if(postList.get(pos).getImage_count()>0) {
 
             ArrayList<MultipleImage> multipleImages=new ArrayList<>();
-            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn);
+            PostPhotosAdapter photosAdapter=new PostPhotosAdapter(context,activity,multipleImages,false,postList.get(holder.getAdapterPosition()).postId,holder.like_btn,postList.get(holder.getAdapterPosition()).getUserId());
             setUrls(holder,multipleImages,photosAdapter);
 
             holder.pager.setAdapter(photosAdapter);
@@ -679,74 +563,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         }
     }
-
-
-    /*private void shareImages(ViewHolder holder,int type) {
-
-        switch (type){
-
-            case 0:
-                Intent intent = new Intent(Intent.ACTION_SEND)
-                        .setType("image/*");
-                intent.putExtra(Intent.EXTRA_STREAM, getBitmapUri(getBitmap(holder.mImageholder), postList.get(holder.getAdapterPosition()).getName()));
-                try {
-                    context.startActivity(Intent.createChooser(intent, "Share using..."));
-                } catch (ActivityNotFoundException e) {
-                    e.printStackTrace();
-                }
-                return;
-            case 1:
-                new DownloadTask(context,holder).execute(stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()));
-                return;
-            case 2:
-                new DownloadTask(context,holder).execute(stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()));
-                return;
-            case 3:
-                new DownloadTask(context,holder).execute(
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()));
-                return;
-            case 4:
-                new DownloadTask(context,holder).execute(
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()));
-                return;
-            case 5:
-                new DownloadTask(context,holder).execute(
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()));
-                return;
-            case 6:
-                new DownloadTask(context,holder).execute(
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_5()));
-                return;
-            case 7:
-                new DownloadTask(context,holder).execute(
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_0()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_1()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_2()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_3()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_4()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_5()),
-                        stringToURL(postList.get(holder.getAdapterPosition()).getImage_url_6()));
-                return;
-
-        }
-
-    }*/
-
 
     private void autoStartSlide(final ViewHolder holder,final int LAST) {
 
@@ -795,12 +611,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         }
         );
 
-        holder.post_text.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return detector.onTouchEvent(event);
-            }
-        });
+        holder.post_text.setOnTouchListener((v, event) -> detector.onTouchEvent(event));
 
     }
 
@@ -872,279 +683,179 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private void getLikeandFav(final ViewHolder holder) {
 
-        //forLiked
         mFirestore.collection("Posts")
                 .document(postList.get(holder.getAdapterPosition()).postId)
-                .collection("Liked_Users")
-                .document(mCurrentUser.getUid())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        if (documentSnapshot.exists()) {
-                            boolean liked = documentSnapshot.getBoolean("liked");
+                   List<String> liked_users=(List<String>) documentSnapshot.get("liked_users");
+                   try {
+                       if (liked_users.contains(mCurrentUser.getUid())) {
+                           holder.like_btn.setFavorite(true, false);
+                       } else {
+                           holder.like_btn.setFavorite(false, false);
+                       }
+                   }catch (Exception e){
+                       holder.like_btn.setFavorite(false,false);
+                   }
 
-                            if (liked) {
-                                holder.like_btn.setFavorite(true,false);
-                            } else {
-                                holder.like_btn.setFavorite(false,false);
-                            }
-                        } else {
-                            Log.e("Like", "No document found");
-
-                        }
-
-                        if(isOnline()) {
-                            holder.like_btn.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                                @Override
-                                public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                    if (favorite) {
-                                        Map<String, Object> likeMap = new HashMap<>();
-                                        likeMap.put("liked", true);
-
-                                        try {
-
-                                            mFirestore.collection("Posts")
-                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                    .collection("Liked_Users")
-                                                    .document(mCurrentUser.getUid())
-                                                    .set(likeMap)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())+1));
-                                                            //Toast.makeText(context, "Liked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error like", e.getMessage());
-                                                        }
-                                                    });
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else {
-                                        Map<String, Object> likeMap = new HashMap<>();
-                                        likeMap.put("liked", false);
-
-                                        try {
-
-                                            mFirestore.collection("Posts")
-                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                    .collection("Liked_Users")
-                                                    .document(mCurrentUser.getUid())
-                                                    //.set(likeMap)
-                                                    .delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-                                                            //holder.like_count.setText(String.valueOf(Integer.parseInt(holder.like_count.getText().toString())-1));
-                                                            //Toast.makeText(context, "Unliked post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error unlike", e.getMessage());
-                                                        }
-                                                    });
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            });
-                        }
-
-
+                    List<String> saved_users=(List<String>) documentSnapshot.get("saved_users");
+                   try{
+                    if(saved_users.contains(mCurrentUser.getUid())){
+                        holder.sav_button.setFavorite(true,false);
+                    }else{
+                        holder.sav_button.setFavorite(false,false);
                     }
+                   }catch (Exception e){
+                       holder.sav_button.setFavorite(false,false);
+                   }
+
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error Like", e.getMessage());
-                    }
-                });
+                .addOnFailureListener(e -> Log.e("Error Like", e.getMessage()));
 
-        //forFavourite
-        mFirestore.collection("Posts")
-                .document(postList.get(holder.getAdapterPosition()).postId)
-                .collection("Saved_Users")
-                .document(mCurrentUser.getUid())
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+        if(isOnline()) {
+            holder.like_btn.setOnFavoriteChangeListener((buttonView, favorite) -> {
+                if (favorite) {
 
-                        if (documentSnapshot.exists()) {
-                            boolean fav = documentSnapshot.getBoolean("Saved");
+                    Map<String, Object> likeMap = new HashMap<>();
+                    likeMap.put("liked_users", FieldValue.arrayUnion(mCurrentUser.getUid()));
+                    mFirestore.collection("Posts")
+                            .document(postList.get(holder.getAdapterPosition()).postId)
+                            .update(likeMap)
+                            .addOnSuccessListener(aVoid -> {
 
-                            if (fav) {
-                                holder.sav_button.setFavorite(true,false);
-                            } else {
-                                holder.sav_button.setFavorite(false,false);
-                            }
-                        } else {
-                            Log.e("Fav", "No document found");
+                                UserHelper userHelper=new UserHelper(context);
+                                Cursor rs = userHelper.getData(1);
+                                rs.moveToFirst();
 
-                        }
+                                String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                                String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
 
-                        if(isOnline()) {
-                            holder.sav_button.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                                @Override
-                                public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                                    if (favorite) {
-
-                                        Map<String, Object> favMap = new HashMap<>();
-                                        favMap.put("Saved", true);
-
-                                        try {
-
-                                            mFirestore.collection("Posts")
-                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                    .collection("Saved_Users")
-                                                    .document(mCurrentUser.getUid())
-                                                    .set(favMap)
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-
-                                                            Map<String, Object> postMap = new HashMap<>();
-
-                                                            postMap.put("userId", postList.get(holder.getAdapterPosition()).getUserId());
-                                                            postMap.put("name", postList.get(holder.getAdapterPosition()).getName());
-                                                            postMap.put("username", postList.get(holder.getAdapterPosition()).getUsername());
-                                                            postMap.put("timestamp", postList.get(holder.getAdapterPosition()).getTimestamp());
-                                                            postMap.put("image_count", postList.get(holder.getAdapterPosition()).getImage_count());
-                                                            postMap.put("description", postList.get(holder.getAdapterPosition()).getDescription());
-                                                            postMap.put("color", postList.get(holder.getAdapterPosition()).getColor());
-
-                                                            try {
-                                                                postMap.put("image_url_0", postList.get(holder.getAdapterPosition()).getImage_url_0());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_1", postList.get(holder.getAdapterPosition()).getImage_url_1());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_2", postList.get(holder.getAdapterPosition()).getImage_url_2());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_3", postList.get(holder.getAdapterPosition()).getImage_url_3());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_4", postList.get(holder.getAdapterPosition()).getImage_url_4());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_5", postList.get(holder.getAdapterPosition()).getImage_url_5());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                            try {
-                                                                postMap.put("image_url_6", postList.get(holder.getAdapterPosition()).getImage_url_6());
-                                                            } catch (Exception e) {
-                                                                e.printStackTrace();
-                                                            }
-
-                                                            mFirestore.collection("Users")
-                                                                    .document(mCurrentUser.getUid())
-                                                                    .collection("Saved_Posts")
-                                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                                    .set(postMap)
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            // Toast.makeText(context, "Added to Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                                @Override
-                                                                public void onFailure(@NonNull Exception e) {
-                                                                    Log.e("Error add fav", e.getMessage());
-                                                                }
-                                                            });
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error fav", e.getMessage());
-                                                        }
-                                                    });
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-
-                                    } else {
-
-                                        Map<String, Object> favMap = new HashMap<>();
-                                        favMap.put("Saved", false);
-
-                                        try {
-
-                                            mFirestore.collection("Posts")
-                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                    .collection("Saved_Users")
-                                                    .document(mCurrentUser.getUid())
-                                                    //.set(favMap)
-                                                    .delete()
-                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                        @Override
-                                                        public void onSuccess(Void aVoid) {
-
-                                                            mFirestore.collection("Users")
-                                                                    .document(mCurrentUser.getUid())
-                                                                    .collection("Saved_Posts")
-                                                                    .document(postList.get(holder.getAdapterPosition()).postId)
-                                                                    .delete()
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            // Toast.makeText(context, "Removed from Saved_Posts, post '" + postList.get(holder.getAdapterPosition()).postId, Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    })
-                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-                                                                            Log.e("Error remove fav", e.getMessage());
-                                                                        }
-                                                                    });
-
-                                                        }
-                                                    })
-                                                    .addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Log.e("Error fav", e.getMessage());
-                                                        }
-                                                    });
-
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
+                                if (!rs.isClosed()) {
+                                    rs.close();
                                 }
-                            });
-                        }
+
+                                addToNotification(postList.get(holder.getAdapterPosition()).getUserId(),
+                                        mCurrentUser.getUid(),
+                                        image,
+                                        username,
+                                        "Liked your post",
+                                        postList.get(holder.getAdapterPosition()).postId,
+                                        "like");
+
+                            })
+                            .addOnFailureListener(e -> Log.e("Error like", e.getMessage()));
+
+                } else {
+                    Map<String, Object> likeMap = new HashMap<>();
+                    likeMap.put("liked_users", FieldValue.arrayRemove(mCurrentUser.getUid()));
+                    mFirestore.collection("Posts")
+                            .document(postList.get(holder.getAdapterPosition()).postId)
+                            .update(likeMap)
+                            .addOnSuccessListener(aVoid -> {
+
+                            })
+                            .addOnFailureListener(e -> Log.e("Error unlike", e.getMessage()));
+                }
+            });
+            holder.sav_button.setOnFavoriteChangeListener((buttonView, favorite) -> {
+                if (favorite) {
+
+                    Map<String, Object> favMap = new HashMap<>();
+                    favMap.put("saved_users", FieldValue.arrayUnion(mCurrentUser.getUid()));
+
+                    try {
+
+                        mFirestore.collection("Posts")
+                                .document(postList.get(holder.getAdapterPosition()).postId)
+                                .update(favMap)
+                                .addOnSuccessListener(aVoid -> {
+
+                                    Map<String, Object> postMap = new HashMap<>();
+
+                                    postMap.put("userId", postList.get(holder.getAdapterPosition()).getUserId());
+                                    postMap.put("name", postList.get(holder.getAdapterPosition()).getName());
+                                    postMap.put("username", postList.get(holder.getAdapterPosition()).getUsername());
+                                    postMap.put("timestamp", postList.get(holder.getAdapterPosition()).getTimestamp());
+                                    postMap.put("image_count", postList.get(holder.getAdapterPosition()).getImage_count());
+                                    postMap.put("description", postList.get(holder.getAdapterPosition()).getDescription());
+                                    postMap.put("color", postList.get(holder.getAdapterPosition()).getColor());
+
+                                    try {
+                                        postMap.put("image_url_0", postList.get(holder.getAdapterPosition()).getImage_url_0());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_1", postList.get(holder.getAdapterPosition()).getImage_url_1());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_2", postList.get(holder.getAdapterPosition()).getImage_url_2());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_3", postList.get(holder.getAdapterPosition()).getImage_url_3());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_4", postList.get(holder.getAdapterPosition()).getImage_url_4());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_5", postList.get(holder.getAdapterPosition()).getImage_url_5());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        postMap.put("image_url_6", postList.get(holder.getAdapterPosition()).getImage_url_6());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    mFirestore.collection("Users")
+                                            .document(mCurrentUser.getUid())
+                                            .collection("Saved_Posts")
+                                            .document(postList.get(holder.getAdapterPosition()).postId)
+                                            .set(postMap)
+                                            .addOnSuccessListener(aVoid1 -> {
+                                            }).addOnFailureListener(e -> Log.e("Error add fav", e.getMessage()));
+                                })
+                                .addOnFailureListener(e -> Log.e("Error fav", e.getMessage()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error Fav", e.getMessage());
+
+                } else {
+
+                    try {
+
+                        Map<String, Object> favMap = new HashMap<>();
+                        favMap.put("saved_users", FieldValue.arrayRemove(mCurrentUser.getUid()));
+                        mFirestore.collection("Posts")
+                                .document(postList.get(holder.getAdapterPosition()).postId)
+                                .update(favMap)
+                                .addOnSuccessListener(aVoid -> mFirestore.collection("Users")
+                                        .document(mCurrentUser.getUid())
+                                        .collection("Saved_Posts")
+                                        .document(postList.get(holder.getAdapterPosition()).postId)
+                                        .delete()
+                                        .addOnSuccessListener(aVoid12 -> {
+
+                                        })
+                                        .addOnFailureListener(e -> Log.e("Error remove fav", e.getMessage())))
+                                .addOnFailureListener(e -> Log.e("Error fav", e.getMessage()));
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
+                }
+            });
+        }
 
     }
 
@@ -1211,6 +922,47 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     }
 
+    private void addToNotification(String admin_id,String user_id,String profile,String username,String message,String post_id,String type){
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("id",user_id);
+        map.put("username",username);
+        map.put("image",profile);
+        map.put("message",message);
+        map.put("timestamp",String.valueOf(System.currentTimeMillis()));
+        map.put("type",type);
+        map.put("action_id",post_id);
+
+        if (!admin_id.equals(user_id)) {
+
+            mFirestore.collection("Users")
+                    .document(admin_id)
+                    .collection("Info_Notifications")
+                    .whereEqualTo("id",user_id)
+                    .whereEqualTo("action_id",post_id)
+                    .whereEqualTo("type",type)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                        if(queryDocumentSnapshots.isEmpty()){
+
+                            mFirestore.collection("Users")
+                                    .document(admin_id)
+                                    .collection("Info_Notifications")
+                                    .add(map)
+                                    .addOnSuccessListener(documentReference -> {
+                                    })
+                                    .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
+
+                        }
+
+                    })
+                    .addOnFailureListener(Throwable::printStackTrace);
+
+        }
+
+    }
+
     private void animatePhotoLike(final ViewHolder holder) {
             holder.vBgLike.setVisibility(View.VISIBLE);
             holder.ivLike.setVisibility(View.VISIBLE);
@@ -1257,37 +1009,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     resetLikeAnimationState(holder);
                     holder.like_btn.setFavorite(true,true);
                 }
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    Map<String, Object> likeMap = new HashMap<>();
-                    likeMap.put("liked", true);
-
-                    try {
-
-                        mFirestore.collection("Posts")
-                                .document(postList.get(holder.getAdapterPosition()).postId)
-                                .collection("Liked_Users")
-                                .document(mCurrentUser.getUid())
-                                .set(likeMap)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.i("post", "liked");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error like", e.getMessage());
-                                    }
-                                });
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-                }
             });
             animatorSet.start();
 
@@ -1296,45 +1017,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     private void resetLikeAnimationState(ViewHolder holder) {
         holder.vBgLike.setVisibility(View.INVISIBLE);
         holder.ivLike.setVisibility(View.INVISIBLE);
-    }
-
-    private void getCounts(final ViewHolder holder) {
-
-        mFirestore.collection("Posts")
-                .document(postList.get(holder.getAdapterPosition()).postId)
-                .collection("Liked_Users")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(final QuerySnapshot querySnapshot) {
-                       // holder.like_count.setText(String.valueOf(querySnapshot.size()));
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error",e.getMessage());
-                    }
-                });
-
-        /*mFirestore.collection("Posts")
-                .document(postList.get(holder.getAdapterPosition()).postId)
-                .collection("Saved_Users")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot querySnapshot) {
-                        fav.setText(String.valueOf(querySnapshot.size()));
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Error",e.getMessage());
-                    }
-                });*/
-
-
     }
 
     @Override

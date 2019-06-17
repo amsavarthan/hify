@@ -76,41 +76,20 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                 .load(usersList.get(position).getImage())
                 .into(holder.image);
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendProfile.startActivity(context,usersList.get(holder.getAdapterPosition()).userId);
-            }
+        holder.mView.setOnClickListener(view -> FriendProfile.startActivity(context,usersList.get(holder.getAdapterPosition()).userId));
+
+        holder.exist_icon.setOnClickListener(view -> {
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialog.setTitle("Information");
+            dialog.setMessage("This icon is shown to indicate that friend request to this user has been sent already.");
+            dialog.setPositiveButton("Ok", (dialogInterface, i) -> dialogInterface.dismiss()).setIcon(R.drawable.ic_call_made_black_24dp).show();
         });
 
-        holder.exist_icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle("Information");
-                dialog.setMessage("This icon is shown to indicate that friend request to this user has been sent already.");
-                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).setIcon(R.drawable.ic_call_made_black_24dp).show();
-            }
-        });
-
-        holder.friend_icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-                dialog.setTitle("Information");
-                dialog.setMessage("This icon is shown to indicate that the user is already your friend.");
-                dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).setIcon(R.drawable.ic_friend).show();
-            }
+        holder.friend_icon.setOnClickListener(view -> {
+            final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            dialog.setTitle("Information");
+            dialog.setMessage("This icon is shown to indicate that the user is already your friend.");
+            dialog.setPositiveButton("Ok", (dialogInterface, i) -> dialogInterface.dismiss()).setIcon(R.drawable.ic_friend).show();
         });
 
     }
@@ -122,33 +101,27 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                 .document(usersList.get(holder.getAdapterPosition()).userId)
                 .collection("Friends")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
-                    holder.exist_icon.setVisibility(View.GONE);
-                    holder.friend_icon.setVisibility(View.VISIBLE);
-                } else {
-                    FirebaseFirestore.getInstance()
-                            .collection("Users")
-                            .document(usersList.get(holder.getAdapterPosition()).userId)
-                            .collection("Friend_Requests")
-                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            if (documentSnapshot.exists()) {
-                                holder.friend_icon.setVisibility(View.GONE);
-                                holder.exist_icon.setVisibility(View.VISIBLE);
-                            } else {
-                                holder.exist_icon.setVisibility(View.GONE);
-                                holder.friend_icon.setVisibility(View.GONE);
-                            }
-                        }
-                    });
-                }
-            }
-        });
+                .get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        holder.exist_icon.setVisibility(View.GONE);
+                        holder.friend_icon.setVisibility(View.VISIBLE);
+                    } else {
+                        FirebaseFirestore.getInstance()
+                                .collection("Users")
+                                .document(usersList.get(holder.getAdapterPosition()).userId)
+                                .collection("Friend_Requests")
+                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .get().addOnSuccessListener(documentSnapshot1 -> {
+                                    if (documentSnapshot1.exists()) {
+                                        holder.friend_icon.setVisibility(View.GONE);
+                                        holder.exist_icon.setVisibility(View.VISIBLE);
+                                    } else {
+                                        holder.exist_icon.setVisibility(View.GONE);
+                                        holder.friend_icon.setVisibility(View.GONE);
+                                    }
+                                });
+                    }
+                });
 
     }
 
@@ -205,29 +178,25 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                 .collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        final String email=documentSnapshot.getString("email");
+                    final String email=documentSnapshot.getString("email");
 
-                        userMap.put("name",  documentSnapshot.getString("name"));
-                        userMap.put("id",    documentSnapshot.getString("id"));
-                        userMap.put("email", email);
-                        userMap.put("image", documentSnapshot.getString("image"));
-                        userMap.put("tokens", documentSnapshot.get("token_ids"));
-                        userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
-                        userMap.put("timestamp",       String.valueOf(System.currentTimeMillis()));
+                    userMap.put("name",  documentSnapshot.getString("name"));
+                    userMap.put("id",    documentSnapshot.getString("id"));
+                    userMap.put("email", email);
+                    userMap.put("image", documentSnapshot.getString("image"));
+                    userMap.put("tokens", documentSnapshot.get("token_ids"));
+                    userMap.put("notification_id", String.valueOf(System.currentTimeMillis()));
+                    userMap.put("timestamp",       String.valueOf(System.currentTimeMillis()));
 
-                        //Add to user
-                        FirebaseFirestore.getInstance()
-                                .collection("Users")
-                                .document(deletedItem.userId)
-                                .collection("Friend_Requests")
-                                .document(documentSnapshot.getString("id"))
-                                .set(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
+                    //Add to user
+                    FirebaseFirestore.getInstance()
+                            .collection("Users")
+                            .document(deletedItem.userId)
+                            .collection("Friend_Requests")
+                            .document(documentSnapshot.getString("id"))
+                            .set(userMap).addOnSuccessListener(aVoid -> {
 
                                 //Add for notification data
                                 FirebaseFirestore.getInstance()
@@ -235,31 +204,16 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                                         .document(deletedItem.userId)
                                         .collection("Friend_Requests")
                                         .document(email)
-                                        .set(userMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
+                                        .set(userMap).addOnSuccessListener(aVoid1 -> {
 
-                                        Snackbar.make(view, "Friend request sent to " + deletedItem.getName(), Snackbar.LENGTH_LONG).show();
-                                        notifyDataSetChanged();
+                                            Snackbar.make(view, "Friend request sent to " + deletedItem.getName(), Snackbar.LENGTH_LONG).show();
+                                            notifyDataSetChanged();
 
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error",e.getMessage());
-                                    }
-                                });
+                                        }).addOnFailureListener(e -> Log.e("Error",e.getMessage()));
 
 
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("Error",e.getMessage());
-                            }
-                        });
+                            }).addOnFailureListener(e -> Log.e("Error",e.getMessage()));
 
-                    }
                 });
 
     }

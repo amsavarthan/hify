@@ -29,7 +29,6 @@ import com.amsavarthan.hify.ui.activities.notification.NotificationActivity;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImage;
 import com.amsavarthan.hify.ui.activities.notification.NotificationImageReply;
 import com.amsavarthan.hify.ui.activities.notification.NotificationReplyActivity;
-import com.amsavarthan.hify.utils.database.NotificationsHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +46,6 @@ public class NotificationUtil {
 
     private static String TAG = NotificationUtil.class.getSimpleName();
     private Context mContext;
-    public static boolean read=true;
 
     public NotificationUtil(Context mContext) {
         this.mContext = mContext;
@@ -194,10 +192,6 @@ public class NotificationUtil {
                 .setContentText(message)
                 .build();
 
-        NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
-        notificationsHelper.insertContact(user_image,title,message,String.valueOf(System.currentTimeMillis()));
-        read=false;
-        notificationsHelper.close();
 
         notificationManagerCompat.notify(id, notification);
 
@@ -252,11 +246,6 @@ public class NotificationUtil {
                 .setSmallIcon(icon)
                 .setContentText(message)
                 .build();
-
-        NotificationsHelper notificationsHelper=new NotificationsHelper(mContext);
-        notificationsHelper.insertContact(user_image,title,message,String.valueOf(System.currentTimeMillis()));
-        read=false;
-        notificationsHelper.close();
 
         notificationManagerCompat.notify(id, notification);
 

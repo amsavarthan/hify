@@ -135,30 +135,27 @@ public class Home extends Fragment {
                                             .document(currentUser.getUid())
                                             .collection("Friends")
                                             .get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot querySnapshot) {
+                                            .addOnSuccessListener(querySnapshot -> {
 
-                                                    if (!querySnapshot.isEmpty()) {
+                                                if (!querySnapshot.isEmpty()) {
 
-                                                        for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
-                                                            if (documentChange.getDocument().getId().equals(doc.getDocument().get("userId"))) {
+                                                    for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
+                                                        if (documentChange.getDocument().getId().equals(doc.getDocument().get("userId"))) {
 
-                                                                Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
-                                                                mPostsList.add(post);
-                                                                refreshLayout.setRefreshing(false);
-                                                                mAdapter_v19.notifyDataSetChanged();
+                                                            Post post = doc.getDocument().toObject(Post.class).withId(doc.getDocument().getId());
+                                                            mPostsList.add(post);
+                                                            refreshLayout.setRefreshing(false);
+                                                            mAdapter_v19.notifyDataSetChanged();
 
-                                                            }
                                                         }
-
-                                                    } else {
-
-                                                       getCurrentUsersPosts();
-
                                                     }
 
+                                                } else {
+
+                                                   getCurrentUsersPosts();
+
                                                 }
+
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override

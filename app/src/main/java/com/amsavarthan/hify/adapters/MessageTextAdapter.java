@@ -99,56 +99,47 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
         mFirestore.collection("Users")
                 .document(messageList.get(position).getFrom())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        Glide.with(context)
-                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                .load(documentSnapshot.getString("image"))
-                                .into(holder.image);
+                    Glide.with(context)
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .load(documentSnapshot.getString("image"))
+                            .into(holder.image);
 
-                        holder.name.setText(documentSnapshot.getString("name"));
+                    holder.name.setText(documentSnapshot.getString("name"));
 
-                    }
                 });
 
         mFirestore.collection("Users")
                 .document(messageList.get(position).getFrom())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                .addOnSuccessListener(documentSnapshot -> {
 
-                        Glide.with(context)
-                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                .load(documentSnapshot.getString("image"))
-                                .into(holder.image);
+                    Glide.with(context)
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .load(documentSnapshot.getString("image"))
+                            .into(holder.image);
 
-                        holder.name.setText(documentSnapshot.getString("name"));
+                    holder.name.setText(documentSnapshot.getString("name"));
 
-                    }
                 });
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(context, NotificationActivity.class);
-                intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
-                intent.putExtra("read", messageList.get(holder.getAdapterPosition()).getRead());
-                intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
-                intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
-                context.startActivity(intent);
+        holder.mView.setOnClickListener(view -> {
+            Intent intent=new Intent(context, NotificationActivity.class);
+            intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
+            intent.putExtra("read", messageList.get(holder.getAdapterPosition()).getRead());
+            intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
+            intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
+            context.startActivity(intent);
 
-                messageList.get(holder.getAdapterPosition()).setRead("true");
-                holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
-                holder.read_icon.setVisibility(View.VISIBLE);
-                holder.read_icon.setAlpha(0.0f);
-                holder.read_icon.animate()
-                        .alpha(1.0f)
-                        .setDuration(300)
-                        .start();
-            }
+            messageList.get(holder.getAdapterPosition()).setRead("true");
+            holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
+            holder.read_icon.setVisibility(View.VISIBLE);
+            holder.read_icon.setAlpha(0.0f);
+            holder.read_icon.animate()
+                    .alpha(1.0f)
+                    .setDuration(300)
+                    .start();
         });
 
         String timeAgo = TimeAgo.using(Long.parseLong(messageList.get(holder.getAdapterPosition()).getTimestamp()));
@@ -156,51 +147,28 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
 
         holder.message.setText(messageList.get(position).getMessage());
 
-        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
+        holder.mView.setOnLongClickListener(v -> {
 
-                new MaterialDialog.Builder(context)
-                        .title("Delete message")
-                        .content("Are you sure do you want to delete this message?")
-                        .positiveText("Yes")
-                        .negativeText("No")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+            new MaterialDialog.Builder(context)
+                    .title("Delete message")
+                    .content("Are you sure do you want to delete this message?")
+                    .positiveText("Yes")
+                    .negativeText("No")
+                    .onPositive((dialog, which) -> mFirestore.collection("Users")
+                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .collection("Notifications")
+                            .document(messageList.get(holder.getAdapterPosition()).msgId)
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                messageList.remove(holder.getAdapterPosition());
+                                notifyItemRemoved(holder.getAdapterPosition());
+                                notifyDataSetChanged();
+                            })
+                            .addOnFailureListener(e -> e.printStackTrace()))
+                    .onNegative((dialog, which) -> dialog.dismiss())
+                    .show();
 
-                                mFirestore.collection("Users")
-                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                        .collection("Notifications")
-                                        .document(messageList.get(holder.getAdapterPosition()).msgId)
-                                        .delete()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                messageList.remove(holder.getAdapterPosition());
-                                                notifyItemRemoved(holder.getAdapterPosition());
-                                                notifyDataSetChanged();
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        });
-
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-
-                return true;
-            }
+            return true;
         });
 
     }

@@ -42,7 +42,6 @@ public class SinglePostView extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
 
 
-
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));

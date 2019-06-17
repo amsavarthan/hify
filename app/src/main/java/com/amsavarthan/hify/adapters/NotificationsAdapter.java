@@ -1,6 +1,7 @@
 package com.amsavarthan.hify.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +11,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.models.Notification;
-import com.amsavarthan.hify.utils.database.NotificationsHelper;
+import com.amsavarthan.hify.ui.activities.forum.AnswersActivity;
+import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
+import com.amsavarthan.hify.ui.activities.post.SinglePostView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -31,12 +37,10 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     private List<Notification> notificationsList;
     private Context context;
-    NotificationsHelper notificationsHelper;
 
-    public NotificationsAdapter(List<Notification> notificationsList, Context context,NotificationsHelper notificationsHelper) {
+    public NotificationsAdapter(List<Notification> notificationsList, Context context) {
         this.notificationsList = notificationsList;
         this.context = context;
-        this.notificationsHelper=notificationsHelper;
     }
 
     @NonNull
@@ -66,20 +70,38 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                 .load(notification.getImage())
                 .into(holder.image);
 
-        holder.title.setText(notification.getTitle());
-        holder.body.setText(notification.getBody());
+        holder.title.setText(notification.getUsername());
+        holder.body.setText(notification.getMessage());
 
-        if(notification.getBody().toLowerCase().equals("liked your post")){
+        if(notification.getType().equals("like")){
             holder.type_image.setImageResource(R.drawable.ic_favorite_red_24dp);
-        }else if(notification.getBody().toLowerCase().equals("commented on your post")){
+        }else if(notification.getType().equals("comment")){
             holder.type_image.setImageResource(R.drawable.ic_comment_blue);
-        }else if(notification.getBody().toLowerCase().equals("sent you friend request")){
+        }else if(notification.getType().equals("friend_req")){
             holder.type_image.setImageResource(R.drawable.ic_person_add_yellow_24dp);
-        }else if(notification.getBody().toLowerCase().equals("accepted your friend request")){
+        }else if(notification.getType().equals("accept_friend_req")){
             holder.type_image.setImageResource(R.drawable.ic_person_green_24dp);
         }else{
             holder.type_image.setImageResource(R.drawable.ic_forum_black_24dp);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+
+            if(notification.getType().equals("like") || notification.getType().equals("comment")){
+
+                context.startActivity(new Intent(context, SinglePostView.class).putExtra("post_id",notification.getAction_id()));
+
+            }else if(notification.getType().equals("friend_req") || notification.getType().equals("accept_friend_req")){
+
+                FriendProfile.startActivity(context,notification.getAction_id());
+
+            }else{
+
+                AnswersActivity.startActivity(context,notification.getAction_id());
+
+            }
+
+        });
 
         holder.itemView.setOnLongClickListener(v -> {
 
@@ -90,7 +112,16 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
                     .negativeText("No")
                     .onPositive((dialog, which) -> {
 
-                        notificationsHelper.deleteItem(holder.getAdapterPosition());
+                        FirebaseFirestore.getInstance()
+                                .collection("Users")
+                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .collection("Info_Notifications")
+                                .document(notificationsList.get(holder.getAdapterPosition()).documentId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                })
+                                .addOnFailureListener(e -> e.printStackTrace());
+
                         notificationsList.remove(holder.getAdapterPosition());
                         Toasty.success(context,"Notification removed",Toasty.LENGTH_SHORT,true).show();
                         notifyDataSetChanged();

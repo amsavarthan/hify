@@ -24,6 +24,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.MainActivity;
@@ -80,8 +81,8 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
 
-    public static void startActivity(Context context){
-        context.startActivity(new Intent(context,RegisterActivity.class));
+    public static void startActivity(Context context) {
+        context.startActivity(new Intent(context, RegisterActivity.class));
     }
 
     @Override
@@ -99,6 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                         Manifest.permission.READ_EXTERNAL_STORAGE
                 )
                 .withListener(new MultiplePermissionsListener() {
+
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if (report.isAnyPermissionPermanentlyDenied()) {
@@ -108,9 +110,10 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-
+                        token.continuePermissionRequest();
                     }
-                }).check();
+                })
+                .check();
 
     }
 

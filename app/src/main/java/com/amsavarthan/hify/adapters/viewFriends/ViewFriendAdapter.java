@@ -87,227 +87,155 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
             FirebaseFirestore.getInstance().collection("Users")
                     .document(usersList.get(position).getId())
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    .addOnSuccessListener(documentSnapshot -> {
 
-                            try {
-                                if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
-                                        !documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername()) &&
-                                        !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                        try {
+                            if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
+                                    !documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername()) &&
+                                    !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("name", documentSnapshot.getString("name"));
-                                    user.put("username", documentSnapshot.getString("username"));
-                                    user.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("name", documentSnapshot.getString("name"));
+                                user.put("username", documentSnapshot.getString("username"));
+                                user.put("image", documentSnapshot.getString("image"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
-                                    holder.name.setText(documentSnapshot.getString("name"));
-                                    holder.username.setText("@"+documentSnapshot.getString("username"));
+                                holder.name.setText(documentSnapshot.getString("name"));
+                                holder.username.setText("@"+documentSnapshot.getString("username"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
 
-                                }else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
-                                        !documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername())) {
+                            }else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
+                                    !documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("name", documentSnapshot.getString("name"));
-                                    user.put("username", documentSnapshot.getString("username"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("name", documentSnapshot.getString("name"));
+                                user.put("username", documentSnapshot.getString("username"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
-                                    holder.name.setText(documentSnapshot.getString("name"));
-                                    holder.username.setText("@"+documentSnapshot.getString("username"));
+                                holder.name.setText(documentSnapshot.getString("name"));
+                                holder.username.setText("@"+documentSnapshot.getString("username"));
 
 
-                                }else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
-                                        !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                            }else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
+                                    !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("name", documentSnapshot.getString("name"));
-                                    user.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("name", documentSnapshot.getString("name"));
+                                user.put("image", documentSnapshot.getString("image"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
-                                    holder.name.setText(documentSnapshot.getString("name"));
+                                holder.name.setText(documentSnapshot.getString("name"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
 
-                                }else if (!documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername()) &&
-                                        !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                            }else if (!documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getUsername()) &&
+                                    !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("username", documentSnapshot.getString("username"));
-                                    user.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("username", documentSnapshot.getString("username"));
+                                user.put("image", documentSnapshot.getString("image"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("f" +
+                                                "riend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
-                                    holder.username.setText("@"+documentSnapshot.getString("username"));
+                                holder.username.setText("@"+documentSnapshot.getString("username"));
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
 
-                                } else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName())) {
+                            } else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("name", documentSnapshot.getString("name"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("name", documentSnapshot.getString("name"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
 
-                                    holder.name.setText(documentSnapshot.getString("name"));
+                                holder.name.setText(documentSnapshot.getString("name"));
 
-                                } else if (!documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                            } else if (!documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("image", documentSnapshot.getString("image"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("image", documentSnapshot.getString("image"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
 
-                                    Glide.with(context)
-                                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                            .load(documentSnapshot.getString("image"))
-                                            .into(holder.image);
+                                Glide.with(context)
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .load(documentSnapshot.getString("image"))
+                                        .into(holder.image);
 
-                                }else if (!documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getName())) {
+                            }else if (!documentSnapshot.getString("username").equals(usersList.get(holder.getAdapterPosition()).getName())) {
 
-                                    Map<String, Object> user = new HashMap<>();
-                                    user.put("username", documentSnapshot.getString("username"));
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("username", documentSnapshot.getString("username"));
 
-                                    FirebaseFirestore.getInstance().collection("Users")
-                                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .collection("Friends")
-                                            .document(usersList.get(holder.getAdapterPosition()).getId())
-                                            .update(user)
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.i("friend_update", "success");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.i("friend_update", "failure");
-                                                }
-                                            });
+                                FirebaseFirestore.getInstance().collection("Users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("Friends")
+                                        .document(usersList.get(holder.getAdapterPosition()).getId())
+                                        .update(user)
+                                        .addOnSuccessListener(aVoid -> Log.i("friend_update", "success"))
+                                        .addOnFailureListener(e -> Log.i("friend_update", "failure"));
 
 
-                                    holder.username.setText("@"+documentSnapshot.getString("username"));
+                                holder.username.setText("@"+documentSnapshot.getString("username"));
 
-                                }
-                            }catch (Exception ex){
-                                ex.printStackTrace();
                             }
+                        }catch (Exception ex){
+                            ex.printStackTrace();
                         }
                     });
 
@@ -369,7 +297,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
 
             mView=itemView;
             image=mView.findViewById(R.id.image);
-            username=(TextView)mView.findViewById(R.id.username);
+            username=mView.findViewById(R.id.username);
             name=mView.findViewById(R.id.name);
             viewBackground =mView.findViewById(R.id.view_background);
             viewForeground =mView.findViewById(R.id.view_foreground);

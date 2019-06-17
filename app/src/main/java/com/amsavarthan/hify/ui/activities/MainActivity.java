@@ -35,7 +35,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -64,12 +63,11 @@ import com.amsavarthan.hify.ui.fragment.About;
 import com.amsavarthan.hify.ui.fragment.FlashMessage;
 import com.amsavarthan.hify.ui.fragment.Forum;
 import com.amsavarthan.hify.ui.fragment.FriendsFragment;
-import com.amsavarthan.hify.ui.activities.notification.Notifications;
+import com.amsavarthan.hify.ui.activities.account.Notifications;
 import com.amsavarthan.hify.ui.fragment.ProfileFragment;
 import com.amsavarthan.hify.utils.Config;
 import com.amsavarthan.hify.utils.NetworkUtil;
 import com.amsavarthan.hify.utils.NotificationUtil;
-import com.amsavarthan.hify.utils.database.NotificationsHelper;
 import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -87,11 +85,8 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -102,11 +97,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.marcoscg.dialogsheet.DialogSheet;
-import com.mikepenz.aboutlibraries.Libs;
-import com.mikepenz.aboutlibraries.LibsBuilder;
-import com.mikepenz.aboutlibraries.LibsConfiguration;
-import com.mikepenz.aboutlibraries.entity.Library;
-import com.mikepenz.aboutlibraries.ui.LibsFragment;
 import com.tapadoo.alerter.Alerter;
 import com.yarolegovich.slidingrootnav.SlidingRootNav;
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder;
@@ -453,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
                     @Override
                     public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-
+                        token.continuePermissionRequest();
                     }
                 }).check();
 
@@ -674,7 +664,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         firestore.collection("Users").document(userId).update(tokenRemove).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                deleteAllnotifications();
                 userHelper.deleteContact(1);
                 mAuth.signOut();
                 LoginActivity.startActivityy(MainActivity.this);
@@ -689,13 +678,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 Log.e("Logout Error", e.getMessage());
             }
         });
-
-    }
-
-    private void deleteAllnotifications() {
-
-        NotificationsHelper notificationsHelper=new NotificationsHelper(this);
-        notificationsHelper.deleteAll();
 
     }
 
@@ -1280,11 +1262,11 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
             CircleImageView badge=badge_action.findViewById(R.id.badge);
 
-            if(!NotificationUtil.read){
+            /*if(!NotificationUtil.read){
                 badge.setVisibility(View.VISIBLE);
             }else{
                 badge.setVisibility(View.GONE);
-            }
+            }*/
 
         }
 

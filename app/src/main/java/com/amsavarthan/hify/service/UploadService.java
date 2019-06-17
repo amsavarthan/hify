@@ -246,8 +246,6 @@ public class UploadService extends Service {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        postMap.put("likes", "0");
-                        postMap.put("favourites", "0");
                         postMap.put("description",description);
                         postMap.put("color", "0");
 

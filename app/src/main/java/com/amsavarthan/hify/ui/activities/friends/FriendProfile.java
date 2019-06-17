@@ -323,29 +323,29 @@ public class FriendProfile extends AppCompatActivity {
             Bundle bundle = this.getArguments();
             if (bundle != null) {
                 id = bundle.getString("id");
-            }else{
-                Toasty.error(rootView.getContext(), "Error retrieving information.", Toasty.LENGTH_SHORT,true).show();
+            } else {
+                Toasty.error(rootView.getContext(), "Error retrieving information.", Toasty.LENGTH_SHORT, true).show();
                 getActivity().finish();
             }
 
             mFirestore = FirebaseFirestore.getInstance();
-            currentUser=FirebaseAuth.getInstance().getCurrentUser();
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-            profile_pic   = rootView.findViewById(R.id.profile_pic);
-            name          = rootView.findViewById(R.id.name);
-            username      = rootView.findViewById(R.id.username);
-            email         = rootView.findViewById(R.id.email);
-            location      = rootView.findViewById(R.id.location);
-            post          = rootView.findViewById(R.id.posts);
-            friend        = rootView.findViewById(R.id.friends);
-            bio           = rootView.findViewById(R.id.bio);
-            req_sent      = rootView.findViewById(R.id.friend_sent);
+            profile_pic = rootView.findViewById(R.id.profile_pic);
+            name = rootView.findViewById(R.id.name);
+            username = rootView.findViewById(R.id.username);
+            email = rootView.findViewById(R.id.email);
+            location = rootView.findViewById(R.id.location);
+            post = rootView.findViewById(R.id.posts);
+            friend = rootView.findViewById(R.id.friends);
+            bio = rootView.findViewById(R.id.bio);
+            req_sent = rootView.findViewById(R.id.friend_sent);
 
-            add_friend    = rootView.findViewById(R.id.friend_no);
+            add_friend = rootView.findViewById(R.id.friend_no);
             remove_friend = rootView.findViewById(R.id.friend_yes);
-            req_layout    = rootView.findViewById(R.id.friend_req);
-            accept        = rootView.findViewById(R.id.accept);
-            decline       = rootView.findViewById(R.id.decline);
+            req_layout = rootView.findViewById(R.id.friend_req);
+            accept = rootView.findViewById(R.id.accept);
+            decline = rootView.findViewById(R.id.decline);
 
             email.setVisibility(View.GONE);
             req_sent.setVisibility(View.VISIBLE);
@@ -364,12 +364,12 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                            friend_name  = documentSnapshot.getString("name");
+                            friend_name = documentSnapshot.getString("name");
                             friend_email = documentSnapshot.getString("email");
                             friend_image = documentSnapshot.getString("image");
                             friend_tokens = (List<String>) documentSnapshot.get("tokens");
 
-                            username.setText(String.format(Locale.ENGLISH,"@%s", documentSnapshot.getString("username")));
+                            username.setText(String.format(Locale.ENGLISH, "@%s", documentSnapshot.getString("username")));
                             name.setText(friend_name);
                             email.setText(friend_email);
                             location.setText(documentSnapshot.getString("location"));
@@ -393,10 +393,10 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                            if(documentSnapshot.exists()) {
+                            if (documentSnapshot.exists()) {
                                 req_sent.setVisibility(View.GONE);
                                 showRemoveButton();
-                            }else{
+                            } else {
 
                                 mFirestore.collection("Users")
                                         .document(id)
@@ -406,7 +406,7 @@ public class FriendProfile extends AppCompatActivity {
                                         .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                             @Override
                                             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                if(!documentSnapshot.exists()){
+                                                if (!documentSnapshot.exists()) {
 
                                                     mFirestore.collection("Users")
                                                             .document(currentUser.getUid())
@@ -416,10 +416,10 @@ public class FriendProfile extends AppCompatActivity {
                                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                                 @Override
                                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                                    if(documentSnapshot.exists()) {
+                                                                    if (documentSnapshot.exists()) {
                                                                         req_sent.setVisibility(View.GONE);
                                                                         showRequestLayout();
-                                                                    }else{
+                                                                    } else {
                                                                         req_sent.setVisibility(View.GONE);
                                                                         showAddButton();
                                                                     }
@@ -429,11 +429,11 @@ public class FriendProfile extends AppCompatActivity {
                                                             .addOnFailureListener(new OnFailureListener() {
                                                                 @Override
                                                                 public void onFailure(@NonNull Exception e) {
-                                                                    Log.w("error","fail",e);
+                                                                    Log.w("error", "fail", e);
                                                                 }
                                                             });
 
-                                                }else{
+                                                } else {
                                                     req_sent.setText("Friend request sent");
                                                     req_sent.setVisibility(View.VISIBLE);
                                                     req_sent.setAlpha(0.0f);
@@ -447,7 +447,7 @@ public class FriendProfile extends AppCompatActivity {
                                         }).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.w("error","fail",e);
+                                        Log.w("error", "fail", e);
                                     }
                                 });
 
@@ -458,7 +458,7 @@ public class FriendProfile extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.w("error","fail",e);
+                            Log.w("error", "fail", e);
                         }
                     });
 
@@ -471,22 +471,21 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(QuerySnapshot documentSnapshots) {
                             //Total Friends
-                            friend.setText(String.format(Locale.ENGLISH,"Total Friends : %d",documentSnapshots.size()));
+                            friend.setText(String.format(Locale.ENGLISH, "Total Friends : %d", documentSnapshots.size()));
                         }
                     });
 
             FirebaseFirestore.getInstance().collection("Posts")
-                    .whereEqualTo("userId",id)
+                    .whereEqualTo("userId", id)
                     .get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot querySnapshot) {
 
-                            post.setText(String.format(Locale.ENGLISH,"Total Posts : %d",querySnapshot.size()));
+                            post.setText(String.format(Locale.ENGLISH, "Total Posts : %d", querySnapshot.size()));
 
                         }
                     });
-
 
 
             return rootView;
@@ -528,7 +527,7 @@ public class FriendProfile extends AppCompatActivity {
                                     .setCancelable(true)
                                     .show());
 
-                       }
+                        }
 
 
                     }).start();
@@ -549,7 +548,7 @@ public class FriendProfile extends AppCompatActivity {
                             super.onAnimationEnd(animation);
                             add_friend.setOnClickListener(v -> new DialogSheet(rootView.getContext())
                                     .setTitle("Add Friend ")
-                                    .setMessage("Are you sure do you want to send friend request to " + friend_name +" ?")
+                                    .setMessage("Are you sure do you want to send friend request to " + friend_name + " ?")
                                     .setPositiveButton("Yes", v1 -> addFriend())
                                     .setNegativeButton("No", v12 -> {
 
@@ -633,16 +632,8 @@ public class FriendProfile extends AppCompatActivity {
                                                             final String email_c = documentSnapshot.getString("email");
                                                             final String id_c = documentSnapshot.getId();
                                                             String image_c = documentSnapshot.getString("image");
-                                                            //String token_c = documentSnapshot.getString("token_id");
-                                                            //String token_c = documentSnapshot.getString("token_id");
+                                                            String username_c = documentSnapshot.getString("username");
                                                             List<String> tokens_c = (List<String>) documentSnapshot.get("token_ids");
-
-
-
-
-
-
-
 
                                                             final Map<String, Object> currentuserInfo = new HashMap<>();
                                                             currentuserInfo.put("name", name_c);
@@ -661,7 +652,7 @@ public class FriendProfile extends AppCompatActivity {
                                                                         @Override
                                                                         public void onSuccess(Void aVoid) {
 
-                                                                               mFirestore.collection("Notifications")
+                                                                            mFirestore.collection("Notifications")
                                                                                     .document(id)
                                                                                     .collection("Accepted_Friend_Requests")
                                                                                     .document(email_c)
@@ -670,27 +661,19 @@ public class FriendProfile extends AppCompatActivity {
                                                                                         @Override
                                                                                         public void onSuccess(Void aVoid) {
 
-                                                                                            mDialog.dismiss();
-                                                                                            Toasty.success(rootView.getContext(), "Friend request accepted", Toasty.LENGTH_SHORT,true).show();
-
-                                                                                            req_layout.animate()
-                                                                                                    .alpha(0.0f)
-                                                                                                    .setDuration(200)
-                                                                                                    .setListener(new AnimatorListenerAdapter() {
-                                                                                                        @Override
-                                                                                                        public void onAnimationEnd(Animator animation) {
-                                                                                                            super.onAnimationEnd(animation);
-                                                                                                            req_layout.setVisibility(View.GONE);
-                                                                                                            showRemoveButton();
-                                                                                                        }
-                                                                                                    }).start();
+                                                                                            addToNotification(id,
+                                                                                                    id_c,
+                                                                                                    image_c,
+                                                                                                    username_c,
+                                                                                                    "Accepted your friend request",
+                                                                                                    "accept_friend_req");
 
                                                                                         }
                                                                                     })
                                                                                     .addOnFailureListener(new OnFailureListener() {
                                                                                         @Override
                                                                                         public void onFailure(@NonNull Exception e) {
-                                                                                            Log.e("Error",e.getMessage());
+                                                                                            Log.e("Error", e.getMessage());
                                                                                         }
                                                                                     });
 
@@ -742,7 +725,7 @@ public class FriendProfile extends AppCompatActivity {
                         .collection("Friend_Requests").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toasty.success(rootView.getContext(), "Friend request denied", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.success(rootView.getContext(), "Friend request denied", Toasty.LENGTH_SHORT, true).show();
 
                         req_layout.animate()
                                 .alpha(0.0f)
@@ -765,11 +748,11 @@ public class FriendProfile extends AppCompatActivity {
                 });
             } catch (Exception ex) {
                 Log.w("error", "fail", ex);
-                Toasty.error(rootView.getContext(), "Some technical error occurred while declining friend request, Try again later.", Toasty.LENGTH_SHORT,true).show();
+                Toasty.error(rootView.getContext(), "Some technical error occurred while declining friend request, Try again later.", Toasty.LENGTH_SHORT, true).show();
             }
         }
 
-        public void addFriend(){
+        public void addFriend() {
 
             FirebaseFirestore.getInstance()
                     .collection("Users")
@@ -816,7 +799,7 @@ public class FriendProfile extends AppCompatActivity {
                                                             }).start();
 
 
-                                                    Toasty.info(rootView.getContext(), "Friend request has been sent already", Toasty.LENGTH_SHORT,true).show();
+                                                    Toasty.info(rootView.getContext(), "Friend request has been sent already", Toasty.LENGTH_SHORT, true).show();
                                                 }
 
                                             }
@@ -829,10 +812,9 @@ public class FriendProfile extends AppCompatActivity {
         }
 
 
-
         private void executeFriendReq() {
 
-            final Map<String,Object> userMap = new HashMap<>();
+            final Map<String, Object> userMap = new HashMap<>();
 
             FirebaseFirestore.getInstance()
                     .collection("Users")
@@ -842,7 +824,7 @@ public class FriendProfile extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                            final String email=documentSnapshot.getString("email");
+                            final String email = documentSnapshot.getString("email");
 
                             userMap.put("name", documentSnapshot.getString("name"));
                             userMap.put("id", documentSnapshot.getString("id"));
@@ -874,32 +856,18 @@ public class FriendProfile extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
 
-                                                            req_sent.setText("Friend request sent");
-                                                            Toasty.success(rootView.getContext(), "Friend request sent.", Toasty.LENGTH_SHORT,true).show();
-
-                                                            add_friend.animate()
-                                                                    .alpha(0.0f)
-                                                                    .setDuration(200)
-                                                                    .setListener(new AnimatorListenerAdapter() {
-                                                                        @Override
-                                                                        public void onAnimationEnd(Animator animation) {
-                                                                            super.onAnimationEnd(animation);
-                                                                            add_friend.setVisibility(View.GONE);
-                                                                            req_sent.setVisibility(View.VISIBLE);
-                                                                            req_sent.setAlpha(0.0f);
-
-                                                                            req_sent.animate()
-                                                                                    .setDuration(200)
-                                                                                    .alpha(1.0f)
-                                                                                    .start();
-                                                                        }
-                                                                    }).start();
+                                                            addToNotification(id,
+                                                                    FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                                                    documentSnapshot.getString("image"),
+                                                                    documentSnapshot.getString("username"),
+                                                                    "Sent you friend request",
+                                                                    "friend_req");
 
                                                         }
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    Log.e("Error",e.getMessage());
+                                                    Log.e("Error", e.getMessage());
                                                 }
                                             });
 
@@ -908,7 +876,7 @@ public class FriendProfile extends AppCompatActivity {
                                     }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.e("Error",e.getMessage());
+                                    Log.e("Error", e.getMessage());
                                 }
                             });
 
@@ -917,7 +885,7 @@ public class FriendProfile extends AppCompatActivity {
 
         }
 
-        public void removeFriend(){
+        public void removeFriend() {
 
             mFirestore.collection("Users").document(currentUser.getUid())
                     .collection("Friends").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -933,7 +901,7 @@ public class FriendProfile extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Toasty.success(rootView.getContext(), "Friend removed successfully", Toasty.LENGTH_SHORT,true).show();
+                                    Toasty.success(rootView.getContext(), "Friend removed successfully", Toasty.LENGTH_SHORT, true).show();
 
                                     remove_friend.animate()
                                             .alpha(0.0f)
@@ -954,12 +922,75 @@ public class FriendProfile extends AppCompatActivity {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.e("Error",e.getMessage());
+                    Log.e("Error", e.getMessage());
                 }
             });
 
         }
 
-    }
+        private void addToNotification(String admin_id, String user_id, String profile, String username, String message, String type) {
 
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", user_id);
+            map.put("username", username);
+            map.put("image", profile);
+            map.put("message", message);
+            map.put("timestamp", String.valueOf(System.currentTimeMillis()));
+            map.put("type", type);
+            map.put("action_id", admin_id);
+
+            if (!admin_id.equals(user_id)) {
+
+                mFirestore.collection("Users")
+                        .document(admin_id)
+                        .collection("Info_Notifications")
+                        .add(map)
+                        .addOnSuccessListener(documentReference -> {
+
+                            if (type.equals("friend_req")) {
+                                req_sent.setText("Friend request sent");
+                                Toasty.success(rootView.getContext(), "Friend request sent.", Toasty.LENGTH_SHORT, true).show();
+
+                                add_friend.animate()
+                                        .alpha(0.0f)
+                                        .setDuration(200)
+                                        .setListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                super.onAnimationEnd(animation);
+                                                add_friend.setVisibility(View.GONE);
+                                                req_sent.setVisibility(View.VISIBLE);
+                                                req_sent.setAlpha(0.0f);
+
+                                                req_sent.animate()
+                                                        .setDuration(200)
+                                                        .alpha(1.0f)
+                                                        .start();
+                                            }
+                                        }).start();
+                            } else {
+                                mDialog.dismiss();
+                                Toasty.success(rootView.getContext(), "Friend request accepted", Toasty.LENGTH_SHORT, true).show();
+
+                                req_layout.animate()
+                                        .alpha(0.0f)
+                                        .setDuration(200)
+                                        .setListener(new AnimatorListenerAdapter() {
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                super.onAnimationEnd(animation);
+                                                req_layout.setVisibility(View.GONE);
+                                                showRemoveButton();
+                                            }
+                                        }).start();
+                            }
+
+                        })
+                        .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
+
+            }
+
+
+        }
+    }
 }

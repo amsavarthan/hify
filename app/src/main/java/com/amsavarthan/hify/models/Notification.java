@@ -1,14 +1,36 @@
 package com.amsavarthan.hify.models;
 
-public class Notification {
+public class Notification extends DocumentID{
 
-    private String image,title,body,timestamp;
+    private String id,username,image,message,timestamp,type,action_id;
 
-    public Notification(String image, String title, String body, String timestamp) {
+    public Notification() {
+    }
+
+    public Notification(String id, String username, String image, String message, String timestamp, String type, String action_id) {
+        this.id = id;
+        this.username = username;
         this.image = image;
-        this.title = title;
-        this.body = body;
+        this.message = message;
         this.timestamp = timestamp;
+        this.type = type;
+        this.action_id = action_id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getImage() {
@@ -19,20 +41,12 @@ public class Notification {
         this.image = image;
     }
 
-    public String getTitle() {
-        return title;
+    public String getMessage() {
+        return message;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getTimestamp() {
@@ -41,5 +55,21 @@ public class Notification {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getAction_id() {
+        return action_id;
+    }
+
+    public void setAction_id(String action_id) {
+        this.action_id = action_id;
     }
 }

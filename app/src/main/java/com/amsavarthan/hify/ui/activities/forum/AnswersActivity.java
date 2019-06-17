@@ -3,6 +3,7 @@ package com.amsavarthan.hify.ui.activities.forum;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.AnswersAdapter;
 import com.amsavarthan.hify.models.Answers;
+import com.amsavarthan.hify.ui.activities.post.CommentsActivity;
+import com.amsavarthan.hify.utils.database.UserHelper;
 import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -76,6 +79,34 @@ public class AnswersActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return super.onSupportNavigateUp();
+    }
+
+    private void addToNotification(String admin_id, String user_id, String profile, String username, String message, String question_id, String type, ProgressDialog mDialog){
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("id",user_id);
+        map.put("username",username);
+        map.put("image",profile);
+        map.put("message",message);
+        map.put("timestamp",String.valueOf(System.currentTimeMillis()));
+        map.put("type",type);
+        map.put("question_id",question_id);
+
+        if(!admin_id.equals(user_id)) {
+
+            mFirestore.collection("Users")
+                    .document(admin_id)
+                    .collection("Info_Notifications")
+                    .add(map)
+                    .addOnSuccessListener(documentReference -> {
+                        mDialog.dismiss();
+                        answer.setText("");
+                        Toasty.success(AnswersActivity.this, "Answer added", Toasty.LENGTH_SHORT, true).show();
+                        adapter.notifyDataSetChanged();
+                    })
+                    .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
+
+        }
     }
 
     @Override
@@ -260,10 +291,19 @@ public class AnswersActivity extends AppCompatActivity {
                                                        @Override
                                                        public void onSuccess(DocumentReference documentReference) {
 
-                                                           mDialog.dismiss();
-                                                           answer.setText("");
-                                                           Toasty.success(AnswersActivity.this,"Answer added",Toasty.LENGTH_SHORT,true).show();
-                                                           adapter.notifyDataSetChanged();
+                                                           UserHelper userHelper=new UserHelper(AnswersActivity.this);
+                                                           Cursor rs = userHelper.getData(1);
+                                                           rs.moveToFirst();
+
+                                                           String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                                                           String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
+
+                                                           if (!rs.isClosed()) {
+                                                               rs.close();
+                                                           }
+
+                                                           addToNotification(author_id,mCurrentUser.getUid(),image,username,"Answered to your question",doc_id,"forum",mDialog);
+
 
                                                        }
                                                    });

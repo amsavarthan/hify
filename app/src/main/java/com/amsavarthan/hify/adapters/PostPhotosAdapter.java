@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -30,12 +31,14 @@ import com.amsavarthan.hify.models.MultipleImage;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreview;
 import com.amsavarthan.hify.ui.activities.notification.ImagePreviewSave;
 import com.amsavarthan.hify.ui.views.HifyImageView;
+import com.amsavarthan.hify.utils.database.UserHelper;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.yalantis.ucrop.UCrop;
 
@@ -58,12 +61,12 @@ public class PostPhotosAdapter extends PagerAdapter {
     private Context context;
     private File compressedFile;
     private Activity activity;
-    private String postId;
+    private String postId,adminId;
     private static final DecelerateInterpolator DECCELERATE_INTERPOLATOR = new DecelerateInterpolator();
     private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator();
     private MaterialFavoriteButton like_btn;
 
-    public PostPhotosAdapter(Context context, Activity activity, ArrayList<MultipleImage> IMAGES, boolean local, String postId, MaterialFavoriteButton like_btn) {
+    public PostPhotosAdapter(Context context, Activity activity, ArrayList<MultipleImage> IMAGES, boolean local, String postId, MaterialFavoriteButton like_btn,String adminId) {
         this.context = context;
         this.IMAGES =IMAGES;
         this.local=local;
@@ -71,6 +74,7 @@ public class PostPhotosAdapter extends PagerAdapter {
         inflater = LayoutInflater.from(context);
         this.postId=postId;
         this.like_btn=like_btn;
+        this.adminId=adminId;
     }
 
     @Override
@@ -134,35 +138,80 @@ public class PostPhotosAdapter extends PagerAdapter {
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+
                 Map<String, Object> likeMap = new HashMap<>();
-                likeMap.put("liked", true);
+                likeMap.put("liked_users", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                FirebaseFirestore.getInstance().collection("Posts")
+                        .document(postId)
+                        .update(likeMap)
+                        .addOnSuccessListener(aVoid -> {
 
-                try {
+                            UserHelper userHelper=new UserHelper(context);
+                            Cursor rs = userHelper.getData(1);
+                            rs.moveToFirst();
 
-                    FirebaseFirestore.getInstance().collection("Posts")
-                            .document(postId)
-                            .collection("Liked_Users")
-                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .set(likeMap)
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.i("post", "liked");
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.e("Error like", e.getMessage());
-                                }
-                            });
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                            String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                            String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
+
+                            if (!rs.isClosed()) {
+                                rs.close();
+                            }
+
+                            addToNotification(adminId,
+                                    FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                    image,
+                                    username,
+                                    "Liked your post",
+                                    postId,
+                                    "like");
+
+                        })
+                        .addOnFailureListener(e -> Log.e("Error like", e.getMessage()));
 
             }
         });
         animatorSet.start();
+
+    }
+
+    private void addToNotification(String admin_id,String user_id,String profile,String username,String message,String post_id,String type){
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("id",user_id);
+        map.put("username",username);
+        map.put("image",profile);
+        map.put("message",message);
+        map.put("timestamp",String.valueOf(System.currentTimeMillis()));
+        map.put("type",type);
+        map.put("action_id",post_id);
+
+        if (!admin_id.equals(user_id)) {
+
+            FirebaseFirestore.getInstance().collection("Users")
+                    .document(admin_id)
+                    .collection("Info_Notifications")
+                    .whereEqualTo("id",user_id)
+                    .whereEqualTo("action_id",post_id)
+                    .whereEqualTo("type",type)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                        if(queryDocumentSnapshots.isEmpty()){
+
+                            FirebaseFirestore.getInstance().collection("Users")
+                                    .document(admin_id)
+                                    .collection("Info_Notifications")
+                                    .add(map)
+                                    .addOnSuccessListener(documentReference -> {
+                                    })
+                                    .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
+
+                        }
+
+                    })
+                    .addOnFailureListener(Throwable::printStackTrace);
+
+        }
 
     }
 
@@ -218,12 +267,7 @@ public class PostPhotosAdapter extends PagerAdapter {
             }
             );
 
-            imageView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return detector.onTouchEvent(event);
-                }
-            });
+            imageView.setOnTouchListener((v, event) -> detector.onTouchEvent(event));
 
 
             Glide.with(context)

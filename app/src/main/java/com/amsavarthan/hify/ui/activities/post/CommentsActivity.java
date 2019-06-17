@@ -108,6 +108,20 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
+
+                        UserHelper userHelper=new UserHelper(CommentsActivity.this);
+                        Cursor rs = userHelper.getData(1);
+                        rs.moveToFirst();
+
+                        String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                        String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
+
+                        if (!rs.isClosed()) {
+                            rs.close();
+                        }
+
+                        addToNotification(user_id,mCurrentUser.getUid(),image,username,"Commented on your post",post_id,"comment");
+
                         Log.i("Comment Message","success");
                     }
                 })
@@ -118,6 +132,32 @@ public class CommentsActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void addToNotification(String admin_id,String user_id,String profile,String username,String message,String post_id,String type){
+
+        Map<String,Object> map=new HashMap<>();
+        map.put("id",user_id);
+        map.put("username",username);
+        map.put("image",profile);
+        map.put("message",message);
+        map.put("timestamp",String.valueOf(System.currentTimeMillis()));
+        map.put("type",type);
+        map.put("action_id",post_id);
+
+        if (!admin_id.equals(user_id)) {
+
+
+            mFirestore.collection("Users")
+                    .document(admin_id)
+                    .collection("Info_Notifications")
+                    .add(map)
+                    .addOnSuccessListener(documentReference -> {
+
+                    })
+                    .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
+
+        }
     }
 
     @Override

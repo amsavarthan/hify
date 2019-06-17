@@ -78,128 +78,91 @@ public class FriendRequestAdapter extends RecyclerView.Adapter<FriendRequestAdap
             FirebaseFirestore.getInstance().collection("Users")
                     .document(usersList.get(position).userId)
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    .addOnSuccessListener(documentSnapshot -> {
 
-                            final String mCurrentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        final String mCurrentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                            if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
-                                    !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                        if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName()) &&
+                                !documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                holder.mBar.setVisibility(View.VISIBLE);
-                                Map<String, Object> user = new HashMap<>();
-                                user.put("name", documentSnapshot.getString("name"));
-                                user.put("image", documentSnapshot.getString("image"));
+                            holder.mBar.setVisibility(View.VISIBLE);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("name", documentSnapshot.getString("name"));
+                            user.put("image", documentSnapshot.getString("image"));
 
-                                FirebaseFirestore.getInstance()
-                                        .collection("Users")
-                                        .document(mCurrentId)
-                                        .collection("Friend_Requests")
-                                        .document(documentSnapshot.getString("id"))
-                                        .update(user)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.i("friend_req_update", "success");
-                                                holder.mBar.setVisibility(View.GONE);
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.i("friend_req_update", "failure");
-                                            }
-                                        });
+                            FirebaseFirestore.getInstance()
+                                    .collection("Users")
+                                    .document(mCurrentId)
+                                    .collection("Friend_Requests")
+                                    .document(documentSnapshot.getString("id"))
+                                    .update(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.i("friend_req_update", "success");
+                                        holder.mBar.setVisibility(View.GONE);
+                                    })
+                                    .addOnFailureListener(e -> Log.i("friend_req_update", "failure"));
 
-                                holder.name.setText(documentSnapshot.getString("name"));
+                            holder.name.setText(documentSnapshot.getString("name"));
 
-                                Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                        .load(documentSnapshot.getString("image"))
-                                        .into(holder.image);
+                            Glide.with(context)
+                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                    .load(documentSnapshot.getString("image"))
+                                    .into(holder.image);
 
 
-                            } else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName())) {
+                        } else if (!documentSnapshot.getString("name").equals(usersList.get(holder.getAdapterPosition()).getName())) {
 
-                                holder.mBar.setVisibility(View.VISIBLE);
-                                Map<String, Object> user = new HashMap<>();
-                                user.put("name", documentSnapshot.getString("name"));
+                            holder.mBar.setVisibility(View.VISIBLE);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("name", documentSnapshot.getString("name"));
 
-                                FirebaseFirestore.getInstance()
-                                        .collection("Users")
-                                        .document(mCurrentId)
-                                        .collection("Friend_Requests")
-                                        .document(documentSnapshot.getString("id"))
-                                        .update(user)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.i("friend_req_update", "success");
-                                                holder.mBar.setVisibility(View.GONE);
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.i("friend_req_update", "failure");
-                                            }
-                                        });
+                            FirebaseFirestore.getInstance()
+                                    .collection("Users")
+                                    .document(mCurrentId)
+                                    .collection("Friend_Requests")
+                                    .document(documentSnapshot.getString("id"))
+                                    .update(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.i("friend_req_update", "success");
+                                        holder.mBar.setVisibility(View.GONE);
+                                    })
+                                    .addOnFailureListener(e -> Log.i("friend_req_update", "failure"));
 
 
-                                holder.name.setText(documentSnapshot.getString("name"));
+                            holder.name.setText(documentSnapshot.getString("name"));
 
-                            } else if (!documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
+                        } else if (!documentSnapshot.getString("image").equals(usersList.get(holder.getAdapterPosition()).getImage())) {
 
-                                holder.mBar.setVisibility(View.VISIBLE);
-                                Map<String, Object> user = new HashMap<>();
-                                user.put("image", documentSnapshot.getString("image"));
+                            holder.mBar.setVisibility(View.VISIBLE);
+                            Map<String, Object> user = new HashMap<>();
+                            user.put("image", documentSnapshot.getString("image"));
 
-                                FirebaseFirestore.getInstance()
-                                        .collection("Users")
-                                        .document(mCurrentId)
-                                        .collection("Friend_Requests")
-                                        .document(documentSnapshot.getString("id"))
-                                        .update(user)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                Log.i("friend_req_update", "success");
-                                                holder.mBar.setVisibility(View.GONE);
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.i("friend_req_update", "failure");
-                                            }
-                                        });
+                            FirebaseFirestore.getInstance()
+                                    .collection("Users")
+                                    .document(mCurrentId)
+                                    .collection("Friend_Requests")
+                                    .document(documentSnapshot.getString("id"))
+                                    .update(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.i("friend_req_update", "success");
+                                        holder.mBar.setVisibility(View.GONE);
+                                    })
+                                    .addOnFailureListener(e -> Log.i("friend_req_update", "failure"));
 
 
-                                Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                        .load(documentSnapshot.getString("image"))
-                                        .into(holder.image);
-
-                            }
+                            Glide.with(context)
+                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                    .load(documentSnapshot.getString("image"))
+                                    .into(holder.image);
 
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e("Error", e.getMessage());
-                }
-            });
+
+                    }).addOnFailureListener(e -> Log.e("Error", e.getMessage()));
         }catch (Exception ex){
             Log.w("error","fastscrolled",ex);
         }
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendProfile.startActivity(context,usersList.get(holder.getAdapterPosition()).userId);
-            }
-        });
+        holder.mView.setOnClickListener(view -> FriendProfile.startActivity(context,usersList.get(holder.getAdapterPosition()).userId));
 
     }
 

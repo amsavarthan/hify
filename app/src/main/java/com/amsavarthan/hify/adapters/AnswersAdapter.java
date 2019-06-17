@@ -80,61 +80,40 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
         FirebaseFirestore.getInstance().collection("Users")
                 .document(answer.getUser_id())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                        if(!documentSnapshot.getString("name").equals(answer.getName())){
+                .addOnSuccessListener(documentSnapshot -> {
+                    if(!documentSnapshot.getString("name").equals(answer.getName())){
 
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("name", documentSnapshot.getString("name"));
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("name", documentSnapshot.getString("name"));
 
-                            FirebaseFirestore.getInstance().collection("Answers")
-                                    .document(answer.Answers_doc_id)
-                                    .update(map)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            holder.name.setText(documentSnapshot.getString("name"));
-                                        }
-                                    });
-
-                        }
+                        FirebaseFirestore.getInstance().collection("Answers")
+                                .document(answer.Answers_doc_id)
+                                .update(map)
+                                .addOnSuccessListener(aVoid -> holder.name.setText(documentSnapshot.getString("name")));
 
                     }
+
                 });
 
         FirebaseFirestore.getInstance().collection("Users")
                 .document(answer.getUser_id())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        Glide.with(context)
-                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                                .load(documentSnapshot.getString("image"))
-                                .into(holder.profile_pic);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                .addOnSuccessListener(documentSnapshot -> Glide.with(context)
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .load(documentSnapshot.getString("image"))
+                        .into(holder.profile_pic))
+                .addOnFailureListener(e -> e.printStackTrace());
 
         FirebaseFirestore.getInstance().collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if(answer.getName().equals(documentSnapshot.getString("name"))){
-                            holder.name.setText("You");
-                            if(answer.getIs_answer().equals("Yes")) {
-                                holder.delete.setVisibility(View.GONE);
-                            }else{
-                                holder.delete.setVisibility(View.VISIBLE);
-                            }
+                .addOnSuccessListener(documentSnapshot -> {
+                    if(answer.getName().equals(documentSnapshot.getString("name"))){
+                        holder.name.setText("You");
+                        if(answer.getIs_answer().equals("Yes")) {
+                            holder.delete.setVisibility(View.GONE);
+                        }else{
+                            holder.delete.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -174,280 +153,200 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
         }
 
 
-        holder.mrk_ans.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.mrk_ans.setOnClickListener(v -> new MaterialDialog.Builder(context)
+                .title("Mark as Answer")
+                .content("Are you sure do you want to mark it as answer?")
+                .positiveText("Yes")
+                .negativeText("No")
+                .onPositive((dialog, which) -> {
 
-                new MaterialDialog.Builder(context)
-                        .title("Mark as Answer")
-                        .content("Are you sure do you want to mark it as answer?")
-                        .positiveText("Yes")
-                        .negativeText("No")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                    dialog.dismiss();
+                    final ProgressDialog mDialog=new ProgressDialog(context);
+                    mDialog.setMessage("Marking as answer....");
+                    mDialog.setIndeterminate(true);
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
 
-                                dialog.dismiss();
-                                final ProgressDialog mDialog=new ProgressDialog(context);
-                                mDialog.setMessage("Marking as answer....");
-                                mDialog.setIndeterminate(true);
-                                mDialog.setCancelable(false);
-                                mDialog.setCanceledOnTouchOutside(false);
-                                mDialog.show();
+                    FirebaseFirestore.getInstance().collection("Questions")
+                            .document(doc_id)
+                            .get()
+                            .addOnSuccessListener(documentSnapshot -> {
 
-                                FirebaseFirestore.getInstance().collection("Questions")
-                                        .document(doc_id)
-                                        .get()
-                                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                try {
+                                    if (TextUtils.isEmpty(documentSnapshot.getString("answered_by"))) {
 
-                                                try {
-                                                    if (TextUtils.isEmpty(documentSnapshot.getString("answered_by"))) {
+                                        Map<String, Object> map1 = new HashMap<>();
+                                        map1.put("is_answer", "Yes");
 
-                                                        Map<String, Object> map1 = new HashMap<>();
-                                                        map1.put("is_answer", "Yes");
+                                        FirebaseFirestore.getInstance()
+                                               .collection("Answers")
+                                                .document(answer.Answers_doc_id)
+                                                .update(map1)
+                                                .addOnSuccessListener(aVoid -> {
 
-                                                        FirebaseFirestore.getInstance()
-                                                               .collection("Answers")
-                                                                .document(answer.Answers_doc_id)
-                                                                .update(map1)
-                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                    @Override
-                                                                    public void onSuccess(Void aVoid) {
+                                                    Map<String, Object> map2 = new HashMap<>();
+                                                    map2.put("answered_by", answer.getName());
+                                                    map2.put("answered_by_id", answer.getUser_id());
 
-                                                                        Map<String, Object> map2 = new HashMap<>();
-                                                                        map2.put("answered_by", answer.getName());
-                                                                        map2.put("answered_by_id", answer.getUser_id());
+                                                    FirebaseFirestore.getInstance()
+                                                            .collection("Questions")
+                                                            .document(answer.getQuestion_id())
+                                                            .update(map2)
+                                                            .addOnSuccessListener(aVoid1 -> {
 
-                                                                        FirebaseFirestore.getInstance()
-                                                                                .collection("Questions")
-                                                                                .document(answer.getQuestion_id())
-                                                                                .update(map2)
-                                                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onSuccess(Void aVoid) {
+                                                                Map<String, Object> notificationMap = new HashMap<>();
+                                                                notificationMap.put("answered_user_id",answer.getUser_id());
+                                                                notificationMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
+                                                                notificationMap.put("question_id",answer.getQuestion_id());
 
-                                                                                        Map<String, Object> notificationMap = new HashMap<>();
-                                                                                        notificationMap.put("answered_user_id",answer.getUser_id());
-                                                                                        notificationMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
-                                                                                        notificationMap.put("question_id",answer.getQuestion_id());
+                                                                FirebaseFirestore.getInstance()
+                                                                        .collection("Marked_Notifications")
+                                                                        .add(notificationMap)
+                                                                        .addOnSuccessListener(documentReference -> {
 
-                                                                                        FirebaseFirestore.getInstance()
-                                                                                                .collection("Marked_Notifications")
-                                                                                                .add(notificationMap)
-                                                                                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                                                                    @Override
-                                                                                                    public void onSuccess(DocumentReference documentReference) {
+                                                                            holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
+                                                                            holder.mrk_ans.setVisibility(View.GONE);
+                                                                            holder.unmrk_ans.setVisibility(View.VISIBLE);
+                                                                            mDialog.dismiss();
+                                                                            Toasty.success(context, "Marked as answer", Toasty.LENGTH_SHORT,true).show();
 
+                                                                        });
 
-                                                                                                        holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
-                                                                                                        holder.mrk_ans.setVisibility(View.GONE);
-                                                                                                        holder.unmrk_ans.setVisibility(View.VISIBLE);
-                                                                                                        mDialog.dismiss();
-                                                                                                        Toasty.success(context, "Marked as answer", Toasty.LENGTH_SHORT,true).show();
-                                                                                                        //notifyDataSetChanged();
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                mDialog.dismiss();
+                                                                Log.e("Error", e.getLocalizedMessage());
+                                                                Toasty.error(context, "Error marking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                                            });
 
-
-                                                                                                    }
-                                                                                                });
-
-                                                                                    }
-                                                                                })
-                                                                                .addOnFailureListener(new OnFailureListener() {
-                                                                                    @Override
-                                                                                    public void onFailure(@NonNull Exception e) {
-                                                                                        mDialog.dismiss();
-                                                                                        Log.e("Error", e.getLocalizedMessage());
-                                                                                        Toasty.error(context, "Error marking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                                                                    }
-                                                                                });
-
-                                                                    }
-                                                                })
-                                                                .addOnFailureListener(new OnFailureListener() {
-                                                                    @Override
-                                                                    public void onFailure(@NonNull Exception e) {
-                                                                        mDialog.dismiss();
-                                                                        Log.e("Error", e.getLocalizedMessage());
-                                                                        Toasty.error(context, "Error marking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                                                    }
-                                                                });
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    mDialog.dismiss();
+                                                    Log.e("Error", e.getLocalizedMessage());
+                                                    Toasty.error(context, "Error marking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                                });
 
 
-                                                    } else {
+                                    } else {
 
-                                                        Toasty.info(context, "Cannot mark more than one answer as correct.", Toasty.LENGTH_SHORT,true).show();
+                                        Toasty.info(context, "Cannot mark more than one answer as correct.", Toasty.LENGTH_SHORT,true).show();
 
-                                                    }
-                                                }catch (Exception e){
-                                                    e.printStackTrace();
-                                                }
+                                    }
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
 
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                mDialog.dismiss();
-                                                Log.e("Error",e.getLocalizedMessage());
-                                                Toasty.error(context, "Error marking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                            }
-                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                mDialog.dismiss();
+                                Log.e("Error",e.getLocalizedMessage());
+                                Toasty.error(context, "Error marking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                            });
 
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-            }
-        });
+                })
+                .onNegative((dialog, which) -> dialog.dismiss()).show());
 
-        holder.unmrk_ans.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new MaterialDialog.Builder(context)
-                        .title("Unmark as Answer")
-                        .content("Are you sure do you want to unmark it as answer?")
-                        .positiveText("Yes")
-                        .negativeText("No")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+        holder.unmrk_ans.setOnClickListener(v -> new MaterialDialog.Builder(context)
+                .title("Unmark as Answer")
+                .content("Are you sure do you want to unmark it as answer?")
+                .positiveText("Yes")
+                .negativeText("No")
+                .onPositive((dialog, which) -> {
 
-                                dialog.dismiss();
-                                final ProgressDialog mDialog=new ProgressDialog(context);
-                                mDialog.setMessage("Unmarking as answer....");
-                                mDialog.setIndeterminate(true);
-                                mDialog.setCancelable(false);
-                                mDialog.setCanceledOnTouchOutside(false);
-                                mDialog.show();
+                    dialog.dismiss();
+                    final ProgressDialog mDialog=new ProgressDialog(context);
+                    mDialog.setMessage("Unmarking as answer....");
+                    mDialog.setIndeterminate(true);
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
 
-                                Map<String,Object> map1=new HashMap<>();
-                                map1.put("is_answer","No");
+                    Map<String,Object> map1=new HashMap<>();
+                    map1.put("is_answer","No");
+
+                    FirebaseFirestore.getInstance()
+                            .collection("Answers")
+                            .document(answer.Answers_doc_id)
+                            .update(map1)
+                            .addOnSuccessListener(aVoid -> {
+
+                                Map<String,Object> map2=new HashMap<>();
+                                map2.put("answered_by","");
+                                map2.put("answered_by_id","");
 
                                 FirebaseFirestore.getInstance()
-                                        .collection("Answers")
-                                        .document(answer.Answers_doc_id)
-                                        .update(map1)
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
+                                        .collection("Questions")
+                                        .document(answer.getQuestion_id())
+                                        .update(map2)
+                                        .addOnSuccessListener(aVoid12 -> {
+                                            mDialog.dismiss();
+                                            notifyItemChanged(holder.getAdapterPosition());
+                                            Toasty.success(context, "Unmarked as answer", Toasty.LENGTH_SHORT,true).show();
+                                            notifyDataSetChanged();
 
-                                                Map<String,Object> map2=new HashMap<>();
-                                                map2.put("answered_by","");
-                                                map2.put("answered_by_id","");
+                                            holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.black_bottom));
+                                            holder.unmrk_ans.setVisibility(View.GONE);
+                                            holder.mrk_ans.setVisibility(View.VISIBLE);
 
-                                                FirebaseFirestore.getInstance()
-                                                        .collection("Questions")
-                                                        .document(answer.getQuestion_id())
-                                                        .update(map2)
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                mDialog.dismiss();
-                                                                notifyItemChanged(holder.getAdapterPosition());
-                                                                Toasty.success(context, "Unmarked as answer", Toasty.LENGTH_SHORT,true).show();
-                                                                notifyDataSetChanged();
-
-                                                                holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.black_bottom));
-                                                                holder.unmrk_ans.setVisibility(View.GONE);
-                                                                holder.mrk_ans.setVisibility(View.VISIBLE);
-
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-                                                                mDialog.dismiss();
-                                                                Log.e("Error",e.getLocalizedMessage());
-                                                                Toasty.error(context, "Error unmarking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                                            }
-                                                        });
-
-                                            }
                                         })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                mDialog.dismiss();
-                                                Log.e("Error",e.getLocalizedMessage());
-                                                Toasty.error(context, "Error unmarking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                            }
+                                        .addOnFailureListener(e -> {
+                                            mDialog.dismiss();
+                                            Log.e("Error",e.getLocalizedMessage());
+                                            Toasty.error(context, "Error unmarking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
                                         });
 
+                            })
+                            .addOnFailureListener(e -> {
+                                mDialog.dismiss();
+                                Log.e("Error",e.getLocalizedMessage());
+                                Toasty.error(context, "Error unmarking as answer: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                            });
 
 
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                dialog.dismiss();
-                            }
-                        }).show();
-            }
-        });
+
+                })
+                .onNegative((dialog, which) -> dialog.dismiss()).show());
 
         if(owner_id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
+            holder.itemView.setOnLongClickListener(v -> {
 
-                    new MaterialDialog.Builder(context)
-                            .title("Delete")
-                            .content("Are you sure do you want to delete it?")
-                            .positiveText("Yes")
-                            .negativeText("No")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                new MaterialDialog.Builder(context)
+                        .title("Delete")
+                        .content("Are you sure do you want to delete it?")
+                        .positiveText("Yes")
+                        .negativeText("No")
+                        .onPositive((dialog, which) -> {
 
-                                    dialog.dismiss();
-                                    final ProgressDialog mDialog = new ProgressDialog(context);
-                                    mDialog.setMessage("Please wait....");
-                                    mDialog.setIndeterminate(true);
-                                    mDialog.setCancelable(false);
-                                    mDialog.setCanceledOnTouchOutside(false);
-                                    mDialog.show();
-
-                                    FirebaseFirestore.getInstance()
-                                            .collection("Answers")
-                                            .document(answer.Answers_doc_id)
-                                            .delete()
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    mDialog.dismiss();
-                                                    answereds.remove(holder.getAdapterPosition());
-                                                    notifyItemRemoved(holder.getAdapterPosition());
-                                                    notifyDataSetChanged();
-                                                    Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
-
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    mDialog.dismiss();
-                                                    Log.e("Error",e.getLocalizedMessage());
-                                                    Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                                }
-                                            });
-                                }
-                            }).onNegative(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             dialog.dismiss();
-                        }
-                    }).show();
+                            final ProgressDialog mDialog = new ProgressDialog(context);
+                            mDialog.setMessage("Please wait....");
+                            mDialog.setIndeterminate(true);
+                            mDialog.setCancelable(false);
+                            mDialog.setCanceledOnTouchOutside(false);
+                            mDialog.show();
+
+                            FirebaseFirestore.getInstance()
+                                    .collection("Answers")
+                                    .document(answer.Answers_doc_id)
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        mDialog.dismiss();
+                                        answereds.remove(holder.getAdapterPosition());
+                                        notifyItemRemoved(holder.getAdapterPosition());
+                                        notifyDataSetChanged();
+                                        Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        mDialog.dismiss();
+                                        Log.e("Error",e.getLocalizedMessage());
+                                        Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                    });
+                        }).onNegative((dialog, which) -> dialog.dismiss()).show();
 
 
-                    return true;
-                }
+                return true;
             });
         }
     }
