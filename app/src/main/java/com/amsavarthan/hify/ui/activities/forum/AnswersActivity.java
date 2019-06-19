@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.adapters.AnswersAdapter;
@@ -65,6 +66,8 @@ public class AnswersActivity extends AppCompatActivity {
     AnswersAdapter adapter;
     List<Answers> answers=new ArrayList<>();
     private String answered_by;
+    private Toolbar toolbar;
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -90,7 +93,7 @@ public class AnswersActivity extends AppCompatActivity {
         map.put("message",message);
         map.put("timestamp",String.valueOf(System.currentTimeMillis()));
         map.put("type",type);
-        map.put("question_id",question_id);
+        map.put("action_id",question_id);
 
         if(!admin_id.equals(user_id)) {
 
@@ -101,11 +104,18 @@ public class AnswersActivity extends AppCompatActivity {
                     .addOnSuccessListener(documentReference -> {
                         mDialog.dismiss();
                         answer.setText("");
+                        getAnswers();
                         Toasty.success(AnswersActivity.this, "Answer added", Toasty.LENGTH_SHORT, true).show();
                         adapter.notifyDataSetChanged();
                     })
                     .addOnFailureListener(e -> Log.e("Error", e.getLocalizedMessage()));
 
+        }else{
+            mDialog.dismiss();
+            answer.setText("");
+            getAnswers();
+            Toasty.success(AnswersActivity.this, "Answer added", Toasty.LENGTH_SHORT, true).show();
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -123,7 +133,7 @@ public class AnswersActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_answers);
 
-        Toolbar toolbar=findViewById(R.id.toolbar);
+        toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Forum");
 
@@ -134,6 +144,7 @@ public class AnswersActivity extends AppCompatActivity {
         mFirestore=FirebaseFirestore.getInstance();
         mCurrentUser= FirebaseAuth.getInstance().getCurrentUser();
         mRecyclerView=findViewById(R.id.recyclerView);
+        refreshLayout=findViewById(R.id.refreshLayout);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -144,35 +155,35 @@ public class AnswersActivity extends AppCompatActivity {
             mFirestore.collection("Questions")
                     .document(getIntent().getStringExtra("question_id"))
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    .addOnSuccessListener(documentSnapshot -> {
+
+                        if(documentSnapshot.exists()) {
+
                             author_id = documentSnapshot.getString("id");
                             author = documentSnapshot.getString("name");
                             doc_id = documentSnapshot.getId();
                             timestamp = documentSnapshot.getString("timestamp");
-                            answered_by = documentSnapshot.getString("id");
+                            try {
+                                answered_by = documentSnapshot.getString("answered_by");
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
                             question = documentSnapshot.getString("question");
-                            Log.i(TAG,"timestamp: "+timestamp);
+                            setupUI();
+
+                        }else{
+
+                            Toasty.error(getApplicationContext(),"The question has been deleted",Toasty.LENGTH_LONG,true).show();
+                            finish();
+
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-
-        }else{
-
-            author_id=getIntent().getStringExtra("user_id");
-            author=getIntent().getStringExtra("author");
-            doc_id=getIntent().getStringExtra("doc_id");
-            timestamp=getIntent().getStringExtra("timestamp");
-            answered_by=getIntent().getStringExtra("answered_by");
-            question=getIntent().getStringExtra("question");
-
+                    .addOnFailureListener(Throwable::printStackTrace);
         }
+
+    }
+
+    private void setupUI(){
 
         adapter=new AnswersAdapter(answers,author_id, doc_id, "Questions", answered_by);
         mRecyclerView.setAdapter(adapter);
@@ -182,11 +193,13 @@ public class AnswersActivity extends AppCompatActivity {
         answer=findViewById(R.id.answer);
 
         question_textview.setText(question);
-        
+
         author_textview.setText(String.format("Asked by %s ( %s )", author, TimeAgo.using(Long.parseLong(timestamp))));
         toolbar.setSubtitle("Asked by " + author + " ( " + TimeAgo.using(Long.parseLong(timestamp)) + " )");
         getSupportActionBar().setSubtitle("Asked by " + author + " ( " + TimeAgo.using(Long.parseLong(timestamp)) + " )");
-        
+
+        /*
+
         mFirestore.collection("Questions")
                 .document(doc_id)
                 .get()
@@ -205,12 +218,19 @@ public class AnswersActivity extends AppCompatActivity {
                         Log.e("error",e.getLocalizedMessage());
                     }
                 });
+        */
+
+        refreshLayout.setOnRefreshListener(this::getAnswers);
 
         getAnswers();
 
     }
 
     private void getAnswers() {
+
+        answers.clear();
+        refreshLayout.setRefreshing(true);
+        findViewById(R.id.default_item).setVisibility(View.GONE);
 
         mFirestore.collection("Answers")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -220,17 +240,22 @@ public class AnswersActivity extends AppCompatActivity {
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
 
                         if(e!=null){
+                            refreshLayout.setRefreshing(false);
                             Log.e(TAG,e.getLocalizedMessage());
                             return;
                         }
 
-                        for(DocumentChange doc:queryDocumentSnapshots.getDocumentChanges()){
+                        if(queryDocumentSnapshots.isEmpty()){
+                            refreshLayout.setRefreshing(false);
+                            findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                        }else{
+                            for(DocumentChange doc:queryDocumentSnapshots.getDocumentChanges()) {
 
-                            if(doc.getType()== DocumentChange.Type.ADDED){
+                                if (doc.getType() == DocumentChange.Type.ADDED) {
 
-
+                                    refreshLayout.setRefreshing(false);
                                     Answers answer = doc.getDocument().toObject(Answers.class).withId(doc.getDocument().getId());
-                                    if (!TextUtils.isEmpty(doc.getDocument().getString("is_answer"))) {
+                                    if (doc.getDocument().getString("is_answer").toLowerCase().equals("yes")) {
                                         answers.add(0, answer);
                                     } else {
                                         answers.add(answer);
@@ -238,9 +263,9 @@ public class AnswersActivity extends AppCompatActivity {
                                     adapter.notifyDataSetChanged();
 
 
-                            }
+                                }
 
-                        
+                            }
                         }
 
                     }
@@ -257,76 +282,76 @@ public class AnswersActivity extends AppCompatActivity {
             mDialog.setCancelable(false);
             mDialog.show();
 
-           mFirestore.collection("Users")
-                   .document(mCurrentUser.getUid())
-                   .get()
-                   .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                       @Override
-                       public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                           Map<String,Object> answerMap=new HashMap<>();
-                           answerMap.put("user_id",documentSnapshot.getString("id"));
-                           answerMap.put("name",documentSnapshot.getString("name"));
-                           answerMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
-                           answerMap.put("answer",answer.getText().toString());
-						   answerMap.put("question_id",doc_id);
-                           answerMap.put("is_answer","no");
-                           answerMap.put("answered_by", "");
-                           answerMap.put("answered_by_id", "");
+            mFirestore.collection("Users")
+                    .document(mCurrentUser.getUid())
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(final DocumentSnapshot documentSnapshot) {
+                            Map<String,Object> answerMap=new HashMap<>();
+                            answerMap.put("user_id",documentSnapshot.getString("id"));
+                            answerMap.put("name",documentSnapshot.getString("name"));
+                            answerMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
+                            answerMap.put("answer",answer.getText().toString());
+                            answerMap.put("question_id",doc_id);
+                            answerMap.put("is_answer","no");
+                            answerMap.put("answered_by", "");
+                            answerMap.put("answered_by_id", "");
 
-                           mFirestore.collection("Answers")
-                                   .add(answerMap)
-                                   .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                       @Override
-                                       public void onSuccess(DocumentReference documentReference) {
+                            mFirestore.collection("Answers")
+                                    .add(answerMap)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
 
-                                           Map<String, Object> notificationMap = new HashMap<>();
-                                           notificationMap.put("answered_user_id",documentSnapshot.getString("id"));
-                                           notificationMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
-                                           notificationMap.put("question_id",doc_id);
+                                            Map<String, Object> notificationMap = new HashMap<>();
+                                            notificationMap.put("answered_user_id",documentSnapshot.getString("id"));
+                                            notificationMap.put("timestamp",String.valueOf(System.currentTimeMillis()));
+                                            notificationMap.put("question_id",doc_id);
 
-                                           FirebaseFirestore.getInstance()
-                                                   .collection("Answered_Notifications")
-                                                   .add(notificationMap)
-                                                   .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                                       @Override
-                                                       public void onSuccess(DocumentReference documentReference) {
+                                            FirebaseFirestore.getInstance()
+                                                    .collection("Answered_Notifications")
+                                                    .add(notificationMap)
+                                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentReference documentReference) {
 
-                                                           UserHelper userHelper=new UserHelper(AnswersActivity.this);
-                                                           Cursor rs = userHelper.getData(1);
-                                                           rs.moveToFirst();
+                                                            UserHelper userHelper=new UserHelper(AnswersActivity.this);
+                                                            Cursor rs = userHelper.getData(1);
+                                                            rs.moveToFirst();
 
-                                                           String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
-                                                           String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
+                                                            String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                                                            String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
 
-                                                           if (!rs.isClosed()) {
-                                                               rs.close();
-                                                           }
+                                                            if (!rs.isClosed()) {
+                                                                rs.close();
+                                                            }
 
-                                                           addToNotification(author_id,mCurrentUser.getUid(),image,username,"Answered to your question",doc_id,"forum",mDialog);
-
-
-                                                       }
-                                                   });
+                                                            addToNotification(author_id,mCurrentUser.getUid(),image,username,"Answered to your question",doc_id,"forum",mDialog);
 
 
-                                       }
-                                   })
-                                   .addOnFailureListener(new OnFailureListener() {
-                                       @Override
-                                       public void onFailure(@NonNull Exception e) {
-                                           mDialog.dismiss();
-                                           Log.e(TAG,e.getLocalizedMessage());
-                                       }
-                                   });
-                       }
-                   })
-                   .addOnFailureListener(new OnFailureListener() {
-                       @Override
-                       public void onFailure(@NonNull Exception e) {
-                           mDialog.dismiss();
-                           Log.e(TAG,e.getLocalizedMessage());
-                       }
-                   });
+                                                        }
+                                                    });
+
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            mDialog.dismiss();
+                                            Log.e(TAG,e.getLocalizedMessage());
+                                        }
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            mDialog.dismiss();
+                            Log.e(TAG,e.getLocalizedMessage());
+                        }
+                    });
         }
     }
 }

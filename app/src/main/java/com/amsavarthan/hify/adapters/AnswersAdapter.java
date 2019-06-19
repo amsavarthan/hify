@@ -110,7 +110,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                 .addOnSuccessListener(documentSnapshot -> {
                     if(answer.getName().equals(documentSnapshot.getString("name"))){
                         holder.name.setText("You");
-                        if(answer.getIs_answer().equals("Yes")) {
+                        if(answer.getIs_answer().equals("yes")) {
                             holder.delete.setVisibility(View.GONE);
                         }else{
                             holder.delete.setVisibility(View.VISIBLE);
@@ -126,7 +126,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
             holder.unmrk_ans.setVisibility(View.GONE);
         }
 
-        if(answer.getIs_answer().equals("Yes")){
+        if(answer.getIs_answer().equals("yes")){
             holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
             if(owner_id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                 holder.mrk_ans.setVisibility(View.GONE);
@@ -152,7 +152,6 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
             }
         }
 
-
         holder.mrk_ans.setOnClickListener(v -> new MaterialDialog.Builder(context)
                 .title("Mark as Answer")
                 .content("Are you sure do you want to mark it as answer?")
@@ -177,7 +176,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                                     if (TextUtils.isEmpty(documentSnapshot.getString("answered_by"))) {
 
                                         Map<String, Object> map1 = new HashMap<>();
-                                        map1.put("is_answer", "Yes");
+                                        map1.put("is_answer", "yes");
 
                                         FirebaseFirestore.getInstance()
                                                .collection("Answers")
@@ -194,6 +193,8 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                                                             .document(answer.getQuestion_id())
                                                             .update(map2)
                                                             .addOnSuccessListener(aVoid1 -> {
+
+                                                                answered_by=answer.getName();
 
                                                                 Map<String, Object> notificationMap = new HashMap<>();
                                                                 notificationMap.put("answered_user_id",answer.getUser_id());
@@ -230,10 +231,12 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
 
                                     } else {
 
+                                        mDialog.dismiss();
                                         Toasty.info(context, "Cannot mark more than one answer as correct.", Toasty.LENGTH_SHORT,true).show();
 
                                     }
                                 }catch (Exception e){
+                                    mDialog.dismiss();
                                     e.printStackTrace();
                                 }
 
@@ -263,7 +266,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                     mDialog.show();
 
                     Map<String,Object> map1=new HashMap<>();
-                    map1.put("is_answer","No");
+                    map1.put("is_answer","no");
 
                     FirebaseFirestore.getInstance()
                             .collection("Answers")
@@ -280,6 +283,8 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                                         .document(answer.getQuestion_id())
                                         .update(map2)
                                         .addOnSuccessListener(aVoid12 -> {
+
+                                            answered_by="";
                                             mDialog.dismiss();
                                             notifyItemChanged(holder.getAdapterPosition());
                                             Toasty.success(context, "Unmarked as answer", Toasty.LENGTH_SHORT,true).show();
@@ -308,7 +313,100 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                 })
                 .onNegative((dialog, which) -> dialog.dismiss()).show());
 
+        holder.delete.setOnClickListener(v ->
+                new MaterialDialog.Builder(context)
+                .title("Delete")
+                .content("Are you sure do you want to delete it?")
+                .positiveText("Yes")
+                .negativeText("No")
+                .onPositive((dialog, which) -> {
+
+                    dialog.dismiss();
+                    final ProgressDialog mDialog = new ProgressDialog(context);
+                    mDialog.setMessage("Please wait....");
+                    mDialog.setIndeterminate(true);
+                    mDialog.setCancelable(false);
+                    mDialog.setCanceledOnTouchOutside(false);
+                    mDialog.show();
+
+                    if(!TextUtils.isEmpty(answered_by)) {
+
+                        Map<String, Object> map1 = new HashMap<>();
+                        map1.put("is_answer", "no");
+
+                        FirebaseFirestore.getInstance()
+                                .collection("Answers")
+                                .document(answer.Answers_doc_id)
+                                .update(map1)
+                                .addOnSuccessListener(aVoid -> {
+
+                                    Map<String, Object> map2 = new HashMap<>();
+                                    map2.put("answered_by", "");
+                                    map2.put("answered_by_id", "");
+
+                                    FirebaseFirestore.getInstance()
+                                            .collection("Questions")
+                                            .document(answer.getQuestion_id())
+                                            .update(map2)
+                                            .addOnSuccessListener(aVoid12 -> {
+                                                FirebaseFirestore.getInstance()
+                                                        .collection("Answers")
+                                                        .document(answer.Answers_doc_id)
+                                                        .delete()
+                                                        .addOnSuccessListener(aVoid1 -> {
+                                                            mDialog.dismiss();
+                                                            answereds.remove(holder.getAdapterPosition());
+                                                            notifyDataSetChanged();
+                                                            Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            mDialog.dismiss();
+                                                            Log.e("Error",e.getLocalizedMessage());
+                                                            Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                                        });
+
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                mDialog.dismiss();
+                                                Log.e("Error", e.getLocalizedMessage());
+                                                Toasty.error(context, "Error unmarking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT, true).show();
+                                            });
+
+                                })
+                                .addOnFailureListener(e -> {
+                                    mDialog.dismiss();
+                                    Log.e("Error", e.getLocalizedMessage());
+                                    Toasty.error(context, "Error unmarking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT, true).show();
+                                });
+
+
+                    }else{
+
+                        FirebaseFirestore.getInstance()
+                                .collection("Answers")
+                                .document(answer.Answers_doc_id)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    mDialog.dismiss();
+                                    answereds.remove(holder.getAdapterPosition());
+                                    notifyDataSetChanged();
+                                    Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+
+                                })
+                                .addOnFailureListener(e -> {
+                                    mDialog.dismiss();
+                                    Log.e("Error",e.getLocalizedMessage());
+                                    Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                });
+
+                    }
+
+                })
+                .onNegative((dialog, which) -> dialog.dismiss()).show());
+
         if(owner_id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
             holder.itemView.setOnLongClickListener(v -> {
 
                 new MaterialDialog.Builder(context)
@@ -326,28 +424,84 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                             mDialog.setCanceledOnTouchOutside(false);
                             mDialog.show();
 
-                            FirebaseFirestore.getInstance()
-                                    .collection("Answers")
-                                    .document(answer.Answers_doc_id)
-                                    .delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        mDialog.dismiss();
-                                        answereds.remove(holder.getAdapterPosition());
-                                        notifyItemRemoved(holder.getAdapterPosition());
-                                        notifyDataSetChanged();
-                                        Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+                            if(!TextUtils.isEmpty(answered_by)) {
 
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        mDialog.dismiss();
-                                        Log.e("Error",e.getLocalizedMessage());
-                                        Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
-                                    });
+                                Map<String, Object> map1 = new HashMap<>();
+                                map1.put("is_answer", "no");
+
+                                FirebaseFirestore.getInstance()
+                                        .collection("Answers")
+                                        .document(answer.Answers_doc_id)
+                                        .update(map1)
+                                        .addOnSuccessListener(aVoid -> {
+
+                                            Map<String, Object> map2 = new HashMap<>();
+                                            map2.put("answered_by", "");
+                                            map2.put("answered_by_id", "");
+
+                                            FirebaseFirestore.getInstance()
+                                                    .collection("Questions")
+                                                    .document(answer.getQuestion_id())
+                                                    .update(map2)
+                                                    .addOnSuccessListener(aVoid12 -> {
+                                                        FirebaseFirestore.getInstance()
+                                                                .collection("Answers")
+                                                                .document(answer.Answers_doc_id)
+                                                                .delete()
+                                                                .addOnSuccessListener(aVoid1 -> {
+                                                                    mDialog.dismiss();
+                                                                    answereds.remove(holder.getAdapterPosition());
+                                                                    notifyDataSetChanged();
+                                                                    Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    mDialog.dismiss();
+                                                                    Log.e("Error",e.getLocalizedMessage());
+                                                                    Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                                                });
+
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        mDialog.dismiss();
+                                                        Log.e("Error", e.getLocalizedMessage());
+                                                        Toasty.error(context, "Error unmarking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT, true).show();
+                                                    });
+
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            mDialog.dismiss();
+                                            Log.e("Error", e.getLocalizedMessage());
+                                            Toasty.error(context, "Error unmarking as answer: " + e.getLocalizedMessage(), Toasty.LENGTH_SHORT, true).show();
+                                        });
+
+
+                            }else{
+
+                                FirebaseFirestore.getInstance()
+                                        .collection("Answers")
+                                        .document(answer.Answers_doc_id)
+                                        .delete()
+                                        .addOnSuccessListener(aVoid -> {
+                                            mDialog.dismiss();
+                                            answereds.remove(holder.getAdapterPosition());
+                                            notifyDataSetChanged();
+                                            Toasty.success(context, "Deleted", Toasty.LENGTH_SHORT,true).show();
+
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            mDialog.dismiss();
+                                            Log.e("Error",e.getLocalizedMessage());
+                                            Toasty.error(context, "Error deleting: "+e.getLocalizedMessage(), Toasty.LENGTH_SHORT,true).show();
+                                        });
+
+                            }
+
                         }).onNegative((dialog, which) -> dialog.dismiss()).show();
-
 
                 return true;
             });
+
         }
     }
 

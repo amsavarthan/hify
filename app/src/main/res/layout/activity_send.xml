@@ -122,6 +122,7 @@
                        android:layout_height="wrap_content"
                        android:background="@drawable/round_background"
                        android:onClick="shareLocation"
+                       android:visibility="gone"
                        android:text=" Share location "
                        android:padding="10dp"
                        />

@@ -16,13 +16,6 @@ public class NetworkUtil {
     public static int TYPE_NOT_CONNECTED = 0;
     public static final int NETWORK_STATUS_NOT_CONNECTED=0,NETWORK_STAUS_WIFI=1,NETWORK_STATUS_MOBILE=2;
 
-    public static boolean isNetworkAvailable() {
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) MainActivity.getApplicationInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return connectivityManager.getActiveNetworkInfo() != null
-                && connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
 
     public static int getConnectivityStatus(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

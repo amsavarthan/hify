@@ -84,7 +84,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
                             mDialog.show();
 
                             FirebaseFirestore.getInstance().collection("Questions")
-                                    .document(allQuestionsModels.get(holder.getAdapterPosition()).question_doc_id)
+                                    .document(allQuestionsModel.question_doc_id)
                                     .delete().addOnSuccessListener(aVoid -> {
                                         mDialog.dismiss();
                                         allQuestionsModels.remove(holder.getAdapterPosition());
@@ -117,17 +117,17 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
         holder.author.setText(String.format(" %s ", allQuestionsModel.getName()));
 
         FirebaseFirestore.getInstance().collection("Users")
-                .document(allQuestionsModels.get(holder.getAdapterPosition()).getId())
+                .document(allQuestionsModel.getId())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     try {
-                        if (!documentSnapshot.getString("name").equals(allQuestionsModels.get(holder.getAdapterPosition()).getName())) {
+                        if (!documentSnapshot.getString("name").equals(allQuestionsModel.getName())) {
 
                             Map<String, Object> map = new HashMap<>();
                             map.put("name", documentSnapshot.getString("name"));
 
                             FirebaseFirestore.getInstance().collection("Answers")
-                                    .document(allQuestionsModels.get(holder.getAdapterPosition()).question_doc_id)
+                                    .document(allQuestionsModel.question_doc_id)
                                     .update(map)
                                     .addOnSuccessListener(aVoid -> holder.author.setText(String.format(" %s ", documentSnapshot.getString("name"))));
 
@@ -137,13 +137,15 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
                     }
                 });
 
-        holder.item.setOnClickListener(v -> context.startActivity(new Intent(context, AnswersActivity.class)
+        /*holder.item.setOnClickListener(v -> context.startActivity(new Intent(context, AnswersActivity.class)
                 .putExtra("answered_by", allQuestionsModels.get(holder.getAdapterPosition()).getAnswered_by())
                 .putExtra("user_id", allQuestionsModels.get(holder.getAdapterPosition()).getId())
                 .putExtra("doc_id", allQuestionsModels.get(holder.getAdapterPosition()).question_doc_id)
                 .putExtra("author", allQuestionsModels.get(holder.getAdapterPosition()).getName())
                 .putExtra("question", allQuestionsModels.get(holder.getAdapterPosition()).getQuestion())
-                .putExtra("timestamp", allQuestionsModels.get(holder.getAdapterPosition()).getTimestamp())));
+                .putExtra("timestamp", allQuestionsModels.get(holder.getAdapterPosition()).getTimestamp())));*/
+
+        holder.item.setOnClickListener(v -> AnswersActivity.startActivity(context,allQuestionsModel.question_doc_id));
 
     }
 

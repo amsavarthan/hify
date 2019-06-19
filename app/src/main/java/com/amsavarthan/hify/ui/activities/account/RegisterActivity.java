@@ -144,7 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
         location = findViewById(R.id.location);
         username = findViewById(R.id.username);
 
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        /*LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         Location location1 = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
         Geocoder geocoder=new Geocoder(getBaseContext(), Locale.getDefault());
@@ -157,7 +157,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Please wait..");

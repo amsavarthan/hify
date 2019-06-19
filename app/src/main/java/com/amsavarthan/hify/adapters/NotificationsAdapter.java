@@ -2,6 +2,7 @@ package com.amsavarthan.hify.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.amsavarthan.hify.ui.activities.friends.FriendProfile;
 import com.amsavarthan.hify.ui.activities.post.SinglePostView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -72,6 +74,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         holder.title.setText(notification.getUsername());
         holder.body.setText(notification.getMessage());
+        holder.timestamp.setText(TimeAgo.using(Long.parseLong(notification.getTimestamp())));
 
         if(notification.getType().equals("like")){
             holder.type_image.setImageResource(R.drawable.ic_favorite_red_24dp);
@@ -144,7 +147,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         private View mView;
         private CircleImageView image;
         private ImageView type_image;
-        private TextView title,body;
+        private TextView title,body,timestamp;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -154,6 +157,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             type_image = mView.findViewById(R.id.type_image);
             title = mView.findViewById(R.id.title);
             body = mView.findViewById(R.id.body);
+            timestamp=mView.findViewById(R.id.timestamp);
 
         }
     }

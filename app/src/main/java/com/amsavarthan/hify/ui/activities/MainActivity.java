@@ -180,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private List<Images> imagesList=new ArrayList<>();
     private boolean validate;
     public static MenuItem add_post;
+    private TextView badge_count;
 
     public static void startActivity(Context context) {
         Intent intent=new Intent(context,MainActivity.class);
@@ -1230,10 +1231,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    public static MainActivity getApplicationInstance(){
-        return activity;
-    }
-
     public void onViewProfileClicked(View view) {
 
         toolbar.setTitle("My Profile");
@@ -1258,17 +1255,31 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         MenuItem notification=menu.findItem(R.id.action_notifications);
         View badge_action=notification.getActionView();
 
-        if(badge_action!=null){
+        badge_count=badge_action.findViewById(R.id.badge);
 
-            CircleImageView badge=badge_action.findViewById(R.id.badge);
+        badge_action.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(notification);
+                badge_count.setVisibility(View.GONE);
+            }
+        });
 
-            /*if(!NotificationUtil.read){
-                badge.setVisibility(View.VISIBLE);
-            }else{
-                badge.setVisibility(View.GONE);
-            }*/
+        int count=getSharedPreferences("Notifications",MODE_PRIVATE).getInt("count",0);
 
-        }
+        FirebaseFirestore.getInstance().collection("Users")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .collection("Info_Notifications")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(queryDocumentSnapshots.size()>count){
+                        badge_count.setVisibility(View.VISIBLE);
+                        badge_count.setText(String.valueOf(queryDocumentSnapshots.size()-count));
+                    }else{
+                        badge_count.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
 
         if(mStateForum){
             add_question.setVisible(true);

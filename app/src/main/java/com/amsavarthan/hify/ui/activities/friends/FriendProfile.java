@@ -937,7 +937,7 @@ public class FriendProfile extends AppCompatActivity {
             map.put("message", message);
             map.put("timestamp", String.valueOf(System.currentTimeMillis()));
             map.put("type", type);
-            map.put("action_id", admin_id);
+            map.put("action_id", user_id);
 
             if (!admin_id.equals(user_id)) {
 

@@ -5,7 +5,7 @@
         android:id="@+id/action_notifications"
         android:icon="@drawable/alerter_ic_notifications"
         android:title="Notifications"
-        android:actionLayout="@layout/custom_notification_icon"
+        app:actionLayout="@layout/custom_notification_icon"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_new"

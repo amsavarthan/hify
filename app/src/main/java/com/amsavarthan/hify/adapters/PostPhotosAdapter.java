@@ -132,12 +132,51 @@ public class PostPhotosAdapter extends PagerAdapter {
             @Override
             public void onAnimationEnd(Animator animation) {
                 resetLikeAnimationState(vBgLike,ivLike);
-                like_btn.setFavorite(true,true);
             }
 
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
+                like_btn.setFavorite(true,true);
+
+                Map<String, Object> likeMap = new HashMap<>();
+                likeMap.put("liked", true);
+
+                try {
+
+                    FirebaseFirestore.getInstance().collection("Posts")
+                            .document(postId)
+                            .collection("Liked_Users")
+                            .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .set(likeMap)
+                            .addOnSuccessListener(aVoid -> {
+
+                                UserHelper userHelper=new UserHelper(context);
+                                Cursor rs = userHelper.getData(1);
+                                rs.moveToFirst();
+
+                                String image = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_IMAGE));
+                                String username = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_USERNAME));
+
+                                if (!rs.isClosed()) {
+                                    rs.close();
+                                }
+
+                                addToNotification(adminId,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                        image,
+                                        username,
+                                        "Liked your post",
+                                        postId,
+                                        "like");
+
+                            })
+                            .addOnFailureListener(e -> Log.e("Error like", e.getMessage()));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                /*region new method, for desc check above getLikeandFav in PostsAdapter.java
 
                 Map<String, Object> likeMap = new HashMap<>();
                 likeMap.put("liked_users", FieldValue.arrayUnion(FirebaseAuth.getInstance().getCurrentUser().getUid()));
@@ -165,8 +204,10 @@ public class PostPhotosAdapter extends PagerAdapter {
                                     postId,
                                     "like");
 
+
                         })
                         .addOnFailureListener(e -> Log.e("Error like", e.getMessage()));
+                        */
 
             }
         });

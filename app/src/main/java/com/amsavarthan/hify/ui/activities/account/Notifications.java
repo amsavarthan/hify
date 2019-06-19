@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.marcoscg.dialogsheet.DialogSheet;
 
@@ -59,44 +60,41 @@ public class Notifications extends AppCompatActivity {
         FirebaseFirestore.getInstance().collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("Info_Notifications")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                        if(!queryDocumentSnapshots.isEmpty()){
+                    getSharedPreferences("Notifications",MODE_PRIVATE).edit().putInt("count",queryDocumentSnapshots.size()).apply();
 
-                            for(DocumentChange documentChange:queryDocumentSnapshots.getDocumentChanges()){
+                    if(!queryDocumentSnapshots.isEmpty()){
 
-                                if(documentChange.getType()== DocumentChange.Type.ADDED){
+                        for(DocumentChange documentChange:queryDocumentSnapshots.getDocumentChanges()){
 
-                                    refreshLayout.setRefreshing(false);
-                                    Notification notification=documentChange.getDocument().toObject(Notification.class).withId(documentChange.getDocument().getId());
-                                    notificationsList.add(notification);
-                                    notificationsAdapter.notifyDataSetChanged();
+                            if(documentChange.getType()== DocumentChange.Type.ADDED){
 
-                                }
-
-                            }
-
-                            if(notificationsList.size()==0){
                                 refreshLayout.setRefreshing(false);
-                                findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                Notification notification=documentChange.getDocument().toObject(Notification.class).withId(documentChange.getDocument().getId());
+                                notificationsList.add(notification);
+                                notificationsAdapter.notifyDataSetChanged();
+
                             }
 
-                        }else{
+                        }
+
+                        if(notificationsList.size()==0){
                             refreshLayout.setRefreshing(false);
                             findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                    }else{
                         refreshLayout.setRefreshing(false);
-                        e.printStackTrace();
+                        findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                     }
+
+                })
+                .addOnFailureListener(e -> {
+                    refreshLayout.setRefreshing(false);
+                    e.printStackTrace();
                 });
 
     }

@@ -16,16 +16,19 @@ import androidx.cardview.widget.CardView;
 
 import com.amsavarthan.hify.R;
 import com.amsavarthan.hify.ui.activities.MainActivity;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.marcoscg.dialogsheet.DialogSheet;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.amsavarthan.hify.ui.activities.MainActivity.add_post;
 import static com.amsavarthan.hify.ui.activities.MainActivity.showFragment;
 import static com.amsavarthan.hify.ui.activities.MainActivity.toolbar;
@@ -37,24 +40,23 @@ import static com.amsavarthan.hify.ui.activities.MainActivity.toolbar;
 public class Dashboard extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener,
         BottomNavigationView.OnNavigationItemReselectedListener{
 
-    View mView;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_dashboard, container, false);
-        return mView;
+       return inflater.inflate(R.layout.frag_dashboard, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        BottomNavigationView bottomNavigationView=view.findViewById(R.id.bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemReselectedListener(this);
 
         loadfragment(new Home());
+        checkforNotifications();
         checkFriendRequest();
 
     }
@@ -99,76 +101,74 @@ public class Dashboard extends Fragment implements BottomNavigationView.OnNaviga
     private CardView request_alert;
     private TextView request_alert_text;
 
+    private void checkforNotifications(){
+
+
+
+    }
+
     private void checkFriendRequest(){
 
-        request_alert=mView.findViewById(R.id.friend_req_alert);
-        request_alert_text=mView.findViewById(R.id.friend_req_alert_text);
+        request_alert=getView().findViewById(R.id.friend_req_alert);
+        request_alert_text=getView().findViewById(R.id.friend_req_alert_text);
 
         FirebaseFirestore.getInstance().collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("Friend_Requests")
-                .addSnapshotListener(getActivity(),new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                .addSnapshotListener(getActivity(), (queryDocumentSnapshots, e) -> {
 
-                        if(e!=null){
-                            e.printStackTrace();
-                            return;
-                        }
-
-                        if(!queryDocumentSnapshots.isEmpty()){
-                            try {
-                                request_alert_text.setText(String.format(getString(R.string.you_have_d_new_friend_request_s), queryDocumentSnapshots.size()));
-                                request_alert.setVisibility(View.VISIBLE);
-                                request_alert.setAlpha(0.0f);
-
-                                request_alert.animate()
-                                        .setDuration(300)
-                                        .scaleX(1.0f)
-                                        .scaleY(1.0f)
-                                        .alpha(1.0f)
-                                        .start();
-
-                                request_alert.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
-                                            toolbar.setTitle("Manage Friends");
-                                            try {
-                                                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Manage Friends");
-                                            } catch (Exception e) {
-                                                Log.e("Error", e.getMessage());
-                                            }
-                                            showFragment(FriendsFragment.newInstance("request"));
-                                        } else {
-                                            showDialog();
-                                        }
-                                    }
-                                });
-                            }catch (Exception e1){
-                                e1.printStackTrace();
-                            }
-                        }
-
+                    if(e!=null){
+                        e.printStackTrace();
+                        return;
                     }
+
+                    if(!queryDocumentSnapshots.isEmpty()){
+                        try {
+                            request_alert_text.setText(String.format(getString(R.string.you_have_d_new_friend_request_s), queryDocumentSnapshots.size()));
+                            request_alert.setVisibility(View.VISIBLE);
+                            request_alert.setAlpha(0.0f);
+
+                            request_alert.animate()
+                                    .setDuration(300)
+                                    .scaleX(1.0f)
+                                    .scaleY(1.0f)
+                                    .alpha(1.0f)
+                                    .start();
+
+                            request_alert.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                                        toolbar.setTitle("Manage Friends");
+                                        try {
+                                            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Manage Friends");
+                                        } catch (Exception e) {
+                                            Log.e("Error", e.getMessage());
+                                        }
+                                        showFragment(FriendsFragment.newInstance("request"));
+                                    } else {
+                                        showDialog();
+                                    }
+                                }
+                            });
+                        }catch (Exception e1){
+                            e1.printStackTrace();
+                        }
+                    }
+
                 });
 
     }
 
     public void showDialog(){
 
-        new DialogSheet(mView.getContext())
+        new DialogSheet(getView().getContext())
                 .setTitle("Information")
                 .setMessage("Email has not been verified, please verify and continue. If you have verified we recommend you to logout and login again")
                 .setPositiveButton("Send again", v -> FirebaseAuth.getInstance().getCurrentUser().sendEmailVerification()
-                        .addOnSuccessListener(aVoid -> Toasty.success(mView.getContext(), "Verification email sent", Toasty.LENGTH_SHORT,true).show())
+                        .addOnSuccessListener(aVoid -> Toasty.success(getView().getContext(), "Verification email sent", Toasty.LENGTH_SHORT,true).show())
                         .addOnFailureListener(e -> Log.e("Error", e.getMessage())))
-                .setNegativeButton("Ok", new DialogSheet.OnNegativeClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                })
+                .setNegativeButton("Ok", v -> { })
                 .setCancelable(true)
                 .setRoundedCorners(true)
                 .setColoredNavigationBar(true)

@@ -24,7 +24,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
-        android:background="#0088ce"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -38,12 +37,10 @@
                 android:layout_height="match_parent">
 
                 <FrameLayout
-                    android:background="#b1e5fb"
                     android:layout_width="match_parent"
                     android:layout_height="168dp"/>
 
                 <FrameLayout
-                    android:background="#0088ce"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
 
@@ -55,8 +52,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
+                <com.amsavarthan.hify.ui.views.HifyImageView
                     android:src="@mipmap/add_question"
+                    android:scaleType="centerCrop"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -65,17 +63,14 @@
                     android:hint="Enter question here"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    app:boxStrokeColor="@color/white"
                     android:paddingStart="10dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_marginBottom="10dp"
-                    android:textColorHint="@color/white"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <EditText
                         android:id="@+id/question"
-                        android:textColor="@color/white"
                         android:inputType="textCapSentences"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
@@ -85,7 +80,6 @@
                 <TextView
                     android:text="Subject"
                     android:padding="10dp"
-                    android:textColor="@color/white"
                     android:layout_marginEnd="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_width="match_parent"
@@ -104,7 +98,7 @@
                     android:layout_margin="16dp"
                     android:onClick="sendQuestion"
                     android:padding="16dp"
-                    app:backgroundTint="@color/white"
+                    android:tint="@color/white"
                     android:src="@drawable/ic_send_blue_24dp"
                     android:layout_height="wrap_content" />
 
