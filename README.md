@@ -53,26 +53,20 @@ Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
 <table>
 
   <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/mobile_reg.png"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/mobile_reg2.png"> </td>
+    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583121990.png"> </td>
+    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583127717.png"> </td>
   </tr>
   
   <tr>
-        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/dashboard.png"> </td>
-        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/news.png"> </td>
+        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583134324.png"> </td>
+        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583139083.png"> </td>
   </tr>
   
    <tr>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/text_post.png"> </td>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/post_reg.png"> </td>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583139083.png"> </td>
+         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561585283943.png"> </td>
     </tr>
     
-   <tr>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/friends.png"> </td>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/message.png"> </td>
-   </tr>
-  
- 
 </table>
 
 ## Developer
