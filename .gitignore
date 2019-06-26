@@ -9,3 +9,8 @@
 .externalNativeBuild
 app/google-services.json
 *.apk
+*.aab
+*.db
+*.db
+*.ser
+*.ser
