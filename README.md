@@ -13,7 +13,7 @@ Just a social app. This app is mostly completed but some bugs would be there.
 **google-services.json file has been deleted for security reasons. Place your google-services.json in /app folder**
 
 <p align="left">
-<a href="https://play.google.com/store/apps/details?id=com.amsavarthan.social.hify"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg"></a>
+<a href="https://play.google.com/store/apps/details?id=com.amsavarthan.social.hify"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg" width="30%"></a>
 </p>
 
 ## Available feautres
