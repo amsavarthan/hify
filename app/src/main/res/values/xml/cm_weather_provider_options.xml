@@ -11,4 +11,4 @@
      limitations under the License.
 -->
 <weather-provider-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.amsavarthan.hify.ui.extras.Weather.ui.activity.SettingsActivity" />
+    android:settingsActivity="com.amsavarthan.social.hify.ui.extras.Weather.ui.activity.SettingsActivity" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.amsavarthan.hify">
+    package="com.amsavarthan.social.hify">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -90,7 +90,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGETNOTIFICATION" />
+                <action android:name="com.amsavarthan.social.hify.TARGETNOTIFICATION" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -100,7 +100,7 @@
             android:excludeFromRecents="true"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGETNOTIFICATIONREPLY" />
+                <action android:name="com.amsavarthan.social.hify.TARGETNOTIFICATIONREPLY" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -118,7 +118,7 @@
             android:excludeFromRecents="true"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGETNOTIFICATION_IMAGE" />
+                <action android:name="com.amsavarthan.social.hify.TARGETNOTIFICATION_IMAGE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -128,7 +128,7 @@
             android:excludeFromRecents="true"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGETNOTIFICATIONREPLY_IMAGE" />
+                <action android:name="com.amsavarthan.social.hify.TARGETNOTIFICATIONREPLY_IMAGE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -146,7 +146,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_COMMENT" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_COMMENT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -164,7 +164,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_FRIENDREQUEST" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_FRIENDREQUEST" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -174,7 +174,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/UpdateAppTheme">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_UPDATE" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_UPDATE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -183,7 +183,7 @@
             android:name=".ui.activities.post.SinglePostView"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_LIKE" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_LIKE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -198,7 +198,7 @@
             android:name=".ui.activities.forum.AnswersActivity"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_FORUM" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_FORUM" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -210,7 +210,7 @@
             android:screenOrientation="portrait"
             >
             <intent-filter>
-                <action android:name="com.amsavarthan.hify.TARGET_FESTIVAL" />
+                <action android:name="com.amsavarthan.social.hify.TARGET_FESTIVAL" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

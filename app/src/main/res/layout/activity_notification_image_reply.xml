@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.amsavarthan.hify.ui.views.HifyImageView
+                <com.amsavarthan.social.hify.ui.views.HifyImageView
                     android:id="@+id/messageImage"
                     android:layout_width="match_parent"
                     android:layout_height="360dp"

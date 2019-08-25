@@ -21,7 +21,7 @@
     <string name="extras">Extras</string>
 
     <!-- app. -->
-    <string name="package_name">com.amsavarthan.hify</string>
+    <string name="package_name">com.amsavarthan.social.hify</string>
     <string name="version_code">v.beta8</string>
 
     <string name="title_activity_about_us">About_us</string>

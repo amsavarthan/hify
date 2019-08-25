@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <com.amsavarthan.hify.ui.views.HifyImageView
+                <com.amsavarthan.social.hify.ui.views.HifyImageView
                     android:src="@mipmap/add_question"
                     android:scaleType="centerCrop"
                     android:layout_width="match_parent"
