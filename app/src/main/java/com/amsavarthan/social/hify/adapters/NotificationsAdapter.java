@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.social.hify.R;
+import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.Notification;
 import com.amsavarthan.social.hify.ui.activities.forum.AnswersActivity;
 import com.amsavarthan.social.hify.ui.activities.friends.FriendProfile;
@@ -27,6 +28,8 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -45,7 +48,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification,parent,false);
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_notification_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_notification,parent,false);
         return new ViewHolder(view);
     }
 

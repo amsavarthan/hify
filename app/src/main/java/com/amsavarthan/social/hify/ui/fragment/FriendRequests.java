@@ -30,6 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 /**
@@ -38,7 +39,6 @@ import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class FriendRequests extends Fragment {
 
-    View mView;
     private List<FriendRequest> requestList;
     private FriendRequestAdapter requestAdapter;
     private FirebaseFirestore mFirestore;
@@ -50,7 +50,7 @@ public class FriendRequests extends Fragment {
         requestList.clear();
         requestAdapter.notifyDataSetChanged();
 
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         mFirestore.collection("Users")
@@ -76,12 +76,12 @@ public class FriendRequests extends Fragment {
 
                             if(requestList.isEmpty()) {
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else{
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -91,7 +91,7 @@ public class FriendRequests extends Fragment {
                     public void onFailure(@NonNull Exception e) {
 
                         refreshLayout.setRefreshing(false);
-                        Toast.makeText(mView.getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getView().getContext(), "Some technical error occurred", Toast.LENGTH_SHORT).show();
                         Log.w("Error", "listen:error", e);
 
                     }
@@ -101,8 +101,10 @@ public class FriendRequests extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_friend_req, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_friend_req_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_friend_req, container, false);
     }
 
     @Override
@@ -112,8 +114,8 @@ public class FriendRequests extends Fragment {
         mFirestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        mRequestView = mView.findViewById(R.id.recyclerView);
-        refreshLayout=mView.findViewById(R.id.refreshLayout);
+        mRequestView = view.findViewById(R.id.recyclerView);
+        refreshLayout=view.findViewById(R.id.refreshLayout);
 
         requestList = new ArrayList<>();
         requestAdapter = new FriendRequestAdapter(requestList, view.getContext());
@@ -124,7 +126,7 @@ public class FriendRequests extends Fragment {
         mRequestView.setHasFixedSize(true);
         mRequestView.setAdapter(requestAdapter);
 
-        refreshLayout.setOnRefreshListener(() -> getUsers());
+        refreshLayout.setOnRefreshListener(this::getUsers);
 
         getUsers();
 

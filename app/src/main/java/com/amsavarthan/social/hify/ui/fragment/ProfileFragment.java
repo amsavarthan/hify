@@ -77,6 +77,7 @@ import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 /**
@@ -85,13 +86,13 @@ import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 public class ProfileFragment extends Fragment {
 
-    View mView;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_profile_view, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_profile_view_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_profile_view, container, false);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class ProfileFragment extends Fragment {
 
         loadFragment(new ProfileFragment.AboutFragment());
 
-        BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        BottomNavigationView bottomNavigationView=view.findViewById(R.id.bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -170,7 +171,10 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.main_drawer, container, false);
+            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+                rootView= inflater.inflate(R.layout.main_drawer_dark, container, false);
+            else
+                rootView= inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -281,7 +285,10 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.main_drawer, container, false);
+            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+                rootView= inflater.inflate(R.layout.main_drawer_dark, container, false);
+            else
+                rootView= inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -424,6 +431,7 @@ public class ProfileFragment extends Fragment {
 
         private TextView name,username,email,location,post,friend,bio,created;
         private CircleImageView profile_pic;
+        private View rootView;
 
         public AboutFragment() {
         }
@@ -431,8 +439,10 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            final View rootView = inflater.inflate(R.layout.frag_about_profile, container, false);
-
+            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+                rootView= inflater.inflate(R.layout.frag_about_profile_dark, container, false);
+            else
+                rootView= inflater.inflate(R.layout.frag_about_profile, container, false);
 
             mAuth = FirebaseAuth.getInstance();
             mFirestore = FirebaseFirestore.getInstance();
@@ -536,7 +546,10 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.frag_edit_profile, container, false);
+            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+                rootView= inflater.inflate(R.layout.frag_edit_profile_dark, container, false);
+            else
+                rootView= inflater.inflate(R.layout.frag_edit_profile, container, false);
 
             mAuth = FirebaseAuth.getInstance();
             mFirestore = FirebaseFirestore.getInstance();

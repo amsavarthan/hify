@@ -33,6 +33,8 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
@@ -44,7 +46,6 @@ public class Home extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private RecyclerView mPostsRecyclerView;
-    private View mView;
     private List<String> mFriendIdList=new ArrayList<>();
     private View statsheetView;
     private BottomSheetDialog mmBottomSheetDialog;
@@ -54,8 +55,10 @@ public class Home extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_home, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_home_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_home, container, false);
     }
 
     @Override
@@ -105,7 +108,7 @@ public class Home extends Fragment {
 
     private void getAllPosts() {
 
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         mFirestore.collection("Posts")
@@ -151,7 +154,7 @@ public class Home extends Fragment {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     refreshLayout.setRefreshing(false);
-                                                    Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                                                    Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                                                     Log.w("Error", "listen:error", e);
                                                 }
                                             });
@@ -162,7 +165,7 @@ public class Home extends Fragment {
 
                         }else{
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
 
                         }
 
@@ -172,7 +175,7 @@ public class Home extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
                     }
                 });
@@ -191,7 +194,7 @@ public class Home extends Fragment {
                         if(queryDocumentSnapshots.isEmpty()){
 
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
 
                         }else{
 
@@ -207,7 +210,7 @@ public class Home extends Fragment {
                             }
 
                             if (mPostsList.isEmpty()) {
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                 refreshLayout.setRefreshing(false);
                             }
 
@@ -219,7 +222,7 @@ public class Home extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
                     }
                 });

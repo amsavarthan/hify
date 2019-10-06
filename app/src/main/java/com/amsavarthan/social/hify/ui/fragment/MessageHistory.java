@@ -40,13 +40,14 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
 
 public class MessageHistory extends Fragment {
 
-    private View mView;
     private List<Message> messages;
     private List<MessageReply> messageReplies;
     private MessageImageAdapter messageImageAdapter;
@@ -63,8 +64,10 @@ public class MessageHistory extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_messages_history, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_messages_history_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_messages_history, container, false);
     }
 
     @Override
@@ -75,17 +78,17 @@ public class MessageHistory extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         messages=new ArrayList<>();
         messageReplies=new ArrayList<>();
-        messageTextAdapter=new MessageTextAdapter(messages,mView.getContext());
-        messageImageAdapter=new MessageImageAdapter(messages,mView.getContext());
-        messageImageReplyAdapter=new MessageImageReplyAdapter(messageReplies,mView.getContext());
-        messageTextReplyAdapter=new MessageTextReplyAdapter(messageReplies,mView.getContext());
+        messageTextAdapter=new MessageTextAdapter(messages,view.getContext());
+        messageImageAdapter=new MessageImageAdapter(messages,view.getContext());
+        messageImageReplyAdapter=new MessageImageReplyAdapter(messageReplies,view.getContext());
+        messageTextReplyAdapter=new MessageTextReplyAdapter(messageReplies,view.getContext());
 
-        mRecyclerView = mView.findViewById(R.id.messageList);
-        tab_1=mView.findViewById(R.id.text);
-        tab_2=mView.findViewById(R.id.text_reply);
-        tab_3=mView.findViewById(R.id.image);
-        tab_4=mView.findViewById(R.id.image_reply);
-        refreshLayout=mView.findViewById(R.id.refreshLayout);
+        mRecyclerView = view.findViewById(R.id.messageList);
+        tab_1=view.findViewById(R.id.text);
+        tab_2=view.findViewById(R.id.text_reply);
+        tab_3=view.findViewById(R.id.image);
+        tab_4=view.findViewById(R.id.image_reply);
+        refreshLayout=view.findViewById(R.id.refreshLayout);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -189,7 +192,7 @@ public class MessageHistory extends Fragment {
     public void getTextMessage(){
 
         refreshLayout.setRefreshing(true);
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications")
@@ -200,7 +203,7 @@ public class MessageHistory extends Fragment {
 
                         if(e!=null){
                             refreshLayout.setRefreshing(false);
-                            Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
+                            Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                             Log.w("error","listen",e);
                             return;
                         }
@@ -222,12 +225,12 @@ public class MessageHistory extends Fragment {
 
                             if(messages.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -238,7 +241,7 @@ public class MessageHistory extends Fragment {
     public void getTextReplyMessage(){
 
         refreshLayout.setRefreshing(true);
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply")
@@ -265,12 +268,12 @@ public class MessageHistory extends Fragment {
 
                             if(messageReplies.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
 
@@ -280,7 +283,7 @@ public class MessageHistory extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                         Log.w("error","listen",e);
                     }
                 });
@@ -290,7 +293,7 @@ public class MessageHistory extends Fragment {
     public void getImageMessage(){
 
         refreshLayout.setRefreshing(true);
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_image")
@@ -315,12 +318,12 @@ public class MessageHistory extends Fragment {
                             }
                             if(messages.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
                     }
                 })
@@ -328,7 +331,7 @@ public class MessageHistory extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                         Log.w("error","listen",e);
                     }
                 });
@@ -338,7 +341,7 @@ public class MessageHistory extends Fragment {
     public void getImageReplyMessage(){
 
         refreshLayout.setRefreshing(true);
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("Notifications_reply_image")
@@ -364,12 +367,12 @@ public class MessageHistory extends Fragment {
                             }
                             if(messageReplies.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else {
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -379,7 +382,7 @@ public class MessageHistory extends Fragment {
                     public void onFailure(@NonNull Exception e) {
 
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                         Log.w("error","listen",e);
 
                     }

@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 
@@ -130,7 +131,21 @@ public class ImagePreviewSave extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        setContentView(R.layout.activity_image_preview_save);
+        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+            setContentView(R.layout.activity_image_preview_save_dark);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor("#212121"));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+                }
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
+            }
+            setContentView(R.layout.activity_image_preview_save);
+        }
 
         intent_URI=getIntent().getStringExtra("uri");
         intent_URL=getIntent().getStringExtra("url");
@@ -149,10 +164,17 @@ public class ImagePreviewSave extends AppCompatActivity {
 
         }else {
 
-            Glide.with(this)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder2)))
-                    .load(intent_URL)
-                    .into(photoView);
+            if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+                Glide.with(this)
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder)))
+                        .load(intent_URL)
+                        .into(photoView);
+            }else{
+                Glide.with(this)
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(getResources().getDrawable(R.drawable.placeholder2)))
+                        .load(intent_URL)
+                        .into(photoView);
+            }
 
 
         }

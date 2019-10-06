@@ -13,15 +13,17 @@ import androidx.annotation.Nullable;
 import com.amsavarthan.social.hify.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class FlashMessage extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener,BottomNavigationView.OnNavigationItemReselectedListener{
+import static android.content.Context.MODE_PRIVATE;
 
-    View mView;
+public class FlashMessage extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener,BottomNavigationView.OnNavigationItemReselectedListener{
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_flash_message, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_flash_message_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_flash_message, container, false);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class FlashMessage extends Fragment implements BottomNavigationView.OnNav
 
         loadFragment(new SendMessage());
 
-        BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        BottomNavigationView bottomNavigationView=view.findViewById(R.id.bottom_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setOnNavigationItemReselectedListener(this);
 

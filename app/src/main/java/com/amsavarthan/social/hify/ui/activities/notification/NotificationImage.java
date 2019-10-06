@@ -3,6 +3,8 @@ package com.amsavarthan.social.hify.ui.activities.notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -128,7 +130,22 @@ public class NotificationImage extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        setContentView(R.layout.activity_notification_image);
+        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+            setContentView(R.layout.activity_notification_image_dark);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor("#212121"));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+                }
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
+            }
+            setContentView(R.layout.activity_notification_image);
+        }
+
         Toolbar toolbar=findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -150,6 +167,7 @@ public class NotificationImage extends AppCompatActivity {
         imageUri = getIntent().getStringExtra("image");
 
         mFirestore = FirebaseFirestore.getInstance();
+
 
         Glide.with(NotificationImage.this)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))

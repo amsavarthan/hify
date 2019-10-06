@@ -34,13 +34,14 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
 
 public class Friends extends Fragment {
 
-    View mView;
     private List<ViewFriends> usersList;
     private ViewFriendAdapter usersAdapter;
     private FirebaseFirestore firestore;
@@ -51,14 +52,16 @@ public class Friends extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_view_friends, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_view_friends_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_view_friends, container, false);
     }
 
     public void startListening() {
         usersList.clear();
         usersAdapter.notifyDataSetChanged();
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         firestore.collection("Users")
@@ -82,12 +85,12 @@ public class Friends extends Fragment {
 
                             if(usersList.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else{
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -97,7 +100,7 @@ public class Friends extends Fragment {
                     public void onFailure(@NonNull Exception e) {
 
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
 
                     }
@@ -112,8 +115,8 @@ public class Friends extends Fragment {
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        mRecyclerView =  mView.findViewById(R.id.recyclerView);
-        refreshLayout=mView.findViewById(R.id.refreshLayout);
+        mRecyclerView =  getView().findViewById(R.id.recyclerView);
+        refreshLayout=getView().findViewById(R.id.refreshLayout);
 
         usersList = new ArrayList<>();
         usersAdapter = new ViewFriendAdapter(usersList, view.getContext());

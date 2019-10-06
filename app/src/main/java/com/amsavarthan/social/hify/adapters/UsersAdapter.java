@@ -24,6 +24,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 22/2/18.
  */
@@ -41,7 +43,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user,parent,false);
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_user_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_user,parent,false);
         return new ViewHolder(view);
     }
 

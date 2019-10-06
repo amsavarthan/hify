@@ -1,6 +1,8 @@
 package com.amsavarthan.social.hify.ui.activities.lottie;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -42,7 +44,21 @@ public class FestivalActivity extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        setContentView(R.layout.activity_festival);
+        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+            setContentView(R.layout.activity_festival_dark);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor("#212121"));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+                }
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
+            }
+            setContentView(R.layout.activity_festival);
+        }
 
         festival_name=getIntent().getStringExtra("festival_name");
         festival_text=getIntent().getStringExtra("festival_text");

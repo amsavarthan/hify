@@ -32,6 +32,8 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHolder> {
 
     private List<Answers> answereds;
@@ -61,8 +63,12 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context=parent.getContext();
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_answer,parent,false));
-    }
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_answer_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_answer,parent,false);
+        return new ViewHolder(view);    }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {

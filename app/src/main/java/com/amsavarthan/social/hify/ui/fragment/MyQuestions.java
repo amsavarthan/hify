@@ -36,6 +36,8 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class MyQuestions extends Fragment {
 
 
@@ -46,7 +48,6 @@ public class MyQuestions extends Fragment {
     private QuestionAdapter adapter;
     private static String TAG = MyQuestions.class.getSimpleName();
     private List<AllQuestionsModel> allQuestionsModelList = new ArrayList<>();
-    private View view;
     private TextView et0,et1,et2,et3,et4,et5,et6,et7,et8,et9,et10,et11,et12,et13;
     private String userId;
     private SwipeRefreshLayout refreshLayout;
@@ -62,8 +63,10 @@ public class MyQuestions extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_my_answered, container, false);
-        return view;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_my_answered_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_my_answered, container, false);
     }
 
     public static MyQuestions newInstance(String user_id){
@@ -79,9 +82,9 @@ public class MyQuestions extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        super.onViewCreated(getView(), savedInstanceState);
 
-        context = view.getContext();
+        context = getView().getContext();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
         adapter = new QuestionAdapter(allQuestionsModelList);
 
@@ -95,24 +98,24 @@ public class MyQuestions extends Fragment {
                 userId=mCurrentUser.getUid();
             }
 
-            et0=view.findViewById(R.id.all);
-            et1=view.findViewById(R.id.accountancy);
-            et2=view.findViewById(R.id.astronomy);
-            et3=view.findViewById(R.id.biology);
-            et4=view.findViewById(R.id.business_maths);
-            et5=view.findViewById(R.id.computer_science);
-            et6=view.findViewById(R.id.commerce);
-            et7=view.findViewById(R.id.chemistry);
-            et8=view.findViewById(R.id.economics);
-            et9=view.findViewById(R.id.geography);
-            et10=view.findViewById(R.id.history);
-            et11=view.findViewById(R.id.physics);
-            et12=view.findViewById(R.id.p_science);
-            et13=view.findViewById(R.id.maths);
+            et0=getView().findViewById(R.id.all);
+            et1=getView().findViewById(R.id.accountancy);
+            et2=getView().findViewById(R.id.astronomy);
+            et3=getView().findViewById(R.id.biology);
+            et4=getView().findViewById(R.id.business_maths);
+            et5=getView().findViewById(R.id.computer_science);
+            et6=getView().findViewById(R.id.commerce);
+            et7=getView().findViewById(R.id.chemistry);
+            et8=getView().findViewById(R.id.economics);
+            et9=getView().findViewById(R.id.geography);
+            et10=getView().findViewById(R.id.history);
+            et11=getView().findViewById(R.id.physics);
+            et12=getView().findViewById(R.id.p_science);
+            et13=getView().findViewById(R.id.maths);
 
-            refreshLayout=view.findViewById(R.id.refreshLayout);
+            refreshLayout=getView().findViewById(R.id.refreshLayout);
 
-            recyclerView = view.findViewById(R.id.recyclerView);
+            recyclerView = getView().findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -138,7 +141,7 @@ public class MyQuestions extends Fragment {
     private void getQuestions() {
 
         refreshLayout.setRefreshing(true);
-        view.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         mFirestore.collection("Questions")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
@@ -164,14 +167,14 @@ public class MyQuestions extends Fragment {
 
 
                             if(allQuestionsModelList.isEmpty()){
-                                view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                 refreshLayout.setRefreshing(false);
                             }
 
 
 
                         } else {
-                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             refreshLayout.setRefreshing(false);
                         }
 
@@ -197,7 +200,7 @@ public class MyQuestions extends Fragment {
             getQuestions();
         }else{
 
-            view.findViewById(R.id.default_item).setVisibility(View.GONE);
+            getView().findViewById(R.id.default_item).setVisibility(View.GONE);
             refreshLayout.setRefreshing(true);
             mFirestore.collection("Questions")
                     .whereEqualTo("subject",subject)
@@ -227,19 +230,19 @@ public class MyQuestions extends Fragment {
                                     }
 
                                     if(allQuestionsModelList.isEmpty()){
-                                        view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                        getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                         refreshLayout.setRefreshing(false);
                                     }
 
                                 } else {
-                                    view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                    getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                     refreshLayout.setRefreshing(false);
                                 }
                             }catch (NullPointerException eee){
                                 Toasty.error(context, "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                                 adapter.notifyDataSetChanged();
                                 if(allQuestionsModelList.isEmpty()){
-                                    view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                    getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                     refreshLayout.setRefreshing(false);
                                 }
                             } catch (Exception ee){
@@ -247,7 +250,7 @@ public class MyQuestions extends Fragment {
                                 Toasty.error(context, "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                                 if(allQuestionsModelList.isEmpty()){
                                     refreshLayout.setRefreshing(false);
-                                    view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                    getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                 }
                             }
 

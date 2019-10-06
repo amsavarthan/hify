@@ -3,6 +3,8 @@ package com.amsavarthan.social.hify.ui.activities.post;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
@@ -168,7 +170,22 @@ public class CommentsActivity extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        setContentView(R.layout.activity_post_comments);
+        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+            setContentView(R.layout.activity_post_comments_dark);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor("#212121"));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
+                }
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
+            }
+            setContentView(R.layout.activity_post_comments);
+        }
+
 
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();

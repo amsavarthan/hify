@@ -35,6 +35,8 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class AllQuestions extends Fragment {
 
 
@@ -45,7 +47,6 @@ public class AllQuestions extends Fragment {
     private QuestionAdapter adapter;
     private static String TAG=AllQuestions.class.getSimpleName();
     private List<AllQuestionsModel> allQuestionsModelList =new ArrayList<>();
-    private View view;
     private TextView et0,et1,et2,et3,et4,et5,et6,et7,et8,et9,et10,et11,et12,et13;
     private SwipeRefreshLayout refreshLayout;
 
@@ -53,10 +54,11 @@ public class AllQuestions extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        view=inflater.inflate(R.layout.frag_answered, container, false);
-        return view;
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_answered_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_answered, container, false);
     }
 
     @Override
@@ -113,11 +115,11 @@ public class AllQuestions extends Fragment {
 
     private void getQuestions() {
 
-        view.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
         Query firstQuery = mFirestore.collection("Questions")
                 .orderBy("timestamp", Query.Direction.DESCENDING);
-        firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
+        firstQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
@@ -139,12 +141,12 @@ public class AllQuestions extends Fragment {
                     }
 
                     if(allQuestionsModelList.isEmpty()){
-                        view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                        getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         refreshLayout.setRefreshing(false);
                     }
 
                 } else {
-                    view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                    getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                     refreshLayout.setRefreshing(false);
                 }
 
@@ -168,7 +170,7 @@ public class AllQuestions extends Fragment {
         }else{
 
             refreshLayout.setRefreshing(true);
-            view.findViewById(R.id.default_item).setVisibility(View.GONE);
+            getView().findViewById(R.id.default_item).setVisibility(View.GONE);
 
             Query firstQuery = mFirestore.collection("Questions")
                     .whereEqualTo("subject",subject)
@@ -198,19 +200,19 @@ public class AllQuestions extends Fragment {
 
                             }
                             if(allQuestionsModelList.isEmpty()){
-                                view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                                 refreshLayout.setRefreshing(false);
                             }
 
                         } else {
-                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             refreshLayout.setRefreshing(false);
                         }
                     }catch (NullPointerException eee){
                         Toasty.error(context, "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         adapter.notifyDataSetChanged();
                         if(allQuestionsModelList.isEmpty()){
-                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             refreshLayout.setRefreshing(false);
                         }
                     } catch (Exception ee){
@@ -218,7 +220,7 @@ public class AllQuestions extends Fragment {
                         Toasty.error(context, "Some technical error occurred", Toasty.LENGTH_SHORT, true).show();
                         if(allQuestionsModelList.isEmpty()){
                             refreshLayout.setRefreshing(false);
-                            view.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
                     }
 

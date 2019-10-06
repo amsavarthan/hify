@@ -28,6 +28,8 @@ import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHolder> {
 
     private List<AllQuestionsModel> allQuestionsModels;
@@ -52,8 +54,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context=parent.getContext();
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_question,parent,false));
-    }
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_question_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_question,parent,false);
+        return new ViewHolder(view);    }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {

@@ -126,6 +126,7 @@
                    android:id="@+id/libraries"
                    android:padding="5dp"
                    android:clickable="true"
+                   android:visibility="gone"
                    android:focusable="true"
                    android:foreground="?selectableItemBackground"
                    android:orientation="horizontal"

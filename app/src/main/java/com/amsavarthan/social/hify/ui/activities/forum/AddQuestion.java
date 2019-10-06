@@ -2,6 +2,8 @@ package com.amsavarthan.social.hify.ui.activities.forum;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -68,8 +70,20 @@ public class AddQuestion extends AppCompatActivity implements AdapterView.OnItem
                                 .setFontAttrId(R.attr.fontPath)
                                 .build()))
                 .build());
-
-        setContentView(R.layout.activity_add_question);
+        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
+            setContentView(R.layout.activity_add_question_dark);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor("#212121"));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                }
+            }
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
+            }
+            setContentView(R.layout.activity_add_question);
+        }
 
         Toolbar toolbar=findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);

@@ -22,6 +22,7 @@ import com.marcoscg.dialogsheet.DialogSheet;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.amsavarthan.social.hify.ui.activities.MainActivity.add_post;
 import static com.amsavarthan.social.hify.ui.activities.MainActivity.showFragment;
 import static com.amsavarthan.social.hify.ui.activities.MainActivity.toolbar;
@@ -37,8 +38,10 @@ public class Dashboard extends Fragment implements BottomNavigationView.OnNaviga
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-       return inflater.inflate(R.layout.frag_dashboard, container, false);
-    }
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_dashboard_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_dashboard, container, false);    }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {

@@ -39,13 +39,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class Discover extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
     private RecyclerView recyclerView;
     private Context context;
     private SwipeRefreshLayout refreshLayout;
-    private View view;
     private FirebaseAuth mAuth;
     private LinearLayout default_item;
     private List<Article> articles = new ArrayList<>();
@@ -59,8 +60,10 @@ public class Discover extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_discover, container, false);
-        return view;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_discover_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_discover, container, false);
     }
 
     @Override

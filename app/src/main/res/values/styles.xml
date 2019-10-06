@@ -15,6 +15,13 @@
         <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
 
+    <style name="BottomNavigationBarThemeDark" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorAccentt</item>
+        <item name="colorPrimaryDark">#FFF</item>
+        <item name="colorAccent">@color/white</item>
+        <item name="dialogSheetAccent">@color/colorAccentt</item>
+    </style>
+
     <style name="LoginAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimaryy</item>
         <item name="android:windowBackground">@color/colorPrimaryy</item>

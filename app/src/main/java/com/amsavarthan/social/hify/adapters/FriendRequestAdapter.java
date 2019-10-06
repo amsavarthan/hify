@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amsavarthan.social.hify.R;
+import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.FriendRequest;
 import com.amsavarthan.social.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -53,7 +56,11 @@ public class FriendRequestAdapter extends RecyclerView.Adapter<FriendRequestAdap
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_friend_req, parent, false);
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_friend_req_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_friend_req,parent,false);
         return new ViewHolder(view);
     }
 

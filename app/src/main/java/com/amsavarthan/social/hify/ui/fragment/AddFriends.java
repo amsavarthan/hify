@@ -34,13 +34,14 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
 
 public class AddFriends extends Fragment {
 
-    View mView;
     private List<Friends> usersList;
     private AddFriendAdapter usersAdapter;
     private FirebaseFirestore firestore;
@@ -51,8 +52,10 @@ public class AddFriends extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_add_friends, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_add_friends_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_add_friends_dark, container, false);
     }
 
     @Override
@@ -62,8 +65,8 @@ public class AddFriends extends Fragment {
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        mRecyclerView = mView.findViewById(R.id.recyclerView);
-        refreshLayout=mView.findViewById(R.id.refreshLayout);
+        mRecyclerView = view.findViewById(R.id.recyclerView);
+        refreshLayout=view.findViewById(R.id.refreshLayout);
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerViewTouchHelper(0, ItemTouchHelper.LEFT, new RecyclerViewTouchHelper.RecyclerItemTouchHelperListener() {
             @Override
@@ -77,7 +80,7 @@ public class AddFriends extends Fragment {
                     final int deletedIndex = viewHolder.getAdapterPosition();
 
                     Snackbar snackbar = Snackbar
-                            .make(mView.findViewById(R.id.layout), "Friend request sent to " + name, Snackbar.LENGTH_LONG);
+                            .make(view.findViewById(R.id.layout), "Friend request sent to " + name, Snackbar.LENGTH_LONG);
 
                     // remove the item from recycler view
                     usersAdapter.removeItem(viewHolder.getAdapterPosition(), snackbar, deletedIndex, deletedItem);
@@ -87,7 +90,7 @@ public class AddFriends extends Fragment {
         });
 
         usersList = new ArrayList<>();
-        usersAdapter = new AddFriendAdapter(usersList, view.getContext(), mView.findViewById(R.id.layout));
+        usersAdapter = new AddFriendAdapter(usersList, view.getContext(), view.findViewById(R.id.layout));
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -110,7 +113,7 @@ public class AddFriends extends Fragment {
     public void getAllUsers() {
         usersList.clear();
         usersAdapter.notifyDataSetChanged();
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         firestore.collection("Users")
@@ -136,12 +139,12 @@ public class AddFriends extends Fragment {
 
                             if(usersList.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else{
                             refreshLayout.setRefreshing(false);
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                         }
 
                     }
@@ -151,7 +154,7 @@ public class AddFriends extends Fragment {
                     public void onFailure(@NonNull Exception e) {
 
                         refreshLayout.setRefreshing(false);
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         Log.w("Error", "listen:error", e);
 
                     }

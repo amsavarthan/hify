@@ -16,6 +16,8 @@ import com.amsavarthan.social.hify.ui.activities.friends.SearchUsersActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
@@ -23,14 +25,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class FriendsFragment extends Fragment implements BottomNavigationView.OnNavigationItemReselectedListener,
 BottomNavigationView.OnNavigationItemSelectedListener{
 
-    View mView;
     FloatingActionButton fab;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.frag_friends, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.frag_friends_dark, container, false);
+        else
+            return inflater.inflate(R.layout.frag_friends, container, false);
     }
 
     public static FriendsFragment newInstance(String frag){
@@ -49,7 +52,7 @@ BottomNavigationView.OnNavigationItemSelectedListener{
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-       fab=mView.findViewById(R.id.searchFab);
+       fab=view.findViewById(R.id.searchFab);
        fab.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
@@ -57,7 +60,7 @@ BottomNavigationView.OnNavigationItemSelectedListener{
            }
        });
 
-        BottomNavigationView bottomNavigationView=mView.findViewById(R.id.bottom_nav);
+        BottomNavigationView bottomNavigationView=view.findViewById(R.id.bottom_nav);
         if(getArguments()!=null){
             bottomNavigationView.setSelectedItemId(R.id.action_view_request);
            loadFragment(new FriendRequests());
@@ -78,16 +81,14 @@ BottomNavigationView.OnNavigationItemSelectedListener{
     }
 
     public void gotoSearch() {
-        SearchUsersActivity.startActivity(getActivity(), mView.getContext(), fab);
+        SearchUsersActivity.startActivity(getActivity(), getView().getContext(), fab);
     }
 
     @Override
     public void onNavigationItemReselected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_view:
-                break;
             case R.id.action_view_request:
-                break;
             case R.id.action_add:
                 break;
 

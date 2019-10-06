@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#212121"
+    >
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/top"
+        android:background="#212121"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:title=""
+            app:titleTextColor="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <FrameLayout
+        android:layout_below="@+id/top"
+        android:id="@+id/frame_container"
+        android:layout_above="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:background="#212121"
+        android:theme="@style/BottomNavigationBarThemeDark"
+        app:menu="@menu/menu_friend_profile"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

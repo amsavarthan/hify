@@ -49,6 +49,8 @@
     <string name="s_people_have_smiled_for_this_post">%d people liked this post</string>
     <string name="s_people_have_saved_this_post">%d people have saved this post</string>
     <string name="you_have_d_new_friend_request_s">You have %d new friend request(s)</string>
+    <string name="desc_post">Some description about the post</string>
+    <string name="your_text_here">Your text here</string>
 
 
 </resources>

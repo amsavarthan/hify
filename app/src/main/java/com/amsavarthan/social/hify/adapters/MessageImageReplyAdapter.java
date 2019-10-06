@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.social.hify.R;
+import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.MessageReply;
 import com.amsavarthan.social.hify.ui.activities.notification.NotificationImageReply;
 import com.bumptech.glide.Glide;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -46,8 +49,12 @@ public class MessageImageReplyAdapter extends RecyclerView.Adapter<MessageImageR
     @Override
     public MessageImageReplyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.message_text_item,parent,false);
         mFirestore=FirebaseFirestore.getInstance();
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.message_text_item_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.message_text_item,parent,false);
         return new ViewHolder(view);
     }
 

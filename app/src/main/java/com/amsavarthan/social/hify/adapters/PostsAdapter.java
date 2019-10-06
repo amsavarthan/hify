@@ -90,6 +90,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import me.grantland.widget.AutofitTextView;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -131,11 +133,14 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_feed_post, parent, false);
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-
+        View view=null;
+        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            view= LayoutInflater.from(context).inflate(R.layout.item_feed_post_dark,parent,false);
+        else
+            view= LayoutInflater.from(context).inflate(R.layout.item_feed_post,parent,false);
         return new ViewHolder(view);
     }
 

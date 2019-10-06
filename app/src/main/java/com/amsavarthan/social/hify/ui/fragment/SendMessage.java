@@ -31,13 +31,14 @@ import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by amsavarthan on 29/3/18.
  */
 
 public class SendMessage extends Fragment {
 
-    private View mView;
     private List<Users> usersList;
     private UsersAdapter usersAdapter;
     private FirebaseFirestore firestore;
@@ -48,8 +49,10 @@ public class SendMessage extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.send_message_fragment, container, false);
-        return mView;
+        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
+            return inflater.inflate(R.layout.send_message_fragment_dark, container, false);
+        else
+            return inflater.inflate(R.layout.send_message_fragment, container, false);
     }
 
     @Override
@@ -59,8 +62,8 @@ public class SendMessage extends Fragment {
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        mRecyclerView = mView.findViewById(R.id.messageList);
-        refreshLayout=mView.findViewById(R.id.refreshLayout);
+        mRecyclerView = view.findViewById(R.id.messageList);
+        refreshLayout=view.findViewById(R.id.refreshLayout);
 
         usersList = new ArrayList<>();
         usersAdapter = new UsersAdapter(usersList, view.getContext());
@@ -85,7 +88,7 @@ public class SendMessage extends Fragment {
     }
 
     public void startListening() {
-        mView.findViewById(R.id.default_item).setVisibility(View.GONE);
+        getView().findViewById(R.id.default_item).setVisibility(View.GONE);
         refreshLayout.setRefreshing(true);
 
         firestore.collection("Users")
@@ -109,11 +112,11 @@ public class SendMessage extends Fragment {
 
                             if(usersList.isEmpty()){
                                 refreshLayout.setRefreshing(false);
-                                mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                                getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             }
 
                         }else{
-                            mView.findViewById(R.id.default_item).setVisibility(View.VISIBLE);
+                            getView().findViewById(R.id.default_item).setVisibility(View.VISIBLE);
                             refreshLayout.setRefreshing(false);
                         }
 
@@ -123,7 +126,7 @@ public class SendMessage extends Fragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Toasty.error(mView.getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
+                        Toasty.error(getView().getContext(), "Some technical error occurred", Toasty.LENGTH_SHORT,true).show();
                         refreshLayout.setRefreshing(false);
                         Log.w("Error", "listen:error", e);
 
