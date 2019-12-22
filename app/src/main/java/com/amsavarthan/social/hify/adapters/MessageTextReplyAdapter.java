@@ -48,11 +48,7 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
     @Override
     public MessageTextReplyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mFirestore=FirebaseFirestore.getInstance();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.message_text_item_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.message_text_item,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.message_text_item,parent,false);
         return new ViewHolder(view);    }
 
 	@Override

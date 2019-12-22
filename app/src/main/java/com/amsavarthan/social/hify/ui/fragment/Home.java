@@ -55,10 +55,7 @@ public class Home extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_home_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_home, container, false);
+       return inflater.inflate(R.layout.frag_home, container, false);
     }
 
     @Override

@@ -80,20 +80,9 @@ public class SendMessage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_send_message_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-                }
-            }
-        }else {
-            setContentView(R.layout.activity_send_message);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
+        setContentView(R.layout.activity_send_message);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
         }
         mFirestore=FirebaseFirestore.getInstance();
         storageReference= FirebaseStorage.getInstance().getReference().child("notification").child("IMG_"+System.currentTimeMillis()+"_"+random()+".jpg");

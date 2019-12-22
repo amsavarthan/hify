@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-   >
+    android:background="?colorPrimaryDark">
 
    <LinearLayout
        android:orientation="vertical"
@@ -17,6 +17,7 @@
            app:cardUseCompatPadding="true"
            android:layoutDirection="ltr"
            android:padding="5dp"
+           style="@style/Widget.MaterialComponents.CardView"
            android:layout_width="match_parent"
            android:layout_height="wrap_content">
 
@@ -36,7 +37,7 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
+                       android:tint="?colorAccent"
                        android:padding="10dp"
                        android:layout_gravity="center"
                        android:src="@drawable/ic_history_black_24dp"
@@ -52,7 +53,6 @@
 
                        <TextView
                            android:text="Version"
-                           android:textColor="#212121"
                            android:gravity="center_vertical"
                            android:layout_width="match_parent"
                            android:layout_height="match_parent" />
@@ -79,14 +79,13 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
+                       android:tint="?colorAccent"
                        android:padding="10dp"
                        android:src="@drawable/ic_favorite_border_black_24dp"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"/>
 
                    <TextView
-                       android:textColor="#212121"
                        android:layout_marginStart="10dp"
                        android:text="Support Development"
                        android:gravity="center_vertical"
@@ -106,14 +105,13 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
                        android:padding="10dp"
+                       android:tint="?colorAccent"
                        android:src="@drawable/ic_github"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"/>
 
                    <TextView
-                       android:textColor="#212121"
                        android:layout_marginStart="10dp"
                        android:text="Fork on Github"
                        android:gravity="center_vertical"
@@ -134,14 +132,12 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
                        android:padding="10dp"
                        android:src="@drawable/ic_github"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"/>
 
                    <TextView
-                       android:textColor="#212121"
                        android:layout_marginStart="10dp"
                        android:text="Open Source Libraries"
                        android:gravity="center_vertical"
@@ -157,6 +153,7 @@
        <androidx.cardview.widget.CardView
            android:layout_margin="8dp"
            app:cardUseCompatPadding="true"
+           style="@style/Widget.MaterialComponents.CardView"
            android:layoutDirection="ltr"
            android:padding="5dp"
            android:layout_width="match_parent"
@@ -170,7 +167,6 @@
 
                <TextView
                    android:text="Author"
-                   android:textColor="#212121"
                    android:textSize="16sp"
                    android:padding="10dp"
                    android:layout_width="match_parent"
@@ -186,7 +182,7 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
+                       android:tint="?colorAccent"
                        android:padding="10dp"
                        android:layout_gravity="center"
                        android:src="@drawable/ic_person_outline_black_24dp"
@@ -195,7 +191,6 @@
 
                        <TextView
                            android:text="Amsavarthan Lv"
-                           android:textColor="#212121"
                            android:layout_marginStart="10dp"
                            android:gravity="center_vertical"
                            android:layout_width="match_parent"
@@ -214,7 +209,7 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
+                       android:tint="?colorAccent"
                        android:padding="10dp"
                        android:layout_gravity="center"
                        android:src="@drawable/ic_public_black_24dp"
@@ -223,7 +218,6 @@
 
                    <TextView
                        android:text="Website"
-                       android:textColor="#212121"
                        android:layout_marginStart="10dp"
                        android:gravity="center_vertical"
                        android:layout_width="match_parent"
@@ -242,9 +236,9 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
                        android:padding="10dp"
-                       android:src="@drawable/ic_email_black_24dp"
+                       android:tint="?colorAccent"
+                       android:src="@drawable/ic_email_24dp"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"/>
 
@@ -257,7 +251,6 @@
 
                        <TextView
                            android:text="Send an email"
-                           android:textColor="#212121"
                            android:gravity="center_vertical"
                            android:layout_width="match_parent"
                            android:layout_height="match_parent" />
@@ -282,7 +275,7 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
+                       android:tint="?colorAccent"
                        android:padding="10dp"
                        android:layout_gravity="center"
                        android:src="@mipmap/ic_notification"
@@ -298,7 +291,6 @@
 
                        <TextView
                            android:text="Hify"
-                           android:textColor="#212121"
                            android:gravity="center_vertical"
                            android:layout_width="match_parent"
                            android:layout_height="match_parent" />
@@ -324,8 +316,8 @@
                    android:layout_height="wrap_content">
 
                    <ImageView
-                       android:tint="#212121"
                        android:padding="10dp"
+                       android:tint="?colorAccent"
                        android:src="@drawable/instagram"
                        android:layout_width="44dp"
                        android:layout_height="44dp"/>
@@ -339,7 +331,6 @@
 
                        <TextView
                            android:text="Instagram"
-                           android:textColor="#212121"
                            android:gravity="center_vertical"
                            android:layout_width="match_parent"
                            android:layout_height="match_parent" />

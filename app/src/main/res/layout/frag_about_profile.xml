@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="none"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?colorPrimaryDark">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +37,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
-                android:textColor="#212121"
+                android:textColor="?android:textColorPrimary"
                 android:text="Getting name..."
                 android:textSize="17sp"
                 />
@@ -57,13 +58,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/username"
-                android:drawableLeft="@drawable/ic_location_on_black_24dp"
                 android:drawablePadding="3dp"
                 android:layout_marginBottom="10dp"
                 android:layout_centerHorizontal="true"
                 android:drawableStart="@drawable/ic_location_on_black_24dp"
                 android:gravity="center_vertical"
-                android:textColor="#212121"
+                android:textColor="?android:textColorPrimary"
                 />
 
             <TextView
@@ -71,13 +71,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/location"
-                android:drawableLeft="@drawable/ic_email_black_24dp"
                 android:drawablePadding="5dp"
                 android:layout_marginBottom="10dp"
                 android:layout_centerHorizontal="true"
                 android:drawableStart="@drawable/ic_email_black_24dp"
                 android:gravity="center_vertical"
-                android:textColor="#212121"
+                android:textColor="?android:textColorPrimary"
                 />
 
             <FrameLayout
@@ -90,8 +89,8 @@
                 <TextView
                     android:visibility="visible"
                     android:id="@+id/friend_sent"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:textSize="17sp"
+                    android:textColor="?colorAccent"
                     android:padding="10dp"
                     android:gravity="center"
                     android:textAllCaps="false"
@@ -101,7 +100,9 @@
                 <Button
                     android:visibility="gone"
                     android:id="@+id/friend_no"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:text="Send Friend Request"
+                    android:textColor="?android:textColorPrimary"
                     android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -110,6 +111,8 @@
                     android:visibility="gone"
                     android:id="@+id/friend_yes"
                     android:text="Unfriend"
+                    android:textColor="?android:textColorPrimary"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -124,10 +127,12 @@
                     <Button
                         android:id="@+id/accept"
                         android:text="Accept"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_margin="5dp"
                         android:textAllCaps="false"
                         android:layout_width="0dp"
                         android:layout_weight="1"
+                        android:textColor="?colorAccent"
                         android:layout_height="wrap_content" />
 
                     <Button
@@ -135,6 +140,7 @@
                         android:text="Decline"
                         android:layout_margin="5dp"
                         android:textAllCaps="false"
+                        android:textColor="?android:textColorPrimary"
                         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                         android:layout_width="0dp"
                         android:layout_weight="1"
@@ -151,6 +157,7 @@
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
                 android:clickable="true"
+                style="@style/Widget.MaterialComponents.CardView"
                 android:focusable="true"
                 android:background="?selectableItemBackground"
                 android:layout_below="@+id/frame"
@@ -176,7 +183,6 @@
                         android:layout_marginTop="10dp"
                         android:text="Getting user bio..."
                         android:gravity="center_horizontal"
-                        android:textColor="#212121"
                         />
 
                 </LinearLayout>
@@ -190,6 +196,7 @@
                 android:layout_margin="10dp"
                 app:cardCornerRadius="4dp"
                 android:clickable="true"
+                style="@style/Widget.MaterialComponents.CardView"
                 android:focusable="true"
                 android:background="?selectableItemBackground"
                 android:layout_below="@+id/bio_card"
@@ -214,11 +221,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         android:text="Getting friends count..."
-                        android:drawableLeft="@drawable/ic_mutual"
                         android:drawablePadding="10dp"
                         android:drawableStart="@drawable/ic_mutual"
                         android:gravity="center_vertical"
-                        android:textColor="#212121"
                         />
 
                     <TextView
@@ -227,11 +232,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:text="Getting posts count..."
-                        android:drawableLeft="@drawable/posts_icon"
                         android:drawablePadding="10dp"
                         android:drawableStart="@drawable/posts_icon"
                         android:gravity="center_vertical"
-                        android:textColor="#212121"
                         />
 
                 </LinearLayout>

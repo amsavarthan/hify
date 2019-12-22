@@ -21,7 +21,6 @@
             app:title="Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -49,7 +48,7 @@
                 android:textSize="17sp"
                 android:background="@drawable/textview_tab_style_blue"
                 android:padding="10dp"
-                android:textColor="#fff" />
+                android:textColor="?android:textColorPrimaryInverse" />
 
             <LinearLayout
                 android:id="@+id/toolbar"
@@ -88,9 +87,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
-                        android:background="@drawable/textview_tab_style_black"
+                        android:background="@drawable/textview_tab_style_grey"
                         android:padding="10dp"
-                        android:textColor="#fff"
+                        android:textColor="?android:textColorPrimaryInverse"
                         android:textSize="17sp" />
 
 
@@ -171,6 +170,7 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_height="wrap_content"
                 android:text="Send new"
+                android:textColor="?android:textColorPrimary"
                 android:onClick="SendNew"
                 android:textAllCaps="false"
                 />
@@ -180,8 +180,10 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_height="wrap_content"
                 android:text="Reply"
+                android:textColor="?colorAccent"
                 android:textAllCaps="false"
                 />
 

@@ -30,10 +30,7 @@ BottomNavigationView.OnNavigationItemSelectedListener{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_friends_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_friends, container, false);
+       return inflater.inflate(R.layout.frag_friends, container, false);
     }
 
     public static FriendsFragment newInstance(String frag){

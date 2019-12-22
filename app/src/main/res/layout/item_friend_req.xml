@@ -5,10 +5,9 @@
     android:id="@+id/friend_item_view"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?selectableItemBackground"
+    android:background="?selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
     android:padding="15dp">
 
   <FrameLayout
@@ -48,7 +47,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Getting User..."
-            android:textColor="#212121"
             android:textSize="16sp" />
 
     </LinearLayout>

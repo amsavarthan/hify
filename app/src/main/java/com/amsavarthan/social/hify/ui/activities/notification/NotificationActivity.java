@@ -102,40 +102,30 @@ public class NotificationActivity extends AppCompatActivity {
                                 .setFontAttrId(R.attr.fontPath)
                                 .build()))
                 .build());
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_notification_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
-            setContentView(R.layout.activity_notification);
-        }
+        setContentView(R.layout.activity_notification);
 
         Toolbar toolbar=findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        nameTxt = (TextView) findViewById(R.id.name);
-        messageTxt = (TextView) findViewById(R.id.messagetxt);
-        imageView = (CircleImageView) findViewById(R.id.circleImageView);
+        nameTxt =  findViewById(R.id.name);
+        messageTxt =  findViewById(R.id.messagetxt);
+        imageView =  findViewById(R.id.circleImageView);
 
         current_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        mSend = (Button) findViewById(R.id.send);
-        message = (EditText) findViewById(R.id.message);
-        mBar = (ProgressBar) findViewById(R.id.progressBar);
-
+        mSend = findViewById(R.id.send);
+        message = findViewById(R.id.message);
+        mBar = findViewById(R.id.progressBar);
 
         msg = getIntent().getStringExtra("message");
         user_id = getIntent().getStringExtra("from_id");
+        nameTxt.setText(getIntent().getStringExtra("name"));
+        Glide.with(NotificationActivity.this)
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .load(getIntent().getStringExtra("image"))
+                .into(imageView);
 
         mFirestore = FirebaseFirestore.getInstance();
 
@@ -152,34 +142,23 @@ public class NotificationActivity extends AppCompatActivity {
                         .into(imageView);
 
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+        }).addOnFailureListener(e -> { });
 
-            }
-        });
+        mFirestore.collection("Users").document(user_id).get().addOnSuccessListener(documentSnapshot -> {
 
-        mFirestore.collection("Users").document(user_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
+            String name = documentSnapshot.getString("name");
+            nameTxt.setText(name);
 
-                String name = documentSnapshot.getString("name");
-                nameTxt.setText(name);
+            String image_ = documentSnapshot.getString("image");
 
-                String image_ = documentSnapshot.getString("image");
+            Glide.with(NotificationActivity.this)
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                    .load(image_)
+                    .into(imageView);
 
-                Glide.with(NotificationActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
-                        .load(image_)
-                        .into(imageView);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                imageView.setVisibility(View.GONE);
-                nameTxt.setVisibility(View.GONE);
-            }
+        }).addOnFailureListener(e -> {
+            imageView.setVisibility(View.GONE);
+            nameTxt.setVisibility(View.GONE);
         });
 
         messageTxt.setText(msg);
@@ -198,7 +177,7 @@ public class NotificationActivity extends AppCompatActivity {
     private void updateReadStatus() {
 
         String read=getIntent().getStringExtra("read");
-        if(read=="false"){
+        if(read.equals("false")){
             Map<String,Object> readMap=new HashMap<>();
             readMap.put("read","true");
 

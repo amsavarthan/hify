@@ -44,11 +44,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_discover_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_discover,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_discover,parent,false);
         return new MyViewHolder(view, onItemClickListener);
     }
 

@@ -136,11 +136,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_feed_post_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_feed_post,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_feed_post,parent,false);
         return new ViewHolder(view);
     }
 

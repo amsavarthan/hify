@@ -43,11 +43,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_user_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_user,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_user,parent,false);
         return new ViewHolder(view);
     }
 

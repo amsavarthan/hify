@@ -10,7 +10,6 @@
         android:layout_height="40dp"
         android:src="@drawable/default_user_art_g_2" />
 
-
     <RelativeLayout
         android:id="@+id/comment_section"
         android:orientation="horizontal"
@@ -30,25 +29,25 @@
             <TextView
                 android:id="@+id/comment_username"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#212121" />
+                android:layout_height="wrap_content"/>
 
             <TextView
                 android:id="@+id/comment_text"
+                android:textColor="?android:textColorPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/delete"
             android:visibility="gone"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:id="@+id/delete"
-            android:tint="#212121"
+            android:tint="#989898"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?selectableItemBackground"
+            android:background="?selectableItemBackground"
             android:padding="5dp"
             android:src="@drawable/ic_delete_forever_black_24dp"
             android:layout_width="wrap_content"

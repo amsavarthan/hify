@@ -5,12 +5,12 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
     tools:context=".ui.activities.account.LoginActivity">
 
     <ImageView
         android:id="@+id/header"
         android:scaleType="fitStart"
+        android:visibility="gone"
         android:src="@mipmap/header"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -32,7 +32,6 @@
             android:paddingTop="20dp">
 
             <TextView
-                android:textColor="#212121"
                 android:layout_marginTop="20dp"
                 fontPath="fonts/bold.ttf"
                 android:layout_width="match_parent"
@@ -42,7 +41,6 @@
                 tools:ignore="MissingPrefix" />
 
             <TextView
-                android:textColor="#212121"
                 fontPath="fonts/bold.ttf"
                 android:layout_below="@+id/welcome_msg"
                 android:layout_width="match_parent"
@@ -93,17 +91,18 @@
                 android:id="@+id/button3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:onClick="onForgotPassword"
                 android:text="Forgot your Password ?"
+                android:textColor="#989898"
                 android:textAllCaps="false"
-                android:textColor="#757575"
                 android:textSize="16sp" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:layout_gravity="center"
                 android:id="@+id/button"
                 android:padding="10dp"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -132,8 +131,9 @@
         android:onClick="onRegister"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:text="New here ? Sign Up instead"
+        android:textColor="#989898"
         android:textAllCaps="false"
-        android:textColor="#757575"
         android:textSize="16sp" />
+
 
 </FrameLayout>

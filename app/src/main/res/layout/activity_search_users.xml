@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryy"
+    android:background="?colorPrimaryDark"
     tools:context="com.amsavarthan.social.hify.ui.activities.friends.SearchUsersActivity">
 
     <com.google.android.material.appbar.AppBarLayout

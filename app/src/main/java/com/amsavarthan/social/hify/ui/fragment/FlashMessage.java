@@ -20,10 +20,7 @@ public class FlashMessage extends Fragment implements BottomNavigationView.OnNav
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_flash_message_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_flash_message, container, false);
+        return inflater.inflate(R.layout.frag_flash_message, container, false);
     }
 
     @Override

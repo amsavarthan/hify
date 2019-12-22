@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?colorPrimaryDark"
     tools:context=".ui.activities.post.SinglePostView">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -19,7 +20,6 @@
             app:title=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>

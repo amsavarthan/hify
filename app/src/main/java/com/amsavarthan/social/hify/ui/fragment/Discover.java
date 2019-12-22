@@ -60,10 +60,7 @@ public class Discover extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_discover_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_discover, container, false);
+       return inflater.inflate(R.layout.frag_discover, container, false);
     }
 
     @Override

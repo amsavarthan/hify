@@ -67,6 +67,7 @@
         <activity
             android:name=".ui.activities.friends.SendActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme2"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.activities.account.Notifications"

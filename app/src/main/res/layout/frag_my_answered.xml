@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?colorPrimaryDark"
     android:orientation="vertical"
     tools:context=".ui.fragment.MyQuestions">
 
@@ -219,7 +220,6 @@
                    android:gravity="center"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:background="@color/white"
                    >
 
                    <ImageView
@@ -234,7 +234,7 @@
                        fontPath="fonts/GoogleSans_Bold.ttf"
                        android:textSize="19sp"
                        android:gravity="center"
-                       android:textColor="#313131"
+                       android:textColor="?android:textColorPrimary"
                        android:text="No questions yet"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"

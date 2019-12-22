@@ -52,11 +52,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_friend_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_friend,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_friend,parent,false);
         return new ViewHolder(view);
     }
 

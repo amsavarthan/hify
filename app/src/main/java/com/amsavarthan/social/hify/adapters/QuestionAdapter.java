@@ -54,11 +54,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context=parent.getContext();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_question_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_question,parent,false);
+        View view= LayoutInflater.from(context).inflate(R.layout.item_question,parent,false);
         return new ViewHolder(view);    }
 
     @Override

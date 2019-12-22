@@ -4,7 +4,6 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -19,7 +18,6 @@
             app:title="Dashboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -38,7 +36,6 @@
 
         <FrameLayout
             android:visibility="gone"
-            android:background="#FFF"
             android:id="@+id/search_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -57,11 +57,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser= FirebaseAuth.getInstance().getCurrentUser();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_comment_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_comment,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.item_comment,parent,false);
         return new ViewHolder(view);    }
 
 	@Override

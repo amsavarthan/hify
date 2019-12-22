@@ -133,21 +133,10 @@ public class PostImage extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_post_image_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
-            setContentView(R.layout.activity_post_image);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
         }
+        setContentView(R.layout.activity_post_image);
 
         imagesList=getIntent().getParcelableArrayListExtra("imagesList");
 

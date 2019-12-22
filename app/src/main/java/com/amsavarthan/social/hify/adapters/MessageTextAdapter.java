@@ -63,7 +63,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
     @Override
     public void onBindViewHolder(@NonNull final MessageTextAdapter.ViewHolder holder, int position) {
 
-        try {
+        /*try {
             if (messageList.get(position).getRead()=="true") {
                 holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
                 holder.read_icon.setVisibility(View.VISIBLE);
@@ -83,7 +83,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
         Glide.with(context)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
@@ -125,17 +125,18 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
             intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
             intent.putExtra("read", messageList.get(holder.getAdapterPosition()).getRead());
             intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
+            intent.putExtra("name", messageList.get(holder.getAdapterPosition()).getUsername());
             intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
             context.startActivity(intent);
 
             messageList.get(holder.getAdapterPosition()).setRead("true");
-            holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
+            /*holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
             holder.read_icon.setVisibility(View.VISIBLE);
             holder.read_icon.setAlpha(0.0f);
             holder.read_icon.animate()
                     .alpha(1.0f)
                     .setDuration(300)
-                    .start();
+                    .start();*/
         });
 
         String timeAgo = TimeAgo.using(Long.parseLong(messageList.get(holder.getAdapterPosition()).getTimestamp()));
@@ -178,7 +179,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
 
         private View mView;
         private CircleImageView image;
-        private ImageView read_icon;
+        //private ImageView read_icon;
         private TextView message,name,time;
 
         public ViewHolder(View itemView) {
@@ -189,7 +190,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
             name = mView.findViewById(R.id.name);
             message = mView.findViewById(R.id.message);
             time = mView.findViewById(R.id.time);
-            read_icon=mView.findViewById(R.id.read);
+            //read_icon=mView.findViewById(R.id.read);
 
         }
     }

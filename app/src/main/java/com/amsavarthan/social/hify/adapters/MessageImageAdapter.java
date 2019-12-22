@@ -47,11 +47,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
     @Override
     public MessageImageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mFirestore=FirebaseFirestore.getInstance();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.message_text_item_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.message_text_item,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.message_text_item,parent,false);
         return new ViewHolder(view);
     }
 
@@ -68,8 +64,8 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
     @Override
     public void onBindViewHolder(@NonNull final MessageImageAdapter.ViewHolder holder, int position) {
 
-        try {
-            if (messageList.get(position).getRead()=="true") {
+        /*try {
+            if (messageList.get(position).getRead().equals("true")) {
                 holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
                 holder.read_icon.setVisibility(View.VISIBLE);
                 holder.read_icon.setAlpha(0.0f);
@@ -88,7 +84,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
         Glide.with(context)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
@@ -117,18 +113,19 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
             intent.putExtra("doc_id", messageList.get(holder.getAdapterPosition()).msgId);
             intent.putExtra("read", messageList.get(holder.getAdapterPosition()).getRead());
             intent.putExtra("from_id", messageList.get(holder.getAdapterPosition()).getFrom());
+            intent.putExtra("name", messageList.get(holder.getAdapterPosition()).getUsername());
             intent.putExtra("message", messageList.get(holder.getAdapterPosition()).getMessage());
             intent.putExtra("image", messageList.get(holder.getAdapterPosition()).getImage());
             context.startActivity(intent);
 
             messageList.get(holder.getAdapterPosition()).setRead("true");
-            holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
+           /* holder.read_icon.setImageDrawable(context.getResources().getDrawable(R.drawable.read_icon));
             holder.read_icon.setVisibility(View.VISIBLE);
             holder.read_icon.setAlpha(0.0f);
             holder.read_icon.animate()
                     .alpha(1.0f)
                     .setDuration(300)
-                    .start();
+                    .start();*/
         });
 
         String timeAgo = TimeAgo.using(Long.parseLong(messageList.get(holder.getAdapterPosition()).getTimestamp()));
@@ -169,7 +166,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView read_icon;
+        //private ImageView read_icon;
         private View mView;
         private CircleImageView image;
         private TextView message,name,time;
@@ -182,7 +179,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
             name = mView.findViewById(R.id.name);
             message = mView.findViewById(R.id.message);
             time = mView.findViewById(R.id.time);
-            read_icon=mView.findViewById(R.id.read);
+            //read_icon=mView.findViewById(R.id.read);
 
         }
     }

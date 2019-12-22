@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryy"
+    android:background="?colorPrimaryDark"
     tools:context=".ui.activities.notification.NotificationImage">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -21,7 +21,6 @@
             app:title="Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -40,7 +39,7 @@
                 android:id="@+id/messageImageHolder"
                 android:layout_alignParentEnd="true"
                 app:cardUseCompatPadding="true"
-                app:cardBackgroundColor="#ccc"
+                style="@style/Widget.MaterialComponents.CardView"
                 app:cardCornerRadius="18dp"
                 android:layout_margin="8dp"
                 android:clickable="true"
@@ -69,11 +68,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="10dp"
                 android:layout_marginStart="10dp"
+                android:background="@drawable/textview_tab_style_blue"
                 android:layout_below="@+id/messageImageHolder"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/textview_tab_style_blue"
-                android:padding="10dp"
-                android:textColor="#fff" />
+                android:padding="10dp"/>
 
             <LinearLayout
                 android:id="@+id/toolbar"
@@ -110,7 +108,7 @@
                         android:id="@+id/replytxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/textview_tab_style_black"
+                        android:background="@drawable/textview_tab_style_grey"
                         android:padding="10dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
@@ -194,6 +192,7 @@
                 android:layout_margin="5dp"
                 android:layout_height="wrap_content"
                 android:text="Send new"
+                android:textColor="?android:textColorPrimary"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:onClick="SendNew"
                 android:textAllCaps="false"
@@ -205,6 +204,8 @@
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
                 android:layout_height="wrap_content"
+                android:textColor="?colorAccent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:text="Reply"
                 android:textAllCaps="false"
                  />

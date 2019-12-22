@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryy"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
@@ -12,8 +11,7 @@
     <RelativeLayout
         android:id="@+id/view_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/delete_icon"
@@ -32,16 +30,16 @@
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@id/delete_icon"
             android:text="Unfriend"
-            android:textColor="#fff"
+            android:textColor="?android:textColorPrimary"
             android:textSize="13dp" />
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:background="?colorPrimarySurface"
         android:id="@+id/view_foreground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
         android:padding="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -66,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/loading_name"
-                android:textColor="#212121"
+                android:textColor="?android:textColorPrimary"
                 android:textSize="16sp" />
 
             <TextView

@@ -60,10 +60,7 @@ public class FriendQuestions extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_my_answered_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_my_answered, container, false);
+        return inflater.inflate(R.layout.frag_my_answered, container, false);
     }
 
     public static FriendQuestions newInstance(String user_id){

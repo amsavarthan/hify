@@ -29,7 +29,6 @@
                 android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
                 >
 
                 <ImageView
@@ -43,8 +42,8 @@
                     android:id="@+id/default_title"
                     fontPath="fonts/GoogleSans_Bold.ttf"
                     android:textSize="19sp"
+                    android:textColor="?android:textColorPrimary"
                     android:gravity="center"
-                    android:textColor="#313131"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:ignore="MissingPrefix" />

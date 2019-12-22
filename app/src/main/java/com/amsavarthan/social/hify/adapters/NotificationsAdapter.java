@@ -48,11 +48,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_notification_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_notification,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.item_notification,parent,false);
         return new ViewHolder(view);
     }
 

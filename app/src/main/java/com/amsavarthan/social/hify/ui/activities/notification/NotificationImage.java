@@ -130,21 +130,7 @@ public class NotificationImage extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_notification_image_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
-            setContentView(R.layout.activity_notification_image);
-        }
+        setContentView(R.layout.activity_notification_image);
 
         Toolbar toolbar=findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -167,7 +153,11 @@ public class NotificationImage extends AppCompatActivity {
         imageUri = getIntent().getStringExtra("image");
 
         mFirestore = FirebaseFirestore.getInstance();
-
+        nameTxt.setText(getIntent().getStringExtra("name"));
+        Glide.with(this)
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .load(getIntent().getStringExtra("image"))
+                .into(imageView);
 
         Glide.with(NotificationImage.this)
                 .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.placeholder))

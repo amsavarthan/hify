@@ -20,7 +20,6 @@
             app:title="Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -63,19 +62,19 @@
                        android:padding="5dp"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
-                       android:textColor="#FF000000"
+                       android:textColor="?android:textColorPrimary"
                        />
 
                    <TextView
                        android:id="@+id/messagetxt"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
-                       android:background="@drawable/textview_tab_style_black"
+                       android:background="@drawable/textview_tab_style_grey"
                        android:padding="10dp"
+                       android:textColor="?android:textColorPrimaryInverse"
                        android:layout_marginEnd="10dp"
                        android:layout_marginStart="10dp"
-                       android:textSize="17sp"
-                       android:textColor="#fff" />
+                       android:textSize="17sp" />
 
                </LinearLayout>
 
@@ -86,7 +85,6 @@
                style="?android:attr/progressBarStyleHorizontal"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:layout_centerHorizontal="true"
                android:indeterminate="true"
                android:visibility="gone" />
 
@@ -150,6 +148,7 @@
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:textColor="?android:textColorPrimary"
                 android:layout_height="wrap_content"
                 android:onClick="SendNew"
                 android:text="Send new"
@@ -160,8 +159,9 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
+                android:textColor="?colorAccent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_height="wrap_content"
-                android:background="@drawable/input_backgtound"
                 android:text="Reply"
                 android:textAllCaps="false"/>
 

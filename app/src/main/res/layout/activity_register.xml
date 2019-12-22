@@ -6,7 +6,6 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
     tools:context=".ui.activities.account.RegisterActivity">
 
     <ScrollView
@@ -20,14 +19,16 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/header"
                 android:scaleType="fitStart"
                 android:src="@mipmap/header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <!--android:layout_marginTop="120dp"-->
             <LinearLayout
-                android:layout_marginTop="120dp"
+                android:layout_marginTop="40dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 android:orientation="vertical"
@@ -41,7 +42,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Get on Board"
-                    android:textColor="#212121"
                     android:textSize="32sp"
                     tools:ignore="MissingPrefix" />
 
@@ -175,13 +175,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Terms and Use"
                         android:onClick="openTerms"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:textAllCaps="false"
                         android:textSize="16sp" />
 
@@ -191,28 +191,28 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Privacy Policy"
                         android:onClick="openPolicy"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="@style/Widget.AppCompat.Button.Borderless.Colored"
                         android:textAllCaps="false"
                         android:textSize="16sp" />
 
                 </LinearLayout>
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:layout_gravity="center"
                     android:id="@+id/button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sign Up"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:padding="10dp"
                     android:layout_marginTop="10dp"
                     android:textAllCaps="false"
-                    android:textColor="#FFF"
                     android:textSize="16sp" />
 
                 <Button
@@ -222,10 +222,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onLogin"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:textColor="#989898"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:text="I am already a member"
                     android:textAllCaps="false"
-                    android:textColor="#757575"
                     android:textSize="16sp" />
 
             </LinearLayout>

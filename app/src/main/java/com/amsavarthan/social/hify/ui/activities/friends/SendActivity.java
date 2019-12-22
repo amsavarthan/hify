@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -17,9 +18,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -58,6 +61,8 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
+import static android.content.res.Configuration.UI_MODE_NIGHT_NO;
+import static android.content.res.Configuration.UI_MODE_NIGHT_YES;
 import static com.amsavarthan.social.hify.utils.Config.random;
 
 public class SendActivity extends AppCompatActivity {
@@ -119,24 +124,20 @@ public class SendActivity extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_send_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-
-                }
-            }
-        }else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
-            setContentView(R.layout.activity_send);
-        }
+        setContentView(R.layout.activity_send);
 
         final Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        int nightModeFlags=getResources().getConfiguration().uiMode& Configuration.UI_MODE_NIGHT_MASK;
+        if(nightModeFlags==UI_MODE_NIGHT_NO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int flags=getWindow().getDecorView().getSystemUiVisibility();
+                flags|=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            }
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDarkk));
+        }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -188,54 +189,45 @@ public class SendActivity extends AppCompatActivity {
             }
         });
 
-        mFirestore.collection("Users").document(current_id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                c_name=documentSnapshot.getString("name");
-                c_image=documentSnapshot.getString("image");
-            }
+        mFirestore.collection("Users").document(current_id).get().addOnSuccessListener(documentSnapshot -> {
+            c_name=documentSnapshot.getString("name");
+            c_image=documentSnapshot.getString("image");
         });
 
-        mSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        mSend.setOnClickListener(view -> {
 
-                String message_=message.getText().toString();
-                if(!TextUtils.isEmpty(message_)){
+            String message_=message.getText().toString();
+            if(!TextUtils.isEmpty(message_)){
 
-                    if(imageUri==null){
+                if(imageUri==null){
 
-                        SendMessage.startActivity(SendActivity.this,"normal_message",message_,c_name,c_image,current_id,user_id);
-                        //Send only message
-                        message.setText("");
+                    SendMessage.startActivity(SendActivity.this,"normal_message",message_,c_name,c_image,current_id,user_id);
+                    //Send only message
+                    message.setText("");
 
-                    }else {
+                }else {
 
-                        SendMessage.startActivity(SendActivity.this,"normal_message",message_,imageUri,c_name,c_image,current_id,user_id,f_name);
-                        //Send message with Image
-                        message.setText("");
-                        imagePreview.setVisibility(View.GONE);
-                        text.setVisibility(View.VISIBLE);
+                    SendMessage.startActivity(SendActivity.this,"normal_message",message_,imageUri,c_name,c_image,current_id,user_id,f_name);
+                    //Send message with Image
+                    message.setText("");
+                    imagePreview.setVisibility(View.GONE);
+                    text.setVisibility(View.VISIBLE);
 
-                    }
-
-
-                }else{
-                    AnimationUtil.shakeView(message, SendActivity.this);
                 }
 
 
+            }else{
+                AnimationUtil.shakeView(message, SendActivity.this);
             }
+
+
         });
 
-        imagePreview.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if(imageUri!=null){
-                    RemoveImage();
-                }
-                return true;
+        imagePreview.setOnLongClickListener(v -> {
+            if(imageUri!=null){
+                RemoveImage();
             }
+            return true;
         });
 
 
@@ -256,33 +248,30 @@ public class SendActivity extends AppCompatActivity {
 
     private void getPhotos(String placeId) {
         final Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoDataClient.getPlacePhotos(placeId);
-        photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
-            @Override
-            public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
-               try {
-                   PlacePhotoMetadataResponse photos = task.getResult();
-                   PlacePhotoMetadataBuffer photoMetadataBuffer;
+        photoMetadataResponse.addOnCompleteListener(task -> {
+           try {
+               PlacePhotoMetadataResponse photos = task.getResult();
+               PlacePhotoMetadataBuffer photoMetadataBuffer;
 
-                   photoMetadataBuffer = photos.getPhotoMetadata();
-                   PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
-                   CharSequence attribution = photoMetadata.getAttributions();
-                   Task<PlacePhotoResponse> photoResponse = mGeoDataClient.getPhoto(photoMetadata);
-                   photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
-                       @Override
-                       public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
-                           PlacePhotoResponse photo = task.getResult();
-                           Bitmap bitmap = photo.getBitmap();
-                           imagePreview.setVisibility(View.VISIBLE);
-                           text.setVisibility(View.GONE);
-                           showRemoveButton();
-                           imageUri = getImageUri(SendActivity.this, bitmap);
-                           imagePreview.setImageURI(getImageUri(SendActivity.this, bitmap));
-                       }
-                   });
-               }catch (Exception ex){
-                   Toasty.info(SendActivity.this, "No image found for this place.", Toasty.LENGTH_SHORT,true).show();
-               }
-            }
+               photoMetadataBuffer = photos.getPhotoMetadata();
+               PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+               CharSequence attribution = photoMetadata.getAttributions();
+               Task<PlacePhotoResponse> photoResponse = mGeoDataClient.getPhoto(photoMetadata);
+               photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
+                   @Override
+                   public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
+                       PlacePhotoResponse photo = task.getResult();
+                       Bitmap bitmap = photo.getBitmap();
+                       imagePreview.setVisibility(View.VISIBLE);
+                       text.setVisibility(View.GONE);
+                       showRemoveButton();
+                       imageUri = getImageUri(SendActivity.this, bitmap);
+                       imagePreview.setImageURI(getImageUri(SendActivity.this, bitmap));
+                   }
+               });
+           }catch (Exception ex){
+               Toasty.info(SendActivity.this, "No image found for this place.", Toasty.LENGTH_SHORT,true).show();
+           }
         });
     }
 

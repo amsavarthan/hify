@@ -51,11 +51,7 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_friend_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_friend,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.item_friend,parent,false);
         return new ViewHolder(view);
     }
 

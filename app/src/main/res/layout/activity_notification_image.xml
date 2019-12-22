@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryy"
+    android:background="?colorPrimaryDark"
     tools:context=".ui.activities.notification.NotificationImage">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -21,7 +21,6 @@
             app:title="Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -45,6 +44,7 @@
                 >
 
                <LinearLayout
+                   android:layout_marginTop="10dp"
                    android:orientation="vertical"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content">
@@ -57,9 +57,9 @@
 
                        <de.hdodenhof.circleimageview.CircleImageView
                            android:id="@+id/circleImageView"
-                           android:layout_width="48dp"
+                           android:layout_width="32dp"
                            android:layout_marginStart="10dp"
-                           android:layout_height="48dp"
+                           android:layout_height="32dp"
                            android:src="@drawable/default_user_art_g_2"
                            app:civ_border_color="@color/colorPrimaryy"
                            app:civ_border_width="0dp" />
@@ -72,7 +72,7 @@
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_marginBottom="5dp"
-                           android:textColor="#FF000000"
+                           android:textColor="?android:textColorPrimary"
                            />
 
                    </LinearLayout>
@@ -82,7 +82,7 @@
                        android:layout_marginTop="5dp"
                        android:layout_margin="8dp"
                        app:cardCornerRadius="18dp"
-                       app:cardBackgroundColor="#ccc"
+                       style="@style/Widget.MaterialComponents.CardView"
                        android:gravity="center_vertical"
                        android:orientation="vertical"
                        android:layout_width="match_parent"
@@ -102,12 +102,12 @@
                        android:id="@+id/messagetxt"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
-                       android:background="@drawable/textview_tab_style_black"
+                       android:background="@drawable/textview_tab_style_grey"
                        android:padding="10dp"
                        android:layout_marginTop="5dp"
                        android:layout_marginStart="10dp"
                        android:textSize="17sp"
-                       android:textColor="#fff" />
+                       android:textColor="?android:textColorPrimaryInverse" />
 
                </LinearLayout>
 
@@ -184,8 +184,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:onClick="SendNew"
+                android:textColor="?android:textColorPrimary"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:text="Send new Hify"
+                android:text="Send new"
                 android:textAllCaps="false"
                 />
 
@@ -195,7 +196,8 @@
                 android:layout_width="0dp"
                 android:layout_margin="5dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/input_backgtound"
+                android:textColor="?colorAccent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:text="Reply"
                 android:textAllCaps="false" />
 

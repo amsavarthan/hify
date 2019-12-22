@@ -4,17 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryy"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/view_background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/delete_icon"
@@ -33,16 +31,16 @@
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/delete_icon"
             android:text="Add as friend"
-            android:textColor="#fff"
+            android:textColor="#989898"
             android:textSize="13sp" />
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:background="?colorPrimarySurface"
         android:id="@+id/view_foreground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
         android:padding="15dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -64,9 +62,9 @@
 
             <TextView
                 android:id="@+id/name"
+                android:textColor="?android:textColorPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#212121"
                 android:textSize="16sp" />
 
             <TextView
@@ -93,7 +91,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
-            android:foreground="?android:attr/selectableItemBackground"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:padding="10dp"
@@ -107,7 +105,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
-            android:foreground="?android:attr/selectableItemBackground"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:padding="10dp"

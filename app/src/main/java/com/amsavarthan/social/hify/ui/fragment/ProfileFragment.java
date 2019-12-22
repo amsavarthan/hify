@@ -89,10 +89,7 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            return inflater.inflate(R.layout.frag_profile_view_dark, container, false);
-        else
-            return inflater.inflate(R.layout.frag_profile_view, container, false);
+        return inflater.inflate(R.layout.frag_profile_view, container, false);
     }
 
     @Override
@@ -171,10 +168,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-                rootView= inflater.inflate(R.layout.main_drawer_dark, container, false);
-            else
-                rootView= inflater.inflate(R.layout.main_drawer, container, false);
+            rootView= inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -285,10 +279,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-                rootView= inflater.inflate(R.layout.main_drawer_dark, container, false);
-            else
-                rootView= inflater.inflate(R.layout.main_drawer, container, false);
+            rootView= inflater.inflate(R.layout.main_drawer, container, false);
             return rootView;
         }
 
@@ -439,10 +430,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-                rootView= inflater.inflate(R.layout.frag_about_profile_dark, container, false);
-            else
-                rootView= inflater.inflate(R.layout.frag_about_profile, container, false);
+           rootView= inflater.inflate(R.layout.frag_about_profile, container, false);
 
             mAuth = FirebaseAuth.getInstance();
             mFirestore = FirebaseFirestore.getInstance();
@@ -546,10 +534,7 @@ public class ProfileFragment extends Fragment {
         @Override
         public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            if(getActivity().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-                rootView= inflater.inflate(R.layout.frag_edit_profile_dark, container, false);
-            else
-                rootView= inflater.inflate(R.layout.frag_edit_profile, container, false);
+            rootView= inflater.inflate(R.layout.frag_edit_profile, container, false);
 
             mAuth = FirebaseAuth.getInstance();
             mFirestore = FirebaseFirestore.getInstance();

@@ -63,11 +63,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context=parent.getContext();
-        View view=null;
-        if(parent.getContext().getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            view= LayoutInflater.from(context).inflate(R.layout.item_answer_dark,parent,false);
-        else
-            view= LayoutInflater.from(context).inflate(R.layout.item_answer,parent,false);
+        View view=LayoutInflater.from(context).inflate(R.layout.item_answer,parent,false);
         return new ViewHolder(view);    }
 
     @Override
@@ -103,7 +99,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                         .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
                         .load(documentSnapshot.getString("image"))
                         .into(holder.profile_pic))
-                .addOnFailureListener(e -> e.printStackTrace());
+                .addOnFailureListener(Throwable::printStackTrace);
 
         FirebaseFirestore.getInstance().collection("Users")
                 .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -111,11 +107,11 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                 .addOnSuccessListener(documentSnapshot -> {
                     if(answer.getName().equals(documentSnapshot.getString("name"))){
                         holder.name.setText("You");
-                        if(answer.getIs_answer().equals("yes")) {
+                        /*if(answer.getIs_answer().equals("yes")) {
                             holder.delete.setVisibility(View.GONE);
                         }else{
                             holder.delete.setVisibility(View.VISIBLE);
-                        }
+                        }*/
                     }
                 });
 
@@ -128,7 +124,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
         }
 
         if(answer.getIs_answer().equals("yes")){
-            holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
+            //holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
             if(owner_id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                 holder.mrk_ans.setVisibility(View.GONE);
                 holder.unmrk_ans.setVisibility(View.VISIBLE);
@@ -207,7 +203,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                                                                         .add(notificationMap)
                                                                         .addOnSuccessListener(documentReference -> {
 
-                                                                            holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
+                                                                            //holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.green_bottom));
                                                                             holder.mrk_ans.setVisibility(View.GONE);
                                                                             holder.unmrk_ans.setVisibility(View.VISIBLE);
                                                                             mDialog.dismiss();
@@ -291,7 +287,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                                             Toasty.success(context, "Unmarked as answer", Toasty.LENGTH_SHORT,true).show();
                                             notifyDataSetChanged();
 
-                                            holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.black_bottom));
+                                            //holder.bottom.setBackgroundColor(context.getResources().getColor(R.color.black_bottom));
                                             holder.unmrk_ans.setVisibility(View.GONE);
                                             holder.mrk_ans.setVisibility(View.VISIBLE);
 
@@ -314,7 +310,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                 })
                 .onNegative((dialog, which) -> dialog.dismiss()).show());
 
-        holder.delete.setOnClickListener(v ->
+        /*holder.delete.setOnClickListener(v ->
                 new MaterialDialog.Builder(context)
                 .title("Delete")
                 .content("Are you sure do you want to delete it?")
@@ -405,6 +401,8 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
 
                 })
                 .onNegative((dialog, which) -> dialog.dismiss()).show());
+
+         */
 
         if(owner_id.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
 
@@ -518,7 +516,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
         FrameLayout bottom;
         TextView answer,name,timestamp;
         Button mrk_ans,unmrk_ans;
-        ImageButton delete;
+        //ImageButton delete;
         CircleImageView profile_pic;
 
         ViewHolder(View itemView) {
@@ -526,7 +524,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
 
             item=itemView.findViewById(R.id.layout);
             bottom=itemView.findViewById(R.id.bottom);
-            delete=itemView.findViewById(R.id.delete);
+            //delete=itemView.findViewById(R.id.delete);
             mrk_ans=itemView.findViewById(R.id.mrk_ans);
             unmrk_ans=itemView.findViewById(R.id.unmrk_ans);
             answer=itemView.findViewById(R.id.answer);

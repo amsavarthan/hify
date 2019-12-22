@@ -297,22 +297,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                 .build());
 
 
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-            setContentView(R.layout.activity_main_dark);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor("#212121"));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()&~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                }
-            }
-        }
-        else {
-            setContentView(R.layout.activity_main);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-            }
-        }
-
+        setContentView(R.layout.activity_main);
         activity=this;
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -352,25 +337,13 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             userId = currentuser.getUid();
             storageReference = FirebaseStorage.getInstance().getReference().child("images").child(currentuser.getUid() + ".jpg");
 
-            if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-
-                slidingRootNav = new SlidingRootNavBuilder(this)
-                        .withToolbarMenuToggle(toolbar)
-                        .withMenuOpened(false)
-                        .withContentClickableWhenMenuOpened(false)
-                        .withSavedState(savedInstanceState)
-                        .withMenuLayout(R.layout.activity_main_drawer_dark)
-                        .inject();
-            }else{
-
-                slidingRootNav = new SlidingRootNavBuilder(this)
-                        .withToolbarMenuToggle(toolbar)
-                        .withMenuOpened(false)
-                        .withContentClickableWhenMenuOpened(false)
-                        .withSavedState(savedInstanceState)
-                        .withMenuLayout(R.layout.activity_main_drawer)
-                        .inject();
-            }
+            slidingRootNav = new SlidingRootNavBuilder(this)
+                    .withToolbarMenuToggle(toolbar)
+                    .withMenuOpened(false)
+                    .withContentClickableWhenMenuOpened(false)
+                    .withSavedState(savedInstanceState)
+                    .withMenuLayout(R.layout.activity_main_drawer)
+                    .inject();
 
             screenIcons = loadScreenIcons();
             screenTitles = loadScreenTitles();
@@ -400,13 +373,10 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
             LinearLayout text_post = sheetView.findViewById(R.id.text_post);
             LinearLayout photo_post = sheetView.findViewById(R.id.image_post);
 
-            text_post.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mBottomSheetDialog.dismiss();
-                    PostText.startActivity(MainActivity.this);
+            text_post.setOnClickListener(view -> {
+                mBottomSheetDialog.dismiss();
+                PostText.startActivity(MainActivity.this);
 
-                }
             });
 
             photo_post.setOnClickListener(new View.OnClickListener() {
@@ -717,21 +687,11 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     }
 
     private DrawerItem createItemFor(int position) {
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false)) {
-
-            return new SimpleItem(screenIcons[position], screenTitles[position])
-                    .withIconTint(color(R.color.white))
-                    .withTextTint(color(R.color.white))
-                    .withSelectedIconTint(color(R.color.colorAccentt))
-                    .withSelectedTextTint(color(R.color.colorAccentt));
-        }else{
-
-            return new SimpleItem(screenIcons[position], screenTitles[position])
-                    .withIconTint(color(R.color.minimal_black))
-                    .withTextTint(color(R.color.minimal_black))
-                    .withSelectedIconTint(color(R.color.colorAccentt))
-                    .withSelectedTextTint(color(R.color.colorAccentt));
-        }
+        return new SimpleItem(screenIcons[position], screenTitles[position])
+                .withIconTint(Color.parseColor("#989898"))
+                .withTextTint(Color.parseColor("#989898"))
+                .withSelectedIconTint(color(R.color.colorAccentt))
+                .withSelectedTextTint(color(R.color.colorAccentt));
     }
 
     @NonNull
@@ -1285,10 +1245,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        if(getSharedPreferences("theme",MODE_PRIVATE).getBoolean("dark",false))
-            menuInflater.inflate(R.menu.menu_posts_dark, menu);
-        else
-            menuInflater.inflate(R.menu.menu_posts,menu);
+        menuInflater.inflate(R.menu.menu_posts,menu);
         add_post=menu.findItem(R.id.action_new);
         add_question=menu.findItem(R.id.action_new_question);
 

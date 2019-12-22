@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?colorPrimaryDark"
     android:orientation="vertical"
-    android:background="#FFF"
     tools:context=".ui.fragment.FriendsFragment"
     >
 
@@ -26,6 +26,7 @@
         android:layout_margin="20dp"
         android:layout_above="@+id/bottom_nav"
         android:padding="16dp"
+        style="@style/Widget.Design.FloatingActionButton"
         android:src="@drawable/ic_search_white_24dp"
         android:transitionName="search" />
 
