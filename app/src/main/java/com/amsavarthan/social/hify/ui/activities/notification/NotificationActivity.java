@@ -3,8 +3,6 @@ package com.amsavarthan.social.hify.ui.activities.notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -123,7 +121,7 @@ public class NotificationActivity extends AppCompatActivity {
         user_id = getIntent().getStringExtra("from_id");
         nameTxt.setText(getIntent().getStringExtra("name"));
         Glide.with(NotificationActivity.this)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(getIntent().getStringExtra("image"))
                 .into(imageView);
 
@@ -137,7 +135,7 @@ public class NotificationActivity extends AppCompatActivity {
                 CircleImageView imageView=findViewById(R.id.currentProfile);
 
                 Glide.with(NotificationActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                         .load(image_)
                         .into(imageView);
 
@@ -152,7 +150,7 @@ public class NotificationActivity extends AppCompatActivity {
             String image_ = documentSnapshot.getString("image");
 
             Glide.with(NotificationActivity.this)
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                     .load(image_)
                     .into(imageView);
 

@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -53,6 +54,7 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
+import static android.content.res.Configuration.UI_MODE_NIGHT_NO;
 import static android.view.View.GONE;
 
 public class PostImage extends AppCompatActivity {
@@ -133,9 +135,6 @@ public class PostImage extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-        }
         setContentView(R.layout.activity_post_image);
 
         imagesList=getIntent().getParcelableArrayListExtra("imagesList");
@@ -147,6 +146,16 @@ public class PostImage extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("New Image Post");
+
+        int nightModeFlags=getResources().getConfiguration().uiMode& Configuration.UI_MODE_NIGHT_MASK;
+        if(nightModeFlags==UI_MODE_NIGHT_NO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int flags=getWindow().getDecorView().getSystemUiVisibility();
+                flags|=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            }
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDarkk));
+        }
 
         try {
             getSupportActionBar().setTitle("New Image Post");

@@ -463,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
         imageView = findViewById(R.id.profile_image);
         username.setText(nam);
         Glide.with(this)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(imag)
                 .into(imageView);
 
@@ -926,7 +926,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
                         username.setText(name);
                         Glide.with(MainActivity.this)
-                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                 .load(image)
                                 .into(imageView);
 
@@ -948,7 +948,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                                                     public void onSuccess(Void aVoid) {
                                                         userHelper.updateContactImage(1, downloadUri.toString());
                                                         Glide.with(MainActivity.this)
-                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                                                 .load(downloadUri)
                                                                 .into(imageView);
 
@@ -1081,7 +1081,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
 
                                         username.setText(name);
                                         Glide.with(MainActivity.this)
-                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                                 .load(image)
                                                 .into(imageView);
 
@@ -1103,7 +1103,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
                                                                     public void onSuccess(Void aVoid) {
                                                                         userHelper.updateContactImage(1, downloadUri.toString());
                                                                         Glide.with(MainActivity.this)
-                                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                                                                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                                                                 .load(downloadUri)
                                                                                 .into(imageView);
 

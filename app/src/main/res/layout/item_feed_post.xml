@@ -30,7 +30,7 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/post_user_image"
                 android:layout_width="30dp"
-                android:src="@drawable/default_user_art_g_2"
+                android:src="@drawable/default_profile_picture"
                 android:layout_centerVertical="true"
                 android:layout_height="30dp"
                 />

@@ -47,7 +47,7 @@
                         android:layout_height="100dp"
                         android:layout_gravity="center_horizontal"
                         android:onClick="setProfilepic"
-                        android:src="@drawable/default_user_art_g_2" />
+                        android:src="@drawable/default_profile_picture" />
 
                     <Button
                         android:layout_gravity="center"

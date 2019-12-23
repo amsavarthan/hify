@@ -24,8 +24,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by amsavarthan on 22/2/18.
  */
@@ -63,7 +61,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         holder.name.setText(usersList.get(position).getName());
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(usersList.get(position).getImage())
                 .into(holder.image);
 
@@ -91,7 +89,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
                             holder.name.setText(documentSnapshot.getString("name"));
 
                             Glide.with(context)
-                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                     .load(documentSnapshot.getString("image"))
                                     .into(holder.image);
 
@@ -127,7 +125,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
 
                             Glide.with(context)
-                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                     .load(documentSnapshot.getString("image"))
                                     .into(holder.image);
 

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
     android:orientation="vertical"
     tools:context="com.amsavarthan.social.hify.ui.activities.post.PostImage">
 
@@ -18,7 +17,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="#FFF"
             app:title="New Image Post" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -37,7 +35,6 @@
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/pager"
-                android:background="@color/colorPrimaryy"
                 android:layout_gravity="top"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -93,7 +90,6 @@
                 android:background="?selectableItemBackground"
                 android:layout_marginEnd="10dp"
                 android:layout_toStartOf="@+id/delete"
-                android:layout_toLeftOf="@+id/delete"
                 android:id="@+id/edit_crop"
                 android:padding="10dp"
                 android:src="@drawable/ic_crop_rotate_black_24dp"
@@ -102,19 +98,23 @@
 
         </RelativeLayout>
 
-        <EditText
-            android:id="@+id/text"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="15dp"
-            android:background="@drawable/input_light_white"
             android:hint="Some description about the post"
-            android:maxLines="5"
-            android:inputType="text|textMultiLine"
-            android:paddingStart="20dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp" />
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/text"
+                android:maxLines="5"
+                android:inputType="text|textMultiLine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

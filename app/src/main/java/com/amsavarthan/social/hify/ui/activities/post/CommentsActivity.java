@@ -2,20 +2,22 @@ package com.amsavarthan.social.hify.ui.activities.post;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -53,6 +55,8 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
+import static android.content.res.Configuration.UI_MODE_NIGHT_NO;
+
 public class CommentsActivity extends AppCompatActivity {
 
     String user_id, post_id;
@@ -62,7 +66,7 @@ public class CommentsActivity extends AppCompatActivity {
     private ProgressBar mProgress;
     private RecyclerView mCommentsRecycler;
     private EditText mCommentText;
-    private MaterialButton mCommentsSend;
+    private AppCompatButton mCommentsSend;
     private FirebaseUser mCurrentUser;
     private boolean owner;
     private CircleImageView user_image;
@@ -170,11 +174,7 @@ public class CommentsActivity extends AppCompatActivity {
                                 .build()))
                 .build());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-        }
         setContentView(R.layout.activity_post_comments);
-
 
         mFirestore = FirebaseFirestore.getInstance();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -182,6 +182,15 @@ public class CommentsActivity extends AppCompatActivity {
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Comments");
+        int nightModeFlags=getResources().getConfiguration().uiMode& Configuration.UI_MODE_NIGHT_MASK;
+        if(nightModeFlags==UI_MODE_NIGHT_NO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int flags=getWindow().getDecorView().getSystemUiVisibility();
+                flags|=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            }
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDarkk));
+        }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -200,7 +209,7 @@ public class CommentsActivity extends AppCompatActivity {
         }
 
         Glide.with(this)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(image)
                 .into(user_image);
 
@@ -220,7 +229,7 @@ public class CommentsActivity extends AppCompatActivity {
                 .document(user_id)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> Glide.with(CommentsActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.gradient_2))
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                         .load( documentSnapshot.getString("image"))
                         .into(user_image))
                 .addOnFailureListener(e -> Log.e("error",e.getLocalizedMessage()));

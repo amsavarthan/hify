@@ -3,6 +3,7 @@ package com.amsavarthan.social.hify.ui.activities.post;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +44,8 @@ import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 import me.grantland.widget.AutofitTextView;
+
+import static android.content.res.Configuration.UI_MODE_NIGHT_NO;
 
 public class PostText extends AppCompatActivity {
 
@@ -102,15 +105,20 @@ public class PostText extends AppCompatActivity {
                 .build());
 
         setContentView(R.layout.activity_post_text);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDarkk));
-        }
-
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("New Text Post");
 
+        int nightModeFlags=getResources().getConfiguration().uiMode& Configuration.UI_MODE_NIGHT_MASK;
+        if(nightModeFlags==UI_MODE_NIGHT_NO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                int flags=getWindow().getDecorView().getSystemUiVisibility();
+                flags|=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            }
+            toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDarkk));
+        }
         try {
             getSupportActionBar().setTitle("New Text Post");
         } catch (Exception e) {

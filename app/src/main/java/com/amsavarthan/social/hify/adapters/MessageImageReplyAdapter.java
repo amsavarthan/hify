@@ -9,12 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.social.hify.R;
-import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.MessageReply;
 import com.amsavarthan.social.hify.ui.activities.notification.NotificationImageReply;
 import com.bumptech.glide.Glide;
@@ -27,8 +25,6 @@ import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -95,7 +91,7 @@ public class MessageImageReplyAdapter extends RecyclerView.Adapter<MessageImageR
                 .addOnSuccessListener(documentSnapshot -> {
 
                     Glide.with(context)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                             .load(documentSnapshot.getString("image"))
                             .into(holder.image);
 

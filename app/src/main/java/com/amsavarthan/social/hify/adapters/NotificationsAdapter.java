@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.social.hify.R;
-import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.Notification;
 import com.amsavarthan.social.hify.ui.activities.forum.AnswersActivity;
 import com.amsavarthan.social.hify.ui.activities.friends.FriendProfile;
@@ -28,8 +27,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -68,7 +65,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         Notification notification=notificationsList.get(position);
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(notification.getImage())
                 .into(holder.image);
 

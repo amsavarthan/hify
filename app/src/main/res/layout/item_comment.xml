@@ -8,7 +8,7 @@
         android:id="@+id/comment_user_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/default_user_art_g_2" />
+        android:src="@drawable/default_profile_picture" />
 
     <RelativeLayout
         android:id="@+id/comment_section"
@@ -44,7 +44,6 @@
             android:visibility="gone"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:tint="#989898"
             android:clickable="true"
             android:focusable="true"
             android:background="?selectableItemBackground"

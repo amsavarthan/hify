@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amsavarthan.social.hify.R;
-import com.amsavarthan.social.hify.adapters.addFriends.AddFriendAdapter;
 import com.amsavarthan.social.hify.models.Friends;
 import com.amsavarthan.social.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
@@ -27,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -69,7 +66,7 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(usersList.get(position).getImage())
                 .into(holder.image);
 

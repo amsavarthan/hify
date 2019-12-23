@@ -29,8 +29,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by amsavarthan on 22/2/18.
  */
@@ -71,7 +69,7 @@ public class AddFriendAdapter extends RecyclerView.Adapter<AddFriendAdapter.View
         holder.listenerText.setText("Add as friend");
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(usersList.get(position).getImage())
                 .into(holder.image);
 

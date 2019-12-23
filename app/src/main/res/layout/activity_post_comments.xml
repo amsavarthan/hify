@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFF"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ui.activities.post.CommentsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/top"
@@ -19,7 +19,6 @@
             app:title="Comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -35,7 +34,7 @@
             android:id="@+id/comment_admin"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/default_user_art_g_2" />
+            android:src="@drawable/default_profile_picture" />
 
         <TextView
             android:layout_gravity="center"
@@ -44,7 +43,7 @@
             android:id="@+id/comment_post_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#212121" />
+            android:textColor="?android:textColorPrimary" />
 
     </LinearLayout>
 
@@ -105,24 +104,24 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/send"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            app:icon="@drawable/ic_send_white_24dp"
-            android:background="@drawable/input_backgtound"
+            android:drawableStart="@drawable/ic_send_white_24dp"
             android:gravity="center"
             android:paddingStart="20dp"
             android:paddingEnd="10dp"
             android:paddingTop="10dp"
             android:text=" Send"
+            android:textColor="?colorControlNormal"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:paddingBottom="10dp"
-            android:singleLine="true"
-            android:textColor="#FFF" />
+            android:singleLine="true"/>
 
 
     </RelativeLayout>

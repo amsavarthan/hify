@@ -141,11 +141,11 @@
         <activity
             android:name=".ui.activities.post.PostText"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme2" />
         <activity
             android:name=".ui.activities.post.CommentsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme2">
             <intent-filter>
                 <action android:name="com.amsavarthan.social.hify.TARGET_COMMENT" />
 
@@ -155,7 +155,7 @@
         <activity
             android:name=".ui.activities.post.PostImage"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme2" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

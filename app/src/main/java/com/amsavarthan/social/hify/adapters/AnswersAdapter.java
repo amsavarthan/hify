@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,8 +30,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHolder> {
 
@@ -96,7 +93,7 @@ public class AnswersAdapter extends RecyclerView.Adapter<AnswersAdapter.ViewHold
                 .document(answer.getUser_id())
                 .get()
                 .addOnSuccessListener(documentSnapshot -> Glide.with(context)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                         .load(documentSnapshot.getString("image"))
                         .into(holder.profile_pic))
                 .addOnFailureListener(Throwable::printStackTrace);

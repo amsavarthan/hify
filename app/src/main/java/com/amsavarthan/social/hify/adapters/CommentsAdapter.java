@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amsavarthan.social.hify.R;
-import com.amsavarthan.social.hify.adapters.viewFriends.ViewFriendAdapter;
 import com.amsavarthan.social.hify.models.Comment;
 import com.amsavarthan.social.hify.ui.activities.friends.FriendProfile;
 import com.bumptech.glide.Glide;
@@ -31,8 +30,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -89,7 +86,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
        holder.image.setOnClickListener(v -> FriendProfile.startActivity(context,commentList.get(holder.getAdapterPosition()).getId()));
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(commentList.get(position).getImage())
                 .into(holder.image);
 
@@ -123,7 +120,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                                 holder.username.setText(documentSnapshot.getString("username"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 
@@ -158,7 +155,7 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
                                         .addOnFailureListener(e -> Log.i("comment_update", "failure"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 

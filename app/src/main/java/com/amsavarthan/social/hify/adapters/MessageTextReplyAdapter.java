@@ -27,8 +27,6 @@ import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by amsavarthan on 22/2/18.
  */
@@ -92,7 +90,7 @@ public class MessageTextReplyAdapter extends RecyclerView.Adapter<MessageTextRep
                 .addOnSuccessListener(documentSnapshot -> {
 
                     Glide.with(context)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                             .load(documentSnapshot.getString("image"))
                             .into(holder.image);
 

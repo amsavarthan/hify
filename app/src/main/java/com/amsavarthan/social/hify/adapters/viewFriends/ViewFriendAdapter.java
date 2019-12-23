@@ -27,8 +27,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * Created by amsavarthan on 22/2/18.
  */
@@ -74,7 +72,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
         holder.username.setText("@"+usersList.get(position).getUsername());
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(usersList.get(position).getImage())
                 .into(holder.image);
 
@@ -107,7 +105,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
                                 holder.username.setText("@"+documentSnapshot.getString("username"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 
@@ -149,7 +147,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
                                 holder.name.setText(documentSnapshot.getString("name"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 
@@ -173,7 +171,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
                                 holder.username.setText("@"+documentSnapshot.getString("username"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 
@@ -209,7 +207,7 @@ public class ViewFriendAdapter extends RecyclerView.Adapter<ViewFriendAdapter.Vi
 
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.image);
 

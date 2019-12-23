@@ -3,8 +3,6 @@ package com.amsavarthan.social.hify.ui.activities.notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -135,7 +133,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
                 CircleImageView imageView=findViewById(R.id.currentProfile);
 
                 Glide.with(NotificationReplyActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                         .load(image_)
                         .into(imageView);
 
@@ -157,7 +155,7 @@ public class NotificationReplyActivity extends AppCompatActivity {
                 String image_ = documentSnapshot.getString("image");
 
                 Glide.with(NotificationReplyActivity.this)
-                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                         .load(image_)
                         .into(imageView);
 

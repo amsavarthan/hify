@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,8 +24,6 @@ import java.util.List;
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -87,7 +84,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
         }*/
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(messageList.get(position).getUserimage())
                 .into(holder.image);
 
@@ -99,7 +96,7 @@ public class MessageImageAdapter extends RecyclerView.Adapter<MessageImageAdapte
                 .addOnSuccessListener(documentSnapshot -> {
 
                     Glide.with(context)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                             .load(documentSnapshot.getString("image"))
                             .into(holder.image);
 

@@ -77,7 +77,6 @@ import es.dmoral.toasty.Toasty;
 import id.zelory.compressor.Compressor;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.MODE_PRIVATE;
 import static androidx.recyclerview.widget.RecyclerView.VERTICAL;
 
 /**
@@ -480,7 +479,7 @@ public class ProfileFragment extends Fragment {
             bio.setText(bi);
 
             Glide.with(rootView.getContext())
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                     .load(imag)
                     .into(profile_pic);
 
@@ -691,7 +690,7 @@ public class ProfileFragment extends Fragment {
             location.setText(loc);
 
             Glide.with(rootView.getContext())
-                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                     .load(imag)
                     .into(profile_pic);
 

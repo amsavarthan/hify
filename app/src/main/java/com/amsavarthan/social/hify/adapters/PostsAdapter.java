@@ -90,8 +90,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import me.grantland.widget.AutofitTextView;
 
-import static android.content.Context.MODE_PRIVATE;
-
 
 /**
  * Created by amsavarthan on 22/2/18.
@@ -297,7 +295,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 holder.user_name.setText(documentSnapshot.getString("username"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.user_image);
 
@@ -328,7 +326,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                         .addOnFailureListener(e -> Log.i("post_update", "failure"));
 
                                 Glide.with(context)
-                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                        .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                         .load(documentSnapshot.getString("image"))
                                         .into(holder.user_image);
 

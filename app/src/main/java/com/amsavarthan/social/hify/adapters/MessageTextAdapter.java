@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -86,7 +85,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
         }*/
 
         Glide.with(context)
-                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                 .load(messageList.get(position).getUserimage())
                 .into(holder.image);
 
@@ -98,7 +97,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
                 .addOnSuccessListener(documentSnapshot -> {
 
                     Glide.with(context)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                             .load(documentSnapshot.getString("image"))
                             .into(holder.image);
 
@@ -112,7 +111,7 @@ public class MessageTextAdapter extends RecyclerView.Adapter<MessageTextAdapter.
                 .addOnSuccessListener(documentSnapshot -> {
 
                     Glide.with(context)
-                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                            .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                             .load(documentSnapshot.getString("image"))
                             .into(holder.image);
 

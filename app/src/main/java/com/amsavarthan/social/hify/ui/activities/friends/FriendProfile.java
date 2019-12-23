@@ -6,8 +6,6 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -91,7 +89,6 @@ public class FriendProfile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         ViewPump.init(ViewPump.builder()
                 .addInterceptor(new CalligraphyInterceptor(
                         new CalligraphyConfig.Builder()
@@ -113,20 +110,14 @@ public class FriendProfile extends AppCompatActivity {
         FirebaseFirestore.getInstance().collection("Users")
                 .document(id)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        toolbar.setTitle(documentSnapshot.getString("name"));
-                        getSupportActionBar().setTitle(documentSnapshot.getString("name"));
-                    }
+                .addOnSuccessListener(documentSnapshot -> {
+                    toolbar.setTitle(documentSnapshot.getString("name"));
+                    getSupportActionBar().setTitle(documentSnapshot.getString("name"));
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        toolbar.setTitle("Friend Profile");
-                        getSupportActionBar().setTitle("Friend Profile");
-                        e.printStackTrace();
-                    }
+                .addOnFailureListener(e -> {
+                    toolbar.setTitle("Friend Profile");
+                    getSupportActionBar().setTitle("Friend Profile");
+                    e.printStackTrace();
                 });
 
         final Bundle bundle = new Bundle();
@@ -137,30 +128,27 @@ public class FriendProfile extends AppCompatActivity {
         loadFragment(fragment);
 
         BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_nav);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_profile:
-                        Fragment aboutfragment=new AboutFragment();
-                        aboutfragment.setArguments(bundle);
-                        loadFragment(aboutfragment);
-                        break;
-                    case R.id.action_posts:
-                        Fragment profilefragment=new PostsFragment();
-                        profilefragment.setArguments(bundle);
-                        loadFragment(profilefragment);
-                        break;
-                    case R.id.action_question:
-                        loadFragment(FriendQuestions.newInstance(id));
-                        break;
-                    default:
-                        Fragment fragment=new AboutFragment();
-                        fragment.setArguments(bundle);
-                        loadFragment(fragment);
-                }
-                return true;
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_profile:
+                    Fragment aboutfragment=new AboutFragment();
+                    aboutfragment.setArguments(bundle);
+                    loadFragment(aboutfragment);
+                    break;
+                case R.id.action_posts:
+                    Fragment profilefragment=new PostsFragment();
+                    profilefragment.setArguments(bundle);
+                    loadFragment(profilefragment);
+                    break;
+                case R.id.action_question:
+                    loadFragment(FriendQuestions.newInstance(id));
+                    break;
+                default:
+                    Fragment fragment1 =new AboutFragment();
+                    fragment1.setArguments(bundle);
+                    loadFragment(fragment1);
             }
+            return true;
         });
 
         bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
@@ -377,7 +365,7 @@ public class FriendProfile extends AppCompatActivity {
                             bio.setText(documentSnapshot.getString("bio"));
 
                             Glide.with(rootView.getContext())
-                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_user_art_g_2))
+                                    .setDefaultRequestOptions(new RequestOptions().placeholder(R.drawable.default_profile_picture))
                                     .load(friend_image)
                                     .into(profile_pic);
 
