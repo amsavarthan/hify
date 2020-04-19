@@ -53,35 +53,82 @@ Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
 ## Screenshots
 
 <table>
-
-  <tr>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583121990.png"> </td>
-    <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583127717.png"> </td>
-  </tr>
-  
-  <tr>
-        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583134324.png"> </td>
-        <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583139083.png"> </td>
-  </tr>
-  
-   <tr>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561583139083.png"> </td>
-         <td> <img src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/1561585283943.png"> </td>
+  <thead>
+    <tr>
+      <th>Light Mode</th>
+      <th>Dark Mode</th>
     </tr>
-    
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Feed.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Feed.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Discover.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Discover.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Friends.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Friends.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Message.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Message.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Forum.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Forum.png"
+        />
+      </td>
+    </tr>
+  </tbody>
 </table>
+
 
 ## Developer
 
 This whole project is maintained only by **Amsavarthan Lv (me)**.<br>
 If you like to contribute, please let me know
 <B>Email : amsavarthan.a@gmail.com</B>
-
-## If you like this project please consider donating
-By donating you help me to improve this project to next level and also buy me some coffee :)
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UF2TDFHZAHELS&source=url
-)
 
 ## Credits
 
