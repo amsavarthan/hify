@@ -32,7 +32,7 @@ public class Splash extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase));
+        super.attachBaseContext(newBase);
         MultiDex.install(this);
     }
 
@@ -40,85 +40,55 @@ public class Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ViewPump.init(ViewPump.builder()
-                .addInterceptor(new CalligraphyInterceptor(
-                        new CalligraphyConfig.Builder()
-                                .setDefaultFontPath("fonts/bold.ttf")
-                                .setFontAttrId(R.attr.fontPath)
-                                .build()))
-                .build());
-
         setContentView(R.layout.activity_splash);
 
-        /*findViewById(R.id.appname).animate()
-                .alpha(1.0f)
-                .setDuration(300)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        findViewById(R.id.appname).setVisibility(View.VISIBLE);
-                    }
-                })
-                .start();*/
+        if(FirebaseAuth.getInstance().getCurrentUser()==null){
+            startActivity(new Intent(Splash.this, LoginActivity.class));
+            finish();
+        }else{
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
+            if(isOnline()){
 
-                if(FirebaseAuth.getInstance().getCurrentUser()==null){
-                    startActivity(new Intent(Splash.this, LoginActivity.class));
-                    finish();
-                }else{
+                UserHelper userHelper=new UserHelper(Splash.this);
+                Cursor rs = userHelper.getData(1);
+                rs.moveToFirst();
 
-                    if(isOnline()){
+                String email = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_EMAIL));
+                String pass = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_PASS));
 
-                        UserHelper userHelper=new UserHelper(Splash.this);
-                        Cursor rs = userHelper.getData(1);
-                        rs.moveToFirst();
-
-                         String email = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_EMAIL));
-                        String pass = rs.getString(rs.getColumnIndex(UserHelper.CONTACTS_COLUMN_PASS));
-
-                        if (!rs.isClosed()) {
-                            rs.close();
-                        }
-
-                        FirebaseAuth.getInstance().signOut();
-                        FirebaseAuth.getInstance()
-                                .signInWithEmailAndPassword(email,pass)
-                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                    @Override
-                                    public void onSuccess(AuthResult authResult) {
-
-                                        MainActivity.startActivity(Splash.this,false);
-                                        finish();
-
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-
-                                        userHelper.deleteContact(1);
-                                        Toasty.error(Splash.this,"Authentication revoked",Toasty.LENGTH_SHORT,true).show();
-                                        startActivity(new Intent(Splash.this, LoginActivity.class));
-                                        finish();
-
-                                    }
-                                });
-
-                    }else{
-
-                        MainActivity.startActivity(Splash.this,true);
-                        finish();
-
-                    }
-
+                if (!rs.isClosed()) {
+                    rs.close();
                 }
 
+                FirebaseAuth.getInstance().signOut();
+                FirebaseAuth.getInstance()
+                        .signInWithEmailAndPassword(email,pass)
+                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                            @Override
+                            public void onSuccess(AuthResult authResult) {
+
+                                MainActivity.startActivity(Splash.this,false);
+                                finish();
+
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+
+                            userHelper.deleteContact(1);
+                            Toasty.error(Splash.this,"Authentication revoked",Toasty.LENGTH_SHORT,true).show();
+                            startActivity(new Intent(Splash.this, LoginActivity.class));
+                            finish();
+
+                        });
+
+            }else{
+
+                MainActivity.startActivity(Splash.this,true);
+                finish();
+
             }
-        },1200);
+
+        }
 
     }
 

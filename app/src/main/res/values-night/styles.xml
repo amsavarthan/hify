@@ -40,7 +40,7 @@
     <style name="SplashAppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorAccent">@color/colorAccentt</item>
         <item name="colorPrimary">@color/colorAccentt</item>
-        <item name="android:windowBackground">@drawable/splash_window_bg_night</item>
+        <item name="android:windowBackground">@drawable/splash_window_bg</item>
         <item name="dialogSheetAccent">@color/colorAccentt</item>
     </style>
 
