@@ -1,11 +1,11 @@
 # Hify
 
-<img src="https://github.com/lvamsavarthan/Hify/blob/master/preview.png">
+<img src="https://github.com/amsavarthan/hify/blob/master/preview.png">
 <br>
 
-[![Hify](https://forthebadge.com/images/badges/built-by-developers.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
-[![Hify](https://forthebadge.com/images/badges/built-with-love.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
-[![Hify](https://forthebadge.com/images/badges/built-for-android.svg)](https://lvamsavarthan.github.io/lvstore/hify.html)
+[![Hify](https://forthebadge.com/images/badges/built-by-developers.svg)](https://amsavarthan.github.io)
+[![Hify](https://forthebadge.com/images/badges/built-with-love.svg)](https://amsavarthan.github.io)
+[![Hify](https://forthebadge.com/images/badges/built-for-android.svg)](https://amsavarthan.github.io)
 
 <br>
 
@@ -63,60 +63,60 @@ Part - 2 : [Deploying to Firebase Cloud Functions](https://youtu.be/3fBiSJB-i_E)
     <tr>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Feed.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Light%20Feed.png"
         />
       </td>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Feed.png"
-        />
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Discover.png"
-        />
-      </td>
-      <td>
-        <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Discover.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Dark%20Feed.png"
         />
       </td>
     </tr>
     <tr>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Friends.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Light%20Discover.png"
         />
       </td>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Friends.png"
-        />
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Message.png"
-        />
-      </td>
-      <td>
-        <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Message.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Dark%20Discover.png"
         />
       </td>
     </tr>
     <tr>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Light%20Forum.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Light%20Friends.png"
         />
       </td>
       <td>
         <img
-          src="https://github.com/lvamsavarthan/Hify/blob/master/screenshots/Dark%20Forum.png"
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Dark%20Friends.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Light%20Message.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Dark%20Message.png"
+        />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Light%20Forum.png"
+        />
+      </td>
+      <td>
+        <img
+          src="https://github.com/amsavarthan/hify/blob/master/screenshots/Dark%20Forum.png"
         />
       </td>
     </tr>
